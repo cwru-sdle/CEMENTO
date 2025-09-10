@@ -30,6 +30,7 @@ from cemento.utils.io import (
     get_default_prefixes_file,
     get_default_references_folder,
 )
+from cemento.utils.utils import get_graph_root_nodes
 
 
 def read_drawio(
@@ -77,6 +78,7 @@ def read_drawio(
 
     if check_errors:
         print("Checking for diagram errors...")
+        # TODO: write custom error checks specifically for axioms
         errors = find_errors_diagram_content(
             elements,
             term_ids,
@@ -112,6 +114,10 @@ def read_drawio(
     restriction_nodes = filter(lambda node: 'parent' in node[1] and node[1]['parent'] in restriction_container_ids,
                                graph.nodes(data=True))
     restriction_nodes = map(lambda node: node[0], restriction_nodes)
+    base_graph = graph.copy()
+    restriction_graph = graph.subgraph(restriction_nodes).copy()
     graph.remove_nodes_from(list(restriction_nodes))
+    restriction_graph_roots = get_graph_root_nodes(restriction_graph)
+    restriction_in_edges = chain.from_iterable(map(lambda root: base_graph.in_edges(root, data=True), restriction_graph_roots))
     graph = relabel_graph_nodes_with_node_attr(graph, new_attr_label=relabel_key.value)
     return graph
