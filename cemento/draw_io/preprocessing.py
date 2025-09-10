@@ -301,6 +301,7 @@ def map_element_values(
 def find_container_errors_diagram_content(
     elements: dict[str, dict[str, any]],
     containers: dict[str, list[str]],
+    restriction_container_ids: Container[str],
     rel_ids: set[str],
 ) -> list[tuple[str, BaseException]]:
     errors = []
@@ -341,6 +342,7 @@ def find_container_errors_diagram_content(
     floating_containers = (
         set(containers.keys()) - connected_containers - nested_containers
     )
+    floating_containers = filter(lambda container_id: container_id not in restriction_container_ids, floating_containers)
 
     for container_id in floating_containers:
         errors.append((container_id, FloatingContainerError))
@@ -374,6 +376,7 @@ def find_errors_diagram_content(
     serious_only: bool = False,
     containers: dict[str, list[str]] = None,
     container_content: Container[str] = None,
+    restriction_container_ids: Container[str] = None,
     error_exemptions: set[str] = None,
 ) -> list[tuple[str, BaseException]]:
     errors = (
@@ -381,7 +384,7 @@ def find_errors_diagram_content(
             elements, term_ids, rel_ids, container_content
         )
         + find_edge_errors_diagram_content(elements, serious_only=serious_only)
-        + find_container_errors_diagram_content(elements, containers, rel_ids)
+        + find_container_errors_diagram_content(elements, containers, restriction_container_ids, rel_ids)
     )
     if error_exemptions is not None:
         errors = list(
