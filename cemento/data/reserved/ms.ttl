@@ -1,3 +1,5 @@
+Class Expressions
+
 and
 or
 not
@@ -10,6 +12,8 @@ max
 exactly
 that
 
+Frame Keywords
+
 Class
 ObjectProperty
 DataProperty
@@ -18,10 +22,14 @@ Individual
 Datatype
 Ontology
 
+Class Relationship Keywords
+
 SubClassOf
 EquivalentTo
 DisjointWith
 DisjoinUnionOf
+
+Property Relationship Keywords
 
 SubPropertyOf
 EquivalentTo
@@ -31,6 +39,8 @@ Domain
 Range
 Characteristics
 
+Property Characteristics
+
 Functional
 InverseFunctional
 Reflexive
@@ -39,10 +49,14 @@ Symmetric
 Asymmetric
 Transitive
 
+Individual Keywords
+
 Types
 Facts
 SameAs
 DifferentFrom
+
+Facet Keywords (for datatype restrictions)
 
 length
 minLength
@@ -54,10 +68,14 @@ langRange
 >=
 >
 
+Punctutation/Structural
+
 enumerations {}
 grouping ()
 separator ,
 inverse
+
+Special Constants
 
 Thing
 Nothing

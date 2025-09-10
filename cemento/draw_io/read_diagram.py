@@ -5,6 +5,7 @@ import sys
 from more_itertools import partition
 from networkx import DiGraph
 
+from cemento.axioms.transforms import split_restriction_graph
 from cemento.draw_io.constants import BadDiagramError, DiagramKey
 from cemento.draw_io.io import write_error_diagram
 from cemento.draw_io.preprocessing import (
@@ -14,12 +15,9 @@ from cemento.draw_io.preprocessing import (
 from cemento.draw_io.transforms import (
     extract_elements,
     generate_graph,
-    get_container_collection_types,
     get_container_values,
-    link_container_members,
     parse_containers,
     parse_elements,
-    relabel_graph_nodes_with_node_attr,
 )
 from cemento.term_matching.transforms import get_prefixes, get_strat_predicates_str
 from cemento.utils.io import (
@@ -27,7 +25,6 @@ from cemento.utils.io import (
     get_default_prefixes_file,
     get_default_references_folder,
 )
-from cemento.utils.utils import get_graph_root_nodes
 
 
 def read_drawio(
@@ -113,56 +110,12 @@ def read_drawio(
         exempted_elements=error_exemptions,
         inverted_rank_arrow=inverted_rank_arrow,
     )
-    # TODO: transfer to custom function
-    element_containers, restriction_containers = partition(
-        lambda item: item[0] in restriction_container_ids, containers.items()
+    graph, restriction_graph = split_restriction_graph(
+        graph,
+        containers,
+        container_labels,
+        base_restriction_box_ids,
+        restriction_container_ids,
+        relabel_key,
     )
-    element_containers = dict(element_containers)
-    restriction_containers = dict(restriction_containers)
-
-    graph = get_container_collection_types(graph, container_labels, element_containers)
-    graph = link_container_members(graph, element_containers)
-    restriction_nodes = filter(
-        lambda node: "parent" in node[1]
-        and node[1]["parent"] in restriction_container_ids,
-        graph.nodes(data=True),
-    )
-    restriction_nodes = list(map(lambda node: node[0], restriction_nodes))
-    base_graph = graph.copy()
-    restriction_graph = graph.subgraph(restriction_nodes).copy()
-    restriction_graph.remove_nodes_from(base_restriction_box_ids)
-    restriction_containers = {
-        key: value
-        for key, value in restriction_containers.items()
-        if key not in base_restriction_box_ids
-    }
-    restriction_graph = get_container_collection_types(
-        restriction_graph, container_labels, restriction_containers
-    )
-    restriction_graph = link_container_members(
-        restriction_graph, restriction_containers
-    )
-    graph.remove_nodes_from(restriction_nodes)
-    restriction_graph_roots = get_graph_root_nodes(restriction_graph)
-    restriction_in_edges = list(
-        chain.from_iterable(
-            map(
-                lambda root: base_graph.in_edges(root, data=True),
-                restriction_graph_roots,
-            )
-        )
-    )
-    restriction_in_edge_nodes = list(
-        chain.from_iterable(
-            map(lambda nodes: (nodes[0], nodes[1]), restriction_in_edges)
-        )
-    )
-    restriction_graph.add_nodes_from(
-        base_graph.subgraph(restriction_in_edge_nodes).nodes(data=True)
-    )
-    restriction_graph.add_edges_from(restriction_in_edges)
-    relabel_graph = partial(
-        relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
-    )
-    graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
     return graph, restriction_graph

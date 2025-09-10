@@ -287,58 +287,6 @@ def get_container_values(
     }
 
 
-def link_container_members(graph: DiGraph, containers: dict[str, list[str]]) -> DiGraph:
-    graph = graph.copy()
-    for container_id, items in containers.items():
-        for item in items:
-            graph.add_edge(container_id, item, label="mds:hasCollectionMember")
-    return graph
-
-
-def get_container_collection_types(
-    graph: DiGraph, container_labels: dict[str, str], containers: dict[str, list[str]]
-) -> dict[str, str]:
-    graph = graph.copy()
-    for container_id in containers.keys():
-        container_type = container_labels[container_id]
-        if not container_type.strip():
-            container_type = "mds:tripleSyntaxSugar"
-        else:
-            # TODO: move search terms to constants file
-            valid_collection_types = {
-                "owl:unionOf",
-                "owl:intersectionOf",
-                "owl:complementOf",
-                "mds:tripleSyntaxSugar",
-            }
-            container_type, did_substitute = substitute_term(
-                container_type,
-                valid_collection_types,
-            )
-            # TODO: move to error check
-            if not did_substitute:
-                raise ValueError(
-                    f"The provided collection header does not seem to match any of the valid collection types. Choose between: {valid_collection_types} or leaving the header blank."
-                )
-        graph.add_edge(container_type, container_id)
-    return graph
-
-
-def relabel_graph_nodes_with_node_attr(
-    graph: DiGraph, new_attr_label: str = DiagramKey.TERM_ID.value
-) -> DiGraph:
-    node_info = nx.get_node_attributes(graph, new_attr_label)
-    relabel_mapping = {
-        current_node_label: (
-            node_info[current_node_label]
-            if current_node_label in node_info
-            else current_node_label
-        )
-        for current_node_label in graph.nodes
-    }
-    return nx.relabel_nodes(graph, relabel_mapping)
-
-
 def get_non_ranked_strat_edges(graph: DiGraph) -> Iterable[tuple[any, any]]:
     return {
         (subj, obj)
