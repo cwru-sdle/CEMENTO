@@ -74,6 +74,7 @@ def convert_graph_to_rdf_graph(
         defaults_folder: str | Path = None,
         prefixes_path: str | Path = None,
         log_substitution_path: str | Path = None,
+        filter_defaults: bool = True,
 ) -> Graph:
     onto_ref_folder = (
         get_default_references_folder() if not onto_ref_folder else onto_ref_folder
@@ -87,7 +88,6 @@ def convert_graph_to_rdf_graph(
 
     # TODO: reference from constants file once moved
     # TODO: replace with proper-cased terms once substitute issue is resolved
-    print(graph.edges(data=True))
     collection_nodes = get_collection_nodes(graph)
     collection_in_edges = get_collection_in_edges(collection_nodes.keys(), graph)
     collection_in_edge_labels = list(
@@ -374,17 +374,18 @@ def convert_graph_to_rdf_graph(
         predicate_term = data["label"]
         rdf_graph.add((domain_term, predicate_term, range_term))
 
-    # replace predicate types if another type than owl:ObjectProperty is defined
-    rdf_graph = remove_generic_property(rdf_graph, default_property=OWL.ObjectProperty)
+    if filter_defaults:
+        # replace predicate types if another type than owl:ObjectProperty is defined
+        rdf_graph = remove_generic_property(rdf_graph, default_property=OWL.ObjectProperty)
 
-    # remove terms that are already in the default namespace if they are subjects
-    default_terms = list(filterfalse(term_not_in_default_namespace_filter, all_terms))
-    redundant_default_triples = rdf_graph.triples_choices((default_terms, None, None))
-    rdf_graph = reduce(
-        lambda rdf_graph, triple: rdf_graph.remove(triple),
-        redundant_default_triples,
-        rdf_graph,
-    )
+        # remove terms that are already in the default namespace if they are subjects
+        default_terms = list(filterfalse(term_not_in_default_namespace_filter, all_terms))
+        redundant_default_triples = rdf_graph.triples_choices((default_terms, None, None))
+        rdf_graph = reduce(
+            lambda rdf_graph, triple: rdf_graph.remove(triple),
+            redundant_default_triples,
+            rdf_graph,
+        )
 
     return rdf_graph
 
@@ -408,7 +409,7 @@ def convert_graph_to_rdf_file(
         prefixes_path=prefixes_path,
         log_substitution_path=log_substitution_path,
     )
-    # element_rdf_graph = convert_to_rdf_graph(element_graph)
-    restriction_rdf_graph = convert_to_rdf_graph(restriction_graph)
-    # TODO: combine graphs here
-    restriction_rdf_graph.serialize(destination=output_path, format=rdf_format)
+    element_rdf_graph = convert_to_rdf_graph(element_graph)
+    restriction_rdf_graph = convert_to_rdf_graph(restriction_graph, filter_defaults=False)
+    combined_rdf_graph = element_rdf_graph + restriction_rdf_graph
+    combined_rdf_graph.serialize(destination=output_path, format=rdf_format)
