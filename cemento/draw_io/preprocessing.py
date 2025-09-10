@@ -342,7 +342,11 @@ def find_container_errors_diagram_content(
     floating_containers = (
         set(containers.keys()) - connected_containers - nested_containers
     )
-    floating_containers = filter(lambda container_id: container_id not in restriction_container_ids, floating_containers)
+    if restriction_container_ids:
+        floating_containers = filter(
+            lambda container_id: container_id not in restriction_container_ids,
+            floating_containers,
+        )
 
     for container_id in floating_containers:
         errors.append((container_id, FloatingContainerError))
@@ -384,7 +388,9 @@ def find_errors_diagram_content(
             elements, term_ids, rel_ids, container_content
         )
         + find_edge_errors_diagram_content(elements, serious_only=serious_only)
-        + find_container_errors_diagram_content(elements, containers, restriction_container_ids, rel_ids)
+        + find_container_errors_diagram_content(
+            elements, containers, restriction_container_ids, rel_ids
+        )
     )
     if error_exemptions is not None:
         errors = list(

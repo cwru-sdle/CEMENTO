@@ -31,13 +31,13 @@ from cemento.utils.utils import get_graph_root_nodes
 
 
 def read_drawio(
-        input_path: str | Path,
-        onto_ref_folder: str | Path = None,
-        prefixes_file: str | Path = None,
-        defaults_folder: str | Path = None,
-        relabel_key: DiagramKey = DiagramKey.LABEL,
-        check_errors: bool = False,
-        inverted_rank_arrow: bool = False,
+    input_path: str | Path,
+    onto_ref_folder: str | Path = None,
+    prefixes_file: str | Path = None,
+    defaults_folder: str | Path = None,
+    relabel_key: DiagramKey = DiagramKey.LABEL,
+    check_errors: bool = False,
+    inverted_rank_arrow: bool = False,
 ) -> DiGraph:
     prefixes_file = get_default_prefixes_file() if not prefixes_file else prefixes_file
     defaults_folder = (
@@ -66,11 +66,20 @@ def read_drawio(
     # separate container IDs between element and restriction boxes
     # TODO: fuzzy match for owl:Restriction
     base_restriction_box_ids = set(
-        filter(lambda container_id: container_labels[container_id] == "owl:Restriction", containers))
-    restriction_box_content_ids = chain.from_iterable(map(lambda box_id: containers[box_id], base_restriction_box_ids))
-    restriction_box_ids = set(chain(base_restriction_box_ids, restriction_box_content_ids))
+        filter(
+            lambda container_id: container_labels[container_id] == "owl:Restriction",
+            containers,
+        )
+    )
+    restriction_box_content_ids = chain.from_iterable(
+        map(lambda box_id: containers[box_id], base_restriction_box_ids)
+    )
+    restriction_box_ids = set(
+        chain(base_restriction_box_ids, restriction_box_content_ids)
+    )
     element_container_ids, restriction_container_ids = partition(
-        lambda container_id: container_id in restriction_box_ids, containers)
+        lambda container_id: container_id in restriction_box_ids, containers
+    )
     restriction_container_ids = set(restriction_container_ids)
 
     if check_errors:
@@ -105,31 +114,55 @@ def read_drawio(
         inverted_rank_arrow=inverted_rank_arrow,
     )
     # TODO: transfer to custom function
-    element_containers, restriction_containers = partition(lambda item: item[0] in restriction_container_ids, containers.items())
+    element_containers, restriction_containers = partition(
+        lambda item: item[0] in restriction_container_ids, containers.items()
+    )
     element_containers = dict(element_containers)
     restriction_containers = dict(restriction_containers)
 
     graph = get_container_collection_types(graph, container_labels, element_containers)
     graph = link_container_members(graph, element_containers)
     restriction_nodes = filter(
-        lambda node: 'parent' in node[1] and node[1]['parent'] in restriction_container_ids,
-        graph.nodes(data=True)
+        lambda node: "parent" in node[1]
+        and node[1]["parent"] in restriction_container_ids,
+        graph.nodes(data=True),
     )
     restriction_nodes = list(map(lambda node: node[0], restriction_nodes))
     base_graph = graph.copy()
     restriction_graph = graph.subgraph(restriction_nodes).copy()
     restriction_graph.remove_nodes_from(base_restriction_box_ids)
-    restriction_containers = {key:value for key, value in restriction_containers.items() if key not in base_restriction_box_ids}
-    restriction_graph = get_container_collection_types(restriction_graph, container_labels, restriction_containers)
-    restriction_graph = link_container_members(restriction_graph, restriction_containers)
+    restriction_containers = {
+        key: value
+        for key, value in restriction_containers.items()
+        if key not in base_restriction_box_ids
+    }
+    restriction_graph = get_container_collection_types(
+        restriction_graph, container_labels, restriction_containers
+    )
+    restriction_graph = link_container_members(
+        restriction_graph, restriction_containers
+    )
     graph.remove_nodes_from(restriction_nodes)
     restriction_graph_roots = get_graph_root_nodes(restriction_graph)
-    restriction_in_edges = list(chain.from_iterable(
-        map(lambda root: base_graph.in_edges(root, data=True), restriction_graph_roots)
-    ))
-    restriction_in_edge_nodes = list(chain.from_iterable(map(lambda nodes: (nodes[0], nodes[1]), restriction_in_edges)))
-    restriction_graph.add_nodes_from(base_graph.subgraph(restriction_in_edge_nodes).nodes(data=True))
+    restriction_in_edges = list(
+        chain.from_iterable(
+            map(
+                lambda root: base_graph.in_edges(root, data=True),
+                restriction_graph_roots,
+            )
+        )
+    )
+    restriction_in_edge_nodes = list(
+        chain.from_iterable(
+            map(lambda nodes: (nodes[0], nodes[1]), restriction_in_edges)
+        )
+    )
+    restriction_graph.add_nodes_from(
+        base_graph.subgraph(restriction_in_edge_nodes).nodes(data=True)
+    )
     restriction_graph.add_edges_from(restriction_in_edges)
-    relabel_graph = partial(relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value)
+    relabel_graph = partial(
+        relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
+    )
     graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
     return graph, restriction_graph

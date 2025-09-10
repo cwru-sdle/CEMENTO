@@ -88,7 +88,7 @@ def get_graph_reference(
 
 
 def test_graph_generation_basic():
-    graph = read_drawio(diagram_test_files[1], check_errors=True)
+    graph, _ = read_drawio(diagram_test_files[1], check_errors=True)
     ref_path = get_corresponding_ref_file(diagram_test_files[1])["json"]
     ref_nodes, ref_edges = get_graph_reference(ref_path)
     graph_nodes, graph_edges = dict(graph.nodes(data=True)), list(
@@ -129,7 +129,7 @@ def test_graph_generation_basic():
 
 
 def test_graph_generation_advanced():
-    graph = read_drawio(diagram_test_files[2], check_errors=True)
+    graph, _ = read_drawio(diagram_test_files[2], check_errors=True)
     ref_path = get_corresponding_ref_file(diagram_test_files[2])["json"]
     print(ref_path)
     ref_nodes, ref_edges = get_graph_reference(ref_path)
@@ -147,7 +147,7 @@ def test_graph_generation_advanced():
 
 
 def test_rdf_graph_generation():
-    graph = read_drawio(diagram_test_files[2], check_errors=True)
+    graph, _ = read_drawio(diagram_test_files[2], check_errors=True)
     ref_path = get_corresponding_ref_file(diagram_test_files[2])["ttl"]
     prefixes_path = Path(ref_path).parent / "prefixes.json"
 
@@ -159,7 +159,7 @@ def test_rdf_graph_generation():
 
 
 def test_container_rdf_graph_generation():
-    graph = read_drawio(diagram_test_files[3], check_errors=True)
+    graph, _ = read_drawio(diagram_test_files[3], check_errors=True)
     ref_path = get_corresponding_ref_file(diagram_test_files[3])["ttl"]
 
     rdf_graph = convert_graph_to_rdf_graph(graph)

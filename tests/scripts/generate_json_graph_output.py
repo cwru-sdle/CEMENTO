@@ -15,7 +15,7 @@ if __name__ == "__main__":
         "output", help="the path to the input .drawio file", metavar="input_path"
     )
     args = parser.parse_args()
-    graph = read_drawio(args.input, check_errors=True)
+    graph, _ = read_drawio(args.input, check_errors=True)
     with open(args.output, "w") as f:
         json.dump(
             {
