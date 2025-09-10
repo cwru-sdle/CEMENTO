@@ -464,6 +464,7 @@ def add_collection_links_to_graph(
     return graph
 
 
+
 def enforce_camel_case_in_rdf_graph(
     rdf_graph: Graph, terms_to_replace: Iterable[URIRef]
 ):

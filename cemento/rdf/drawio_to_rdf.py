@@ -16,7 +16,7 @@ def convert_drawio_to_rdf(
     collect_domains_ranges: bool = False,
     log_substitution_path: str | Path = None,
 ) -> None:
-    graph = read_drawio(
+    element_graph, restriction_graph = read_drawio(
         input_path,
         onto_ref_folder=onto_ref_folder,
         prefixes_file=prefixes_path,
@@ -24,7 +24,8 @@ def convert_drawio_to_rdf(
         check_errors=check_errors,
     )
     convert_graph_to_rdf_file(
-        graph,
+        element_graph,
+        restriction_graph,
         output_path,
         file_format=file_format,
         onto_ref_folder=onto_ref_folder,

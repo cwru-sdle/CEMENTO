@@ -1,7 +1,7 @@
 from collections import defaultdict
 from copy import deepcopy
 from functools import partial, reduce
-from itertools import chain, filterfalse
+from itertools import chain, filterfalse, starmap
 from pathlib import Path
 
 import networkx as nx
@@ -67,12 +67,12 @@ from cemento.utils.utils import (
 
 
 def convert_graph_to_rdf_graph(
-    graph: DiGraph,
-    collect_domains_ranges: bool = False,
-    onto_ref_folder: str | Path = None,
-    defaults_folder: str | Path = None,
-    prefixes_path: str | Path = None,
-    log_substitution_path: str | Path = None,
+        graph: DiGraph,
+        collect_domains_ranges: bool = False,
+        onto_ref_folder: str | Path = None,
+        defaults_folder: str | Path = None,
+        prefixes_path: str | Path = None,
+        log_substitution_path: str | Path = None,
 ) -> Graph:
     onto_ref_folder = (
         get_default_references_folder() if not onto_ref_folder else onto_ref_folder
@@ -87,6 +87,7 @@ def convert_graph_to_rdf_graph(
     # TODO: reference from constants file once moved
     # TODO: replace with proper-cased terms once substitute issue is resolved
     collection_nodes = get_collection_nodes(graph)
+    collection_subgraph = get_collection_subgraph(graph, collection_nodes)
     collection_in_edges = get_collection_in_edges(collection_nodes.keys(), graph)
     collection_in_edge_labels = list(
         map(
@@ -388,21 +389,24 @@ def convert_graph_to_rdf_graph(
 
 
 def convert_graph_to_rdf_file(
-    graph: DiGraph,
-    output_path: str | Path,
-    file_format: str | RDFFormat = None,
-    collect_domains_ranges: bool = False,
-    onto_ref_folder: str | Path = None,
-    defaults_folder: str | Path = None,
-    prefixes_path: str | Path = None,
-    log_substitution_path: str | Path = None,
+        element_graph: DiGraph,
+        restriction_graph: DiGraph,
+        output_path: str | Path,
+        file_format: str | RDFFormat = None,
+        collect_domains_ranges: bool = False,
+        onto_ref_folder: str | Path = None,
+        defaults_folder: str | Path = None,
+        prefixes_path: str | Path = None,
+        log_substitution_path: str | Path = None,
 ):
     rdf_format = get_rdf_format(output_path, file_format=file_format)
-    rdf_graph = convert_graph_to_rdf_graph(
-        graph,
+    convert_to_rdf_graph = partial(
+        convert_graph_to_rdf_graph,
         onto_ref_folder=onto_ref_folder,
         defaults_folder=defaults_folder,
         prefixes_path=prefixes_path,
         log_substitution_path=log_substitution_path,
     )
-    rdf_graph.serialize(destination=output_path, format=rdf_format)
+    # element_rdf_graph = convert_to_rdf_graph(element_graph)
+    restriction_rdf_graph = convert_to_rdf_graph(restriction_graph)
+    restriction_rdf_graph.serialize(destination=output_path, format=rdf_format)

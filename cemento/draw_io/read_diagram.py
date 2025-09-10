@@ -1,10 +1,8 @@
-import itertools
-from itertools import chain
-import sys
+from functools import partial
 from itertools import chain
 from pathlib import Path
 
-import networkx as nx
+from more_itertools import partition
 from networkx import DiGraph
 
 from cemento.draw_io.constants import BadDiagramError, DiagramKey
@@ -13,7 +11,6 @@ from cemento.draw_io.preprocessing import (
     find_errors_diagram_content,
     get_diagram_error_exemptions,
 )
-from more_itertools import partition
 from cemento.draw_io.transforms import (
     extract_elements,
     generate_graph,
@@ -113,11 +110,13 @@ def read_drawio(
     graph = link_container_members(graph, element_containers)
     restriction_nodes = filter(lambda node: 'parent' in node[1] and node[1]['parent'] in restriction_container_ids,
                                graph.nodes(data=True))
-    restriction_nodes = map(lambda node: node[0], restriction_nodes)
+    restriction_nodes = list(map(lambda node: node[0], restriction_nodes))
     base_graph = graph.copy()
     restriction_graph = graph.subgraph(restriction_nodes).copy()
-    graph.remove_nodes_from(list(restriction_nodes))
+    graph.remove_nodes_from(restriction_nodes)
     restriction_graph_roots = get_graph_root_nodes(restriction_graph)
     restriction_in_edges = chain.from_iterable(map(lambda root: base_graph.in_edges(root, data=True), restriction_graph_roots))
-    graph = relabel_graph_nodes_with_node_attr(graph, new_attr_label=relabel_key.value)
-    return graph
+    restriction_graph.add_edges_from(restriction_in_edges)
+    relabel_graph = partial(relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value)
+    graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
+    return graph, restriction_graph
