@@ -1,3 +1,4 @@
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from functools import partial, reduce
@@ -86,8 +87,8 @@ def convert_graph_to_rdf_graph(
 
     # TODO: reference from constants file once moved
     # TODO: replace with proper-cased terms once substitute issue is resolved
+    print(graph.edges(data=True))
     collection_nodes = get_collection_nodes(graph)
-    collection_subgraph = get_collection_subgraph(graph, collection_nodes)
     collection_in_edges = get_collection_in_edges(collection_nodes.keys(), graph)
     collection_in_edge_labels = list(
         map(
@@ -409,4 +410,5 @@ def convert_graph_to_rdf_file(
     )
     # element_rdf_graph = convert_to_rdf_graph(element_graph)
     restriction_rdf_graph = convert_to_rdf_graph(restriction_graph)
+    # TODO: combine graphs here
     restriction_rdf_graph.serialize(destination=output_path, format=rdf_format)
