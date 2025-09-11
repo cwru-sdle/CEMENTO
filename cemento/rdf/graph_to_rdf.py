@@ -57,6 +57,7 @@ from cemento.utils.io import (
     get_default_prefixes_file,
     get_default_references_folder,
     get_rdf_format,
+    get_reserved_references_folder,
 )
 from cemento.utils.utils import (
     chain_filter,
@@ -68,13 +69,14 @@ from cemento.utils.utils import (
 
 
 def convert_graph_to_rdf_graph(
-        graph: DiGraph,
-        collect_domains_ranges: bool = False,
-        onto_ref_folder: str | Path = None,
-        defaults_folder: str | Path = None,
-        prefixes_path: str | Path = None,
-        log_substitution_path: str | Path = None,
-        filter_defaults: bool = True,
+    graph: DiGraph,
+    collect_domains_ranges: bool = False,
+    onto_ref_folder: str | Path = None,
+    defaults_folder: str | Path = None,
+    prefixes_path: str | Path = None,
+    log_substitution_path: str | Path = None,
+    extra_substitution_paths: list[str | Path] | None = None,
+    filter_defaults: bool = True,
 ) -> Graph:
     onto_ref_folder = (
         get_default_references_folder() if not onto_ref_folder else onto_ref_folder
@@ -84,7 +86,12 @@ def convert_graph_to_rdf_graph(
     )
     prefixes_path = get_default_prefixes_file() if not prefixes_path else prefixes_path
     prefixes, inv_prefixes = get_prefixes(prefixes_path, onto_ref_folder)
-    search_terms = get_search_terms(inv_prefixes, onto_ref_folder, defaults_folder)
+    search_terms = get_search_terms(
+        inv_prefixes,
+        onto_ref_folder,
+        defaults_folder,
+        extra_paths=extra_substitution_paths,
+    )
 
     # TODO: reference from constants file once moved
     # TODO: replace with proper-cased terms once substitute issue is resolved
@@ -376,11 +383,17 @@ def convert_graph_to_rdf_graph(
 
     if filter_defaults:
         # replace predicate types if another type than owl:ObjectProperty is defined
-        rdf_graph = remove_generic_property(rdf_graph, default_property=OWL.ObjectProperty)
+        rdf_graph = remove_generic_property(
+            rdf_graph, default_property=OWL.ObjectProperty
+        )
 
         # remove terms that are already in the default namespace if they are subjects
-        default_terms = list(filterfalse(term_not_in_default_namespace_filter, all_terms))
-        redundant_default_triples = rdf_graph.triples_choices((default_terms, None, None))
+        default_terms = list(
+            filterfalse(term_not_in_default_namespace_filter, all_terms)
+        )
+        redundant_default_triples = rdf_graph.triples_choices(
+            (default_terms, None, None)
+        )
         rdf_graph = reduce(
             lambda rdf_graph, triple: rdf_graph.remove(triple),
             redundant_default_triples,
@@ -391,25 +404,36 @@ def convert_graph_to_rdf_graph(
 
 
 def convert_graph_to_rdf_file(
-        element_graph: DiGraph,
-        restriction_graph: DiGraph,
-        output_path: str | Path,
-        file_format: str | RDFFormat = None,
-        collect_domains_ranges: bool = False,
-        onto_ref_folder: str | Path = None,
-        defaults_folder: str | Path = None,
-        prefixes_path: str | Path = None,
-        log_substitution_path: str | Path = None,
+    element_graph: DiGraph,
+    restriction_graph: DiGraph,
+    output_path: str | Path,
+    file_format: str | RDFFormat = None,
+    collect_domains_ranges: bool = False,
+    onto_ref_folder: str | Path = None,
+    defaults_folder: str | Path = None,
+    prefixes_path: str | Path = None,
+    log_substitution_path: str | Path = None,
 ):
     rdf_format = get_rdf_format(output_path, file_format=file_format)
+    manchester_syntax_ref = get_reserved_references_folder()
     convert_to_rdf_graph = partial(
         convert_graph_to_rdf_graph,
         onto_ref_folder=onto_ref_folder,
         defaults_folder=defaults_folder,
         prefixes_path=prefixes_path,
+        collect_domains_ranges=collect_domains_ranges,
         log_substitution_path=log_substitution_path,
     )
     element_rdf_graph = convert_to_rdf_graph(element_graph)
-    restriction_rdf_graph = convert_to_rdf_graph(restriction_graph, filter_defaults=False)
+    restriction_rdf_graph = convert_to_rdf_graph(
+        restriction_graph,
+        filter_defaults=False,
+        extra_substitution_paths=[manchester_syntax_ref],
+    )
+
+    # Process restriction rdf graph
+    for subj, pred, obj in restriction_rdf_graph:
+        print(subj, pred, obj)
+
     combined_rdf_graph = element_rdf_graph + restriction_rdf_graph
     combined_rdf_graph.serialize(destination=output_path, format=rdf_format)

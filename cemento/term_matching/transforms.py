@@ -291,6 +291,7 @@ def get_search_terms(
     inv_prefixes: dict[URIRef, str],
     onto_ref_folder: str | Path = None,
     defaults_folder: str | Path = None,
+    extra_paths: list[str | Path] | None = None,
 ):
     search_terms = get_search_terms_from_defaults(get_default_namespace_prefixes())
 
@@ -307,6 +308,15 @@ def get_search_terms(
             get_rdf_file_iter(onto_ref_folder),
         )
         search_terms |= merge_dictionaries(file_search_terms)
+
+    # TODO: make more functional using reduce
+    if extra_paths is not None:
+        for extra_path in extra_paths:
+            file_search_terms = map(
+                partial(get_search_terms_from_graph, inv_prefixes=inv_prefixes),
+                get_rdf_file_iter(extra_path),
+            )
+            search_terms |= merge_dictionaries(file_search_terms)
 
     return search_terms
 

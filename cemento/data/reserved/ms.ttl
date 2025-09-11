@@ -1,81 +1,118 @@
-Class Expressions
+@prefix ms: <https://cwrusdle.bitbucket.io/mds/manchester-syntax/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 
-and
-or
-not
-some
-only
-value
-Self
-min
-max
-exactly
-that
+###################### Ontology Information ##############################
+ms:Ontology a owl:Ontology ;
+    rdfs:label "MDS-Onto Manchester Syntax" ;
+    dcterms:creator "Gabriel Obsequio Ponón" ;
+    dcterms:description "A light ontology for the semantic use of manchester syntax keywords in turtle-format-based constructs." ;
+    dcterms:title "MDS-Onto-MS" ;
+    dcterms:license <https://creativecommons.org/licenses/by-sa/4.0/> ;
+    owl:versionInfo "0.1.0" .
 
-Frame Keywords
+### Class Properties
 
-Class
-ObjectProperty
-DataProperty
-AnnotationProperty
-Individual
-Datatype
-Ontology
+ms:and rdf:type rdf:Property .
 
-Class Relationship Keywords
+ms:or rdf:type rdf:Property . 
 
-SubClassOf
-EquivalentTo
-DisjointWith
-DisjoinUnionOf
+ms:not rdf:type rdf:Property . 
 
-Property Relationship Keywords
+ms:some rdf:type rdf:Property . 
 
-SubPropertyOf
-EquivalentTo
-DisjointWith
-InverseOf
-Domain
-Range
-Characteristics
+ms:only rdf:type rdf:Property . 
 
-Property Characteristics
+ms:value rdf:type rdf:Property . 
 
-Functional
-InverseFunctional
-Reflexive
-Irreflexive
-Symmetric
-Asymmetric
-Transitive
+ms:Self rdf:type rdf:Property . 
 
-Individual Keywords
+ms:min rdf:type rdf:Property . 
 
-Types
-Facts
-SameAs
-DifferentFrom
+ms:max rdf:type rdf:Property . 
 
-Facet Keywords (for datatype restrictions)
+ms:exactly rdf:type rdf:Property . 
 
-length
-minLength
-maxLength
-pattern
-langRange
-<=
-<
->=
->
+ms:that rdf:type rdf:Property .
 
-Punctutation/Structural
+#Class Relationship Keywords
+#
+#SubClassOf
+#EquivalentTo
+#DisjointWith
+#DisjoinUnionOf
 
-enumerations {}
-grouping ()
-separator ,
-inverse
+#Property Relationship Keywords
+#
+#SubPropertyOf
+#EquivalentTo
+#DisjointWith
+#InverseOf
+#Domain
+#Range
+#Characteristics
 
-Special Constants
+### Property Characteristics
 
-Thing
-Nothing
+ms:Functional rdf:type owl:ObjectProperty . 
+
+ms:InverseFunctional rdf:type owl:ObjectProperty . 
+
+ms:Reflexive rdf:type owl:ObjectProperty . 
+
+ms:Irreflexive rdf:type owl:ObjectProperty . 
+
+ms:Symmetric rdf:type owl:ObjectProperty . 
+
+ms:Asymmetric rdf:type owl:ObjectProperty . 
+
+ms:Transitive rdf:type owl:ObjectProperty . 
+
+
+### Individual Keywords
+
+##Types
+#Facts
+ms:SameAs rdf:type owl:AnnotationProperty . 
+
+ms:DifferentFrom rdf:type owl:AnnotationProperty . 
+
+### Facet Keywords (for datatype restrictions)
+
+xsd:length rdf:type owl:DatatypeProperty .
+
+xsd:minLength rdf:type owl:DatatypeProperty .
+
+xsd:maxLength rdf:type owl:DatatypeProperty .
+
+xsd:pattern rdf:type owl:DatatypeProperty .
+
+rdf:langRange rdf:type owl:AnnotationProperty .
+
+xsd:minInclusive rdf:type owl:DatatypeProperty .
+
+xsd:maxInclusive rdf:type owl:DatatypeProperty .
+
+xsd:minExclusive rdf:type owl:DatatypeProperty .
+
+xsd:maxExclusive rdf:type owl:DatatypeProperty .
+
+#<=
+#<
+#>=
+#>
+
+#Punctutation/Structural
+#
+#enumerations {}
+#grouping ()
+#separator ,
+#inverse
+#
+#Special Constants
+#
+#Thing
+#Nothing
