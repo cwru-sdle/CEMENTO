@@ -2,8 +2,10 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ms: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 ###################### Ontology Information ##############################
 ms:Ontology a owl:Ontology ;
@@ -38,6 +40,13 @@ ms:exactly rdf:type rdf:Property .
 
 ms:that rdf:type rdf:Property .
 
+# contrived reserved keywords
+
+ms:onClass rdf:type rdf:Property ;
+    skos:exactMatch owl:onClass .
+
+ms:of rdf:type rdf:Property ;
+    skos:exactMatch owl:onClass .
 #Class Relationship Keywords
 #
 #SubClassOf
@@ -82,23 +91,31 @@ ms:DifferentFrom rdf:type owl:AnnotationProperty .
 
 ### Facet Keywords (for datatype restrictions)
 
-xsd:length rdf:type owl:DatatypeProperty .
+ms:length rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:length .
 
-xsd:minLength rdf:type owl:DatatypeProperty .
+ms:minLength rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:minLength .
 
-xsd:maxLength rdf:type owl:DatatypeProperty .
+ms:maxLength rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:maxLength .
 
-xsd:pattern rdf:type owl:DatatypeProperty .
+ms:pattern rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:pattern .
 
 rdf:langRange rdf:type owl:AnnotationProperty .
 
-xsd:minInclusive rdf:type owl:DatatypeProperty .
+ms:minInclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:minInclusive .
 
-xsd:maxInclusive rdf:type owl:DatatypeProperty .
+ms:maxInclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:maxInclusive .
 
-xsd:minExclusive rdf:type owl:DatatypeProperty .
+ms:minExclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:minExclusive .
 
-xsd:maxExclusive rdf:type owl:DatatypeProperty .
+ms:maxExclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:maxExclusive .
 
 #<=
 #<

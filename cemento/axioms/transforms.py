@@ -7,6 +7,7 @@ from cemento.term_matching.transforms import substitute_term
 from itertools import chain
 from functools import partial
 from cemento.utils.utils import get_graph_root_nodes
+from cemento.axioms.modules import MS
 
 
 def relabel_graph_nodes_with_node_attr(
