@@ -5,7 +5,7 @@ import sys
 from more_itertools import partition
 from networkx import DiGraph
 
-from cemento.axioms.transforms import split_restriction_graph
+from cemento.axioms.transforms import split_restriction_graph, split_container_ids
 from cemento.draw_io.constants import BadDiagramError, DiagramKey
 from cemento.draw_io.io import write_error_diagram
 from cemento.draw_io.preprocessing import (
@@ -60,24 +60,10 @@ def read_drawio(
 
     error_exemptions = get_diagram_error_exemptions(non_container_elements)
 
-    # separate container IDs between element and restriction boxes
-    # TODO: fuzzy match for owl:Restriction
-    base_restriction_box_ids = set(
-        filter(
-            lambda container_id: container_labels[container_id] == "owl:Restriction",
-            containers,
-        )
+    base_restriction_box_ids, restriction_container_ids = split_container_ids(
+        container_labels,
+        containers,
     )
-    restriction_box_content_ids = chain.from_iterable(
-        map(lambda box_id: containers[box_id], base_restriction_box_ids)
-    )
-    restriction_box_ids = set(
-        chain(base_restriction_box_ids, restriction_box_content_ids)
-    )
-    element_container_ids, restriction_container_ids = partition(
-        lambda container_id: container_id in restriction_box_ids, containers
-    )
-    restriction_container_ids = set(restriction_container_ids)
 
     if check_errors:
         print("Checking for diagram errors...")

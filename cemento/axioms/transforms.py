@@ -61,6 +61,31 @@ def get_container_collection_types(
     return graph
 
 
+def split_container_ids(
+    container_labels: dict[str, str],
+    containers: dict[str, list[str]],
+) -> tuple[set[str], set[str]]:
+    # separate container IDs between element and restriction boxes
+    # TODO: fuzzy match for owl:Restriction
+    base_restriction_box_ids = set(
+        filter(
+            lambda container_id: container_labels[container_id] == "owl:Restriction",
+            containers,
+        )
+    )
+    restriction_box_content_ids = chain.from_iterable(
+        map(lambda box_id: containers[box_id], base_restriction_box_ids)
+    )
+    restriction_box_ids = set(
+        chain(base_restriction_box_ids, restriction_box_content_ids)
+    )
+    restriction_container_ids = filter(
+        lambda container_id: container_id in restriction_box_ids, containers
+    )
+    restriction_container_ids = set(restriction_container_ids)
+    return base_restriction_box_ids, restriction_container_ids
+
+
 def split_restriction_graph(
     graph: DiGraph,
     containers: dict[str, list[str]],
