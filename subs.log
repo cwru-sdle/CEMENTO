@@ -1,0 +1,3 @@
+,original_term,search_key,search_result,score,matched_term
+0,equivalentTo,equivalentTo,xsd:EquivalentTo,86,http://www.w3.org/2001/XMLSchema#EquivalentTo
+1,equivalentTo,mds:EquivalentTo,xsd:EquivalentTo,88,http://www.w3.org/2001/XMLSchema#EquivalentTo

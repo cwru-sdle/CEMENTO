@@ -6,45 +6,39 @@ class MS(DefinedNamespace):
 
     _fail = True
 
-    Length: URIRef
-    MinInclusive: URIRef
-    SameAs: URIRef
-    InverseFunctional: URIRef
-    OnClass: URIRef
-    Value: URIRef
-    LangRange: URIRef
-    Max: URIRef
-    MaxLength: URIRef
-    MaxInclusive: URIRef
-    Ontology: URIRef
+    max: URIRef
+    Irreflexive: URIRef
+    Reflexive: URIRef
+    belongsTo: URIRef
+    DifferentFrom: URIRef
+    maxLength: URIRef
+    only: URIRef
+    minExclusive: URIRef
+    exactly: URIRef
+    length: URIRef
+    maxExclusive: URIRef
+    minLength: URIRef
+    minInclusive: URIRef
+    some: URIRef
     Ontology: URIRef
     Or: URIRef
-    Irreflexive: URIRef
-    And: URIRef
-    Only: URIRef
-    Transitive: URIRef
-    Exactly: URIRef
-    Min: URIRef
-    MinExclusive: URIRef
-    OnClass: URIRef
-    Ontology: URIRef
-    MinLength: URIRef
-    Ontology: URIRef
-    Not: URIRef
+    value: URIRef
     Asymmetric: URIRef
-    Ontology: URIRef
-    Symmetric: URIRef
-    Some: URIRef
+    langRange: URIRef
     Functional: URIRef
-    Of: URIRef
-    MaxExclusive: URIRef
-    Reflexive: URIRef
-    Pattern: URIRef
-    Of: URIRef
-    Ontology: URIRef
-    DifferentFrom: URIRef
-    Ontology: URIRef
-    That: URIRef
+    IntroTerm: URIRef
+    Transitive: URIRef
+    that: URIRef
+    maxInclusive: URIRef
+    pattern: URIRef
+    Not: URIRef
+    SameAs: URIRef
+    min: URIRef
+    onClass: URIRef
+    Symmetric: URIRef
+    InverseFunctional: URIRef
     Self: URIRef
+    And: URIRef
+    of: URIRef
 
-    _NS = Namespace("http://www.w3.org/2001/XMLSchema#")
+    _NS = Namespace("https://cwrusdle.bitbucket.io/mds/manchester-syntax/")

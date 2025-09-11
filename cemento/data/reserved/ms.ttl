@@ -2,7 +2,6 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix ms: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -18,11 +17,11 @@ ms:Ontology a owl:Ontology ;
 
 ### Class Properties
 
-ms:and rdf:type rdf:Property .
+ms:And rdf:type rdf:Property .
 
-ms:or rdf:type rdf:Property . 
+ms:Or rdf:type rdf:Property .
 
-ms:not rdf:type rdf:Property . 
+ms:Not rdf:type rdf:Property .
 
 ms:some rdf:type rdf:Property . 
 
@@ -47,10 +46,17 @@ ms:onClass rdf:type rdf:Property ;
 
 ms:of rdf:type rdf:Property ;
     skos:exactMatch owl:onClass .
+
+ms:IntroTerm rdf:type owl:Class .
+
+ms:belongsTo rdf:type owl:ObjectProperty .
+
+#ms:equivalentTo rdf:type rdf:Property ;
+#    skos:exactMatch owl:equivalentClass .
+
 #Class Relationship Keywords
 #
-#SubClassOf
-#EquivalentTo
+##SubClassOf
 #DisjointWith
 #DisjoinUnionOf
 

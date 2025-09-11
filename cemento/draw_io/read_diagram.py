@@ -64,6 +64,7 @@ def read_drawio(
         container_labels,
         containers,
     )
+    all_restriction_container_ids = base_restriction_box_ids | restriction_container_ids
 
     if check_errors:
         print("Checking for diagram errors...")
@@ -75,7 +76,7 @@ def read_drawio(
             serious_only=True,
             containers=containers,
             container_content=container_content,
-            restriction_container_ids=restriction_container_ids,
+            restriction_container_ids=all_restriction_container_ids,
             error_exemptions=error_exemptions,
         )
         if errors:

@@ -11,6 +11,7 @@ from more_itertools import unique_everseen
 from networkx import DiGraph
 from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, URIRef
 
+from cemento.axioms.transforms import expand_axiom_terms
 from cemento.rdf.filters import term_in_search_results, term_not_in_default_namespace
 from cemento.rdf.io import (
     get_diagram_terms_iter,
@@ -76,6 +77,7 @@ def convert_graph_to_rdf_graph(
     prefixes_path: str | Path = None,
     log_substitution_path: str | Path = None,
     extra_substitution_paths: list[str | Path] | None = None,
+    default_prefix_for_unassigned: str = "mds",
     filter_defaults: bool = True,
 ) -> Graph:
     onto_ref_folder = (
@@ -152,7 +154,7 @@ def convert_graph_to_rdf_graph(
         inv_prefixes,
     )
 
-    # get the list of terms from which to consruct URIRefs and Literals and create them
+    # get the list of terms from which to construct URIRefs and Literals and create them
     construct_term_inputs = list(
         filter(
             lambda x: fst(x) not in literal_terms,
@@ -169,7 +171,11 @@ def convert_graph_to_rdf_graph(
                 lambda term_info: (
                     fst(term_info),
                     construct_term_uri(
-                        *get_abbrev_term(fst(term_info), is_predicate=snd(term_info)),
+                        *get_abbrev_term(
+                            fst(term_info),
+                            is_predicate=snd(term_info),
+                            default_prefix=default_prefix_for_unassigned,
+                        ),
                         prefixes=prefixes,
                     ),
                 ),
@@ -252,6 +258,13 @@ def convert_graph_to_rdf_graph(
     for triple in collection_triples:
         rdf_graph.add(triple)
 
+    # print("triples")
+    # print(collection_triples)
+    # print("incoming")
+    # print(collection_in_edges)
+    # print("targets")
+    # print(collection_targets)
+    # print()
     graph = add_collection_links_to_graph(
         collection_in_edges, collection_targets, graph
     )
@@ -432,8 +445,7 @@ def convert_graph_to_rdf_file(
     )
 
     # Process restriction rdf graph
-    for subj, pred, obj in restriction_rdf_graph:
-        print(subj, pred, obj)
+    restriction_rdf_graph = expand_axiom_terms(restriction_rdf_graph)
 
     combined_rdf_graph = element_rdf_graph + restriction_rdf_graph
     combined_rdf_graph.serialize(destination=output_path, format=rdf_format)

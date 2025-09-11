@@ -30,7 +30,7 @@ if __name__ == "__main__":
         f.write(textwrap.dedent(header))
 
         subj_terms = map(lambda term: split_uri(term)[1], filter(lambda term: isinstance(term, URIRef), g.subjects()))
-        for subj_term in subj_terms:
-            f.write(f"{tab}{subj_term[0].upper() + subj_term[1:]}: URIRef\n")
+        for subj_term in set(subj_terms):
+            f.write(f"{tab}{subj_term}: URIRef\n")
         f.write('\n')
         f.write(f'{tab}_NS = Namespace("{onto_term_uri}")')

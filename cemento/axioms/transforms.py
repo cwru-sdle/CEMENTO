@@ -1,3 +1,9 @@
+from pprint import pprint
+import sys
+
+from more_itertools.recipes import flatten
+from rdflib import Graph
+from rdflib.namespace import RDF, SKOS
 from networkx import DiGraph
 import networkx as nx
 from cemento.draw_io.constants import DiagramKey
@@ -74,16 +80,18 @@ def split_container_ids(
             containers,
         )
     )
-    restriction_box_content_ids = chain.from_iterable(
-        map(lambda box_id: containers[box_id], base_restriction_box_ids)
+    restriction_container_graph = nx.DiGraph()
+    restriction_container_graph.add_edges_from(
+        {(key, value) for key, values in containers.items() for value in values}
     )
-    restriction_box_ids = set(
-        chain(base_restriction_box_ids, restriction_box_content_ids)
+    restriction_container_ids = set(
+        flatten(
+            map(
+                lambda box_id: nx.descendants(restriction_container_graph, box_id),
+                base_restriction_box_ids,
+            )
+        )
     )
-    restriction_container_ids = filter(
-        lambda container_id: container_id in restriction_box_ids, containers
-    )
-    restriction_container_ids = set(restriction_container_ids)
     return base_restriction_box_ids, restriction_container_ids
 
 
@@ -98,6 +106,7 @@ def split_restriction_graph(
     element_containers, restriction_containers = partition(
         lambda item: item[0] in restriction_container_ids, containers.items()
     )
+    print(restriction_container_ids)
     element_containers = dict(element_containers)
     restriction_containers = dict(restriction_containers)
 
@@ -142,9 +151,30 @@ def split_restriction_graph(
         base_graph.subgraph(restriction_in_edge_nodes).nodes(data=True)
     )
     restriction_graph.add_edges_from(restriction_in_edges)
+    for subj, _, _ in restriction_in_edges:
+        restriction_graph.add_edge(subj, "ms:introTerm", label="ms:belongsTo")
+
     relabel_graph = partial(
         relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
     )
     graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
 
     return graph, restriction_graph
+
+
+def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
+    graph = nx.DiGraph()
+    intro_terms = list(restriction_rdf_graph.subjects(MS.belongsTo, MS.IntroTerm))
+    # restriction_rdf_graph.remove((None, RDF.type, None))
+    # restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
+    # restriction_rdf_graph.remove((None, MS.belongsTo, None))
+    graph.add_edges_from(
+        ((subj, obj, {"label": pred}) for subj, pred, obj in restriction_rdf_graph)
+    )
+    restriction_rdf_graph.serialize("intermediate.ttl", format="turtle")
+    # # for term in intro_terms:
+    # for subj, obj in nx.dfs_edges(graph):
+    #     pred = graph[subj][obj].get('label', None)
+    #     print(subj, pred, obj)
+
+    return restriction_rdf_graph
