@@ -9,7 +9,7 @@ from cemento.draw_io.constants import DiagramKey
 from collections.abc import Container
 from more_itertools import partition
 from cemento.term_matching.transforms import substitute_term
-from itertools import chain
+from itertools import chain, product
 from functools import partial
 from cemento.utils.utils import get_graph_root_nodes
 from cemento.axioms.modules import MS
@@ -28,14 +28,6 @@ def relabel_graph_nodes_with_node_attr(
         for current_node_label in graph.nodes
     }
     return nx.relabel_nodes(graph, relabel_mapping)
-
-
-def link_container_members(graph: DiGraph, containers: dict[str, list[str]]) -> DiGraph:
-    graph = graph.copy()
-    for container_id, items in containers.items():
-        for item in items:
-            graph.add_edge(container_id, item, label="mds:hasCollectionMember")
-    return graph
 
 
 def get_container_collection_types(
@@ -108,9 +100,10 @@ def split_restriction_graph(
     )
     element_containers = dict(element_containers)
     restriction_containers = dict(restriction_containers)
-    for container_id, items in containers.items():
-        for item in items:
-            graph.add_edge(container_id, item, label="mds:hasCollectionMember")
+    collection_edges = list(
+        flatten(map(lambda item: list(product([item[0]], item[1])), containers.items()))
+    )
+    graph.add_edges_from(collection_edges, label="mds:hasCollectionMember")
     graph.remove_nodes_from(base_restriction_box_ids)
     graph = get_container_collection_types(graph, container_labels, element_containers)
     restriction_nodes = filter(
