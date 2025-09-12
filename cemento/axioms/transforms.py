@@ -1,7 +1,8 @@
 import sys
+from pprint import pprint
 
 from more_itertools.recipes import flatten
-from rdflib import Graph
+from rdflib import Graph, BNode
 from rdflib.namespace import RDF, SKOS
 from networkx import DiGraph
 import networkx as nx
@@ -9,7 +10,7 @@ from cemento.draw_io.constants import DiagramKey
 from collections.abc import Container
 from more_itertools import partition
 from cemento.term_matching.transforms import substitute_term
-from itertools import chain, product
+from itertools import chain, product, filterfalse
 from functools import partial
 from cemento.utils.utils import get_graph_root_nodes
 from cemento.axioms.modules import MS
@@ -159,13 +160,13 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     restriction_rdf_graph.remove((None, RDF.type, None))
     restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
     restriction_rdf_graph.remove((None, MS.belongsTo, None))
-    graph.add_edges_from(
-        ((subj, obj, {"label": pred}) for subj, pred, obj in restriction_rdf_graph)
-    )
+    graph_triples = ((subj, obj, {'label': pred}) for subj, pred, obj in restriction_rdf_graph)
+    graph_triples = filterfalse(lambda triple: isinstance(triple[0], BNode), graph_triples)
+    graph.add_edges_from(list(graph_triples))
+    graph.edges(data=True)
     restriction_rdf_graph.serialize("intermediate.ttl", format="turtle")
-    # # for term in intro_terms:
-    # for subj, obj in nx.dfs_edges(graph):
-    #     pred = graph[subj][obj].get('label', None)
-    #     print(subj, pred, obj)
+    print(intro_terms)
+    pprint(list((subj, obj, data.get('label', None)) for subj, obj, data in graph.edges(data=True)))
 
+    # initiate chain
     return restriction_rdf_graph
