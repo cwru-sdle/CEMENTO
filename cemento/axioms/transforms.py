@@ -1,4 +1,3 @@
-from pprint import pprint
 import sys
 
 from more_itertools.recipes import flatten
@@ -92,6 +91,7 @@ def split_container_ids(
             )
         )
     )
+    restriction_container_ids.update(base_restriction_box_ids)
     return base_restriction_box_ids, restriction_container_ids
 
 
@@ -100,27 +100,28 @@ def split_restriction_graph(
     containers: dict[str, list[str]],
     container_labels: dict[str, str],
     base_restriction_box_ids: set[str],
-    restriction_container_ids: Container[str],
+    restriction_container_ids: set[str],
     relabel_key: DiagramKey = DiagramKey.LABEL,
 ):
     element_containers, restriction_containers = partition(
         lambda item: item[0] in restriction_container_ids, containers.items()
     )
-    print(restriction_container_ids)
     element_containers = dict(element_containers)
     restriction_containers = dict(restriction_containers)
-
+    for container_id, items in containers.items():
+        for item in items:
+            graph.add_edge(container_id, item, label="mds:hasCollectionMember")
+    graph.remove_nodes_from(base_restriction_box_ids)
     graph = get_container_collection_types(graph, container_labels, element_containers)
-    graph = link_container_members(graph, element_containers)
     restriction_nodes = filter(
         lambda node: "parent" in node[1]
         and node[1]["parent"] in restriction_container_ids,
         graph.nodes(data=True),
     )
-    restriction_nodes = list(map(lambda node: node[0], restriction_nodes))
+    restriction_nodes = set(map(lambda node: node[0], restriction_nodes))
+    restriction_nodes.update(restriction_container_ids)
     base_graph = graph.copy()
     restriction_graph = graph.subgraph(restriction_nodes).copy()
-    restriction_graph.remove_nodes_from(base_restriction_box_ids)
     restriction_containers = {
         key: value
         for key, value in restriction_containers.items()
@@ -128,9 +129,6 @@ def split_restriction_graph(
     }
     restriction_graph = get_container_collection_types(
         restriction_graph, container_labels, restriction_containers
-    )
-    restriction_graph = link_container_members(
-        restriction_graph, restriction_containers
     )
     graph.remove_nodes_from(restriction_nodes)
     restriction_graph_roots = get_graph_root_nodes(restriction_graph)
@@ -165,9 +163,9 @@ def split_restriction_graph(
 def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     graph = nx.DiGraph()
     intro_terms = list(restriction_rdf_graph.subjects(MS.belongsTo, MS.IntroTerm))
-    # restriction_rdf_graph.remove((None, RDF.type, None))
-    # restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
-    # restriction_rdf_graph.remove((None, MS.belongsTo, None))
+    restriction_rdf_graph.remove((None, RDF.type, None))
+    restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
+    restriction_rdf_graph.remove((None, MS.belongsTo, None))
     graph.add_edges_from(
         ((subj, obj, {"label": pred}) for subj, pred, obj in restriction_rdf_graph)
     )

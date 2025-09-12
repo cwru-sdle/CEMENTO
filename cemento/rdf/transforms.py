@@ -1,3 +1,4 @@
+from pprint import pprint
 import re
 from collections.abc import Callable, Iterable
 from functools import reduce

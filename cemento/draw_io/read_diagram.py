@@ -2,6 +2,8 @@ from functools import partial
 from itertools import chain
 from pathlib import Path
 import sys
+from pprint import pprint
+
 from more_itertools import partition
 from networkx import DiGraph
 
@@ -64,7 +66,6 @@ def read_drawio(
         container_labels,
         containers,
     )
-    all_restriction_container_ids = base_restriction_box_ids | restriction_container_ids
 
     if check_errors:
         print("Checking for diagram errors...")
@@ -76,7 +77,7 @@ def read_drawio(
             serious_only=True,
             containers=containers,
             container_content=container_content,
-            restriction_container_ids=all_restriction_container_ids,
+            restriction_container_ids=restriction_container_ids,
             error_exemptions=error_exemptions,
         )
         if errors:

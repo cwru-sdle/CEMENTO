@@ -4,6 +4,7 @@ from copy import deepcopy
 from functools import partial, reduce
 from itertools import chain, filterfalse, starmap
 from pathlib import Path
+from pprint import pprint
 
 import networkx as nx
 import rdflib
@@ -257,14 +258,6 @@ def convert_graph_to_rdf_graph(
 
     for triple in collection_triples:
         rdf_graph.add(triple)
-
-    # print("triples")
-    # print(collection_triples)
-    # print("incoming")
-    # print(collection_in_edges)
-    # print("targets")
-    # print(collection_targets)
-    # print()
     graph = add_collection_links_to_graph(
         collection_in_edges, collection_targets, graph
     )
