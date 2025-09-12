@@ -6,39 +6,40 @@ class MS(DefinedNamespace):
 
     _fail = True
 
-    max: URIRef
-    Irreflexive: URIRef
-    Reflexive: URIRef
-    belongsTo: URIRef
-    DifferentFrom: URIRef
-    maxLength: URIRef
-    only: URIRef
-    minExclusive: URIRef
+    that: URIRef
+    SameAs: URIRef
+    pattern: URIRef
     exactly: URIRef
-    length: URIRef
-    maxExclusive: URIRef
+    Ontology: URIRef
+    max: URIRef
+    Transitive: URIRef
+    some: URIRef
+    Reflexive: URIRef
+    DifferentFrom: URIRef
+    only: URIRef
+    Symmetric: URIRef
+    belongsTo: URIRef
+    of: URIRef
+    IntroTerm: URIRef
+    equivalentTo: URIRef
+    maxInclusive: URIRef
+    min: URIRef
+    langRange: URIRef
+    InverseFunctional: URIRef
+    Or: URIRef
+    Irreflexive: URIRef
+    onClass: URIRef
+    Self: URIRef
     minLength: URIRef
     minInclusive: URIRef
-    some: URIRef
-    Ontology: URIRef
-    Or: URIRef
-    value: URIRef
-    Asymmetric: URIRef
-    langRange: URIRef
     Functional: URIRef
-    IntroTerm: URIRef
-    Transitive: URIRef
-    that: URIRef
-    maxInclusive: URIRef
-    pattern: URIRef
-    Not: URIRef
-    SameAs: URIRef
-    min: URIRef
-    onClass: URIRef
-    Symmetric: URIRef
-    InverseFunctional: URIRef
-    Self: URIRef
+    value: URIRef
+    minExclusive: URIRef
+    maxLength: URIRef
+    maxExclusive: URIRef
     And: URIRef
-    of: URIRef
+    Not: URIRef
+    Asymmetric: URIRef
+    length: URIRef
 
     _NS = Namespace("https://cwrusdle.bitbucket.io/mds/manchester-syntax/")

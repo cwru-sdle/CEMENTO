@@ -1,9 +1,11 @@
 import sys
+from pkgutil import extend_path
 from pprint import pprint
 
+import rdflib
 from more_itertools.recipes import flatten
 from rdflib import Graph, BNode
-from rdflib.namespace import RDF, SKOS
+from rdflib.namespace import RDF, SKOS, OWL
 from networkx import DiGraph
 import networkx as nx
 from cemento.draw_io.constants import DiagramKey
@@ -157,7 +159,7 @@ def split_restriction_graph(
 def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     graph = nx.DiGraph()
     intro_terms = list(restriction_rdf_graph.subjects(MS.belongsTo, MS.IntroTerm))
-    restriction_rdf_graph.remove((None, RDF.type, None))
+    restriction_rdf_graph.remove((None, RDF.type, None)) # TODO: exempt if intro term
     restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
     restriction_rdf_graph.remove((None, MS.belongsTo, None))
     graph_triples = ((subj, obj, {'label': pred}) for subj, pred, obj in restriction_rdf_graph)
@@ -165,8 +167,41 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     graph.add_edges_from(list(graph_triples))
     graph.edges(data=True)
     restriction_rdf_graph.serialize("intermediate.ttl", format="turtle")
-    print(intro_terms)
-    pprint(list((subj, obj, data.get('label', None)) for subj, obj, data in graph.edges(data=True)))
+    # print(intro_terms)
+    # pprint(list((subj, obj, data.get('label', None)) for subj, obj, data in graph.edges(data=True)))
+
+    ms_ttl_term_mapping = {
+        MS.equivalentTo: OWL.equivalentClass,
+        MS.some: OWL.someValuesFrom,
+        MS.of: OWL.onClass,
+        MS.max:OWL.maxQualifiedCardinality,
+    }
 
     # initiate chain
+    # NOTE: the chains only apply to property restrictions!
+    expanded_axiom_rdf_graph = rdflib.Graph()
+    for prefix, namespace_uri in restriction_rdf_graph.namespaces():
+        expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
+    for intro_term in intro_terms:
+        restriction = BNode()
+        for subj, obj in nx.edge_dfs(graph, intro_term):
+            label = graph[subj][obj].get("label", None)
+            if subj == intro_term:
+                ttl_pred = ms_ttl_term_mapping[label]
+                expanded_axiom_rdf_graph.add((intro_term, ttl_pred, restriction))
+                expanded_axiom_rdf_graph.add((restriction, RDF.type, OWL.Restriction))
+                expanded_axiom_rdf_graph.add((restriction, OWL.onProperty, obj))
+            elif label in ms_ttl_term_mapping:
+                ttl_pred = ms_ttl_term_mapping[label]
+                if isinstance(obj, BNode):
+                    relevant_nodes = restriction_rdf_graph.transitive_objects(obj, None)
+                    relevant_nodes = filter(lambda node: isinstance(node, BNode), relevant_nodes)
+                    collection_triples = flatten(map(lambda node: restriction_rdf_graph.triples((node, None, None)), relevant_nodes))
+                    for collection_triple in collection_triples:
+                        expanded_axiom_rdf_graph.add(collection_triple)
+                expanded_axiom_rdf_graph.add((restriction, ttl_pred, obj))
+    expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
+
+    # remove original chain triples
+
     return restriction_rdf_graph
