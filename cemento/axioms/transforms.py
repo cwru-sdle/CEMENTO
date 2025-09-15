@@ -1,11 +1,12 @@
+import re
 import sys
 from pkgutil import extend_path
 from pprint import pprint
 
 import rdflib
-from more_itertools.recipes import flatten
-from rdflib import Graph, BNode
-from rdflib.namespace import RDF, SKOS, OWL
+from more_itertools.recipes import flatten, unique_everseen
+from rdflib import Graph, BNode, Literal, XSD
+from rdflib.namespace import RDF, SKOS, OWL, RDFS
 from networkx import DiGraph
 import networkx as nx
 from cemento.draw_io.constants import DiagramKey
@@ -167,18 +168,20 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     graph.add_edges_from(list(graph_triples))
     graph.edges(data=True)
     restriction_rdf_graph.serialize("intermediate.ttl", format="turtle")
-    # print(intro_terms)
-    # pprint(list((subj, obj, data.get('label', None)) for subj, obj, data in graph.edges(data=True)))
 
+    # TODO: add mapping to exact matches in namespace class generator script
     ms_ttl_term_mapping = {
         MS.equivalentTo: OWL.equivalentClass,
         MS.some: OWL.someValuesFrom,
         MS.of: OWL.onClass,
         MS.max:OWL.maxQualifiedCardinality,
+        MS.min: OWL.minQualifiedCardinality,
+        MS.only: OWL.allValuesFrom,
     }
 
     # initiate chain
     # NOTE: the chains only apply to property restrictions!
+    # TODO: add support for just datatype. Datatype facets for property restrictions are supported.
     expanded_axiom_rdf_graph = rdflib.Graph()
     for prefix, namespace_uri in restriction_rdf_graph.namespaces():
         expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
@@ -189,9 +192,10 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             if subj == intro_term:
                 ttl_pred = ms_ttl_term_mapping[label]
                 expanded_axiom_rdf_graph.add((intro_term, ttl_pred, restriction))
+                print(list(unique_everseen(chain(types, classes))))
                 expanded_axiom_rdf_graph.add((restriction, RDF.type, OWL.Restriction))
                 expanded_axiom_rdf_graph.add((restriction, OWL.onProperty, obj))
-            elif label in ms_ttl_term_mapping:
+            elif label in ms_ttl_term_mapping: # TODO: support turtle value counterpart as well
                 ttl_pred = ms_ttl_term_mapping[label]
                 if isinstance(obj, BNode):
                     relevant_nodes = restriction_rdf_graph.transitive_objects(obj, None)
@@ -199,6 +203,10 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                     collection_triples = flatten(map(lambda node: restriction_rdf_graph.triples((node, None, None)), relevant_nodes))
                     for collection_triple in collection_triples:
                         expanded_axiom_rdf_graph.add(collection_triple)
+                elif isinstance(obj, Literal) and isinstance(obj.value, str) and (match := re.search(r'(.*)\[(.*)\]', obj.value)):
+                    facet = match.group(2)
+                    value = match.group(1).strip()
+                    obj = Literal(value)
                 expanded_axiom_rdf_graph.add((restriction, ttl_pred, obj))
     expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
 

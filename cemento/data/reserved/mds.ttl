@@ -1,0 +1,19 @@
+@prefix ms: <https://cwrusdle.bitbucket.io/mds/manchester-syntax/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mds: <https://cwrusdle.bitbucket.io/mds/> .
+
+###################### Ontology Information ##############################
+mds:Ontology a owl:Ontology .
+
+### Object Properties
+
+mds:enumeration rdf:type owl:ObjectProperty .
+
+mds:tripleSyntaxSugar rdf:type owl:ObjectProperty .
+
+mds:hasCollectionMember rdf:type owl:ObjectProperty .

@@ -112,7 +112,6 @@ def convert_graph_to_rdf_graph(
     nodes_to_remove = set(collection_nodes.keys()) | valid_collection_types
     collection_subgraph = get_collection_subgraph(set(collection_nodes.keys()), graph)
     graph.remove_nodes_from(nodes_to_remove)
-
     aliases = {
         term: aliases
         for term, aliases in map(

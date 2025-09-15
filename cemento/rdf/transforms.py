@@ -11,6 +11,7 @@ from rdflib import OWL, RDF, RDFS, SKOS, XSD, BNode, Graph, Literal, Namespace, 
 from rdflib.collection import Collection
 from rdflib.namespace import split_uri
 
+from cemento.axioms.modules import MDS
 from cemento.rdf.preprocessing import (
     clean_literal_string,
     format_literal,
@@ -19,6 +20,7 @@ from cemento.rdf.preprocessing import (
 from cemento.term_matching.constants import RANK_PROPS
 from cemento.term_matching.transforms import substitute_term_multikey
 from cemento.utils.constants import valid_collection_types
+from cemento.axioms.modules import MS
 from cemento.utils.utils import (
     enforce_camel_case,
     filter_graph,
@@ -372,7 +374,7 @@ def get_collection_in_edges(
         for collection_id in collection_nodes
         for (subj, obj, attr) in graph.in_edges(collection_id, data=True)
         if subj not in valid_collection_types
-        and ("label" not in attr or attr["label"] != "mds:hasCollectionMember")
+        and ("label" not in attr or attr["label"] != "mds:hasCollectionMember") # TODO: convert string comparisons with namespace-class based symbol
     ]
 
 
