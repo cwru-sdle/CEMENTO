@@ -41,5 +41,7 @@ class MS(DefinedNamespace):
     belongsTo: URIRef
     equivalentTo: URIRef
     Reflexive: URIRef
+    forWhich: URIRef
+    RemoveIterNumber: URIRef
 
     _NS = Namespace("https://cwrusdle.bitbucket.io/mds/manchester-syntax/")

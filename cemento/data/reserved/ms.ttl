@@ -55,6 +55,8 @@ ms:belongsTo rdf:type owl:ObjectProperty .
 ms:equivalentTo rdf:type rdf:Property ;
     skos:exactMatch owl:equivalentClass .
 
+ms:forWhich rdf:type rdf:Property .
+
 #Class Relationship Keywords
 #
 ##SubClassOf
