@@ -263,7 +263,9 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             print(subj, obj, pred, label)
             if label == 'forward':
                 if pred == MS.forWhich:
+                    current_node = None
                     continue
+
                 if subj in repeated_combinators and subj not in visited_combinator:
                     comb_subj = next(graph.predecessors(obj))
                     compressed_node = BNode()
@@ -271,12 +273,13 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                     compressed_graph.add_node(compressed_node, **compressed_node_attrs)
                     compressed_nodes[compressed_node] = [subj]
                     visited_combinator.add(subj)
+
                 if obj in repeated_combinators:
                     current_node = None
-                else:
-                    if current_node is None:
-                        current_node = BNode()
-                    compressed_nodes[current_node].append((pred, obj))
+
+                if current_node is None:
+                    current_node = BNode()
+                compressed_nodes[current_node].append((pred, obj))
             else:
                 current_node = None
 
