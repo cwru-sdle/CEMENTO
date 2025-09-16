@@ -1,3 +1,4 @@
+import logging
 import re
 import sys
 from collections import defaultdict
@@ -5,7 +6,8 @@ from pkgutil import extend_path
 from pprint import pprint
 
 import rdflib
-from thefuzz.process import  extractOne
+from more_itertools.more import map_reduce
+from thefuzz.process import extractOne
 from more_itertools.recipes import flatten, unique_everseen
 from rdflib import Graph, BNode, Literal, XSD
 from rdflib.namespace import RDF, SKOS, OWL, RDFS
@@ -155,15 +157,27 @@ def split_restriction_graph(
     repeated_nodes = defaultdict(int)
     combinator_term_add_edges = []
     for node, data in restriction_graph.nodes(data=True):
-        label = data.get('label', None)
+        label = data.get("label", None)
         # TODO: move refs to constants
-        if label is not None and label and (substitute_label := extractOne(label, {"ms:and", "ms:or"}, score_cutoff=90)):
+        if (
+            label is not None
+            and label
+            and (
+                substitute_label := extractOne(
+                    label, {"ms:and", "ms:or"}, score_cutoff=90
+                )
+            )
+        ):
             substitute_label = substitute_label[0]
             substitute_label_value = substitute_label.replace("ms:", "")
             repeated_nodes[substitute_label] += 1
             idx = repeated_nodes[substitute_label]
-            restriction_graph.nodes[node]['label'] = f"ms:combinator-{substitute_label_value}-iter-{idx}"
-            combinator_term_add_edges.append((node, substitute_label, {'label': "skos:exactMatch"}))
+            restriction_graph.nodes[node][
+                "label"
+            ] = f"ms:combinator-{substitute_label_value}-iter-{idx}"
+            combinator_term_add_edges.append(
+                (node, substitute_label, {"label": "skos:exactMatch"})
+            )
     restriction_graph.add_edges_from(combinator_term_add_edges)
     relabel_graph = partial(
         relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
@@ -175,15 +189,25 @@ def split_restriction_graph(
 
 def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     graph = nx.DiGraph()
-    repeated_combinators = restriction_rdf_graph.triples_choices((None, SKOS.exactMatch, [MS.And, MS.Or]))
-    repeated_combinators = filter(lambda triple: triple[0] not in {MS.And, MS.Or}, repeated_combinators)
+    repeated_combinators = restriction_rdf_graph.triples_choices(
+        (None, SKOS.exactMatch, [MS.And, MS.Or])
+    )
+    repeated_combinators = filter(
+        lambda triple: triple[0] not in {MS.And, MS.Or}, repeated_combinators
+    )
     repeated_combinators = {subj: obj for subj, _, obj in repeated_combinators}
+
     intro_terms = list(restriction_rdf_graph.subjects(MS.belongsTo, MS.IntroTerm))
-    restriction_rdf_graph.remove((None, RDF.type, None)) # TODO: exempt if intro term
+
+    restriction_rdf_graph.remove((None, RDF.type, None))  # TODO: exempt if intro term
     restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
     restriction_rdf_graph.remove((None, MS.belongsTo, None))
-    graph_triples = ((subj, obj, {'label': pred}) for subj, pred, obj in restriction_rdf_graph)
-    graph_triples = filterfalse(lambda triple: isinstance(triple[0], BNode), graph_triples)
+    graph_triples = (
+        (subj, obj, {"label": pred}) for subj, pred, obj in restriction_rdf_graph
+    )
+    graph_triples = filterfalse(
+        lambda triple: isinstance(triple[0], BNode), graph_triples
+    )
     graph.add_edges_from(list(graph_triples))
     graph.edges(data=True)
     restriction_rdf_graph.serialize("intermediate.ttl", format="turtle")
@@ -193,7 +217,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
         MS.equivalentTo: OWL.equivalentClass,
         MS.some: OWL.someValuesFrom,
         MS.of: OWL.onClass,
-        MS.max:OWL.maxQualifiedCardinality,
+        MS.max: OWL.maxQualifiedCardinality,
         MS.min: OWL.minQualifiedCardinality,
         MS.only: OWL.allValuesFrom,
     }
@@ -204,17 +228,61 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     expanded_axiom_rdf_graph = rdflib.Graph()
     for prefix, namespace_uri in restriction_rdf_graph.namespaces():
         expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
-    print(intro_terms)
-    stacks = dict()
-    for intro_term in intro_terms:
-        for subj, obj in nx.edge_dfs(graph, intro_term):
-            label = graph[subj][obj].get("label", None)
-            if label == MS.forWhich:
-                combinator_child = graph.
-                stacks[(subj, repeated_combinators[obj])]
 
+    pivot_node_types = dict()
+    pivot_triples = restriction_rdf_graph.triples_choices(
+        (None, MS.forWhich, list(repeated_combinators.keys()))
+    )
+    pivot_node_predicates = map_reduce(
+        pivot_triples,
+        keyfunc=lambda triple: triple[2],
+        valuefunc=lambda triple: restriction_rdf_graph.predicates(triple[2], None),
+    )
+    class_rest_preds = {MS.equivalentTo, RDF.type, RDFS.subClassOf}
+    prop_rest_preds = {MS.max, MS.only, MS.that, MS.exactly, MS.value}
+    # TODO: check that the restriction graph has no floating nodes
+    # TODO: check if the predicates are all the same type as a preprocessing step
+    # TODO: handle unknown case
+    for key, values in pivot_node_predicates.items():
+        type_det_value = next(flatten(values))
+        pred_type = None
+        if type_det_value in class_rest_preds:
+            pred_type = "class"
+        elif type_det_value in prop_rest_preds:
+            pred_type = "prop"
+        pivot_node_types[key] = pred_type
+    compressed_graph = graph.copy()
+    compressed_nodes = defaultdict(list)
+    visited_combinator = set()
+    for intro_term in intro_terms:
+        current_node = None
+        for subj, obj, label in nx.dfs_labeled_edges(graph, intro_term):
+            if subj == obj:
+                continue
+            pred = graph[subj][obj].get("label", None) if subj != obj else None
+            print(subj, obj, pred, label)
+            if label == 'forward':
+                if pred == MS.forWhich:
+                    continue
+                if subj in repeated_combinators and subj not in visited_combinator:
+                    comb_subj = next(graph.predecessors(obj))
+                    compressed_node = BNode()
+                    compressed_node_attrs = {"subject": comb_subj, "combinator": repeated_combinators[subj], "combinator_type": pivot_node_types[subj]}
+                    compressed_graph.add_node(compressed_node, **compressed_node_attrs)
+                    compressed_nodes[compressed_node] = [subj]
+                    visited_combinator.add(subj)
+                if obj in repeated_combinators:
+                    current_node = None
+                else:
+                    if current_node is None:
+                        current_node = BNode()
+                    compressed_nodes[current_node].append((pred, obj))
+            else:
+                current_node = None
+
+    pprint(compressed_nodes)
     # for intro_term in intro_terms:
-    #     restriction = BNode()\
+    #     restriction = BNode()
     #     for subj, obj in nx.edge_dfs(graph, intro_term):
     #         label = graph[subj][obj].get("label", None)
     #         if subj == intro_term:
