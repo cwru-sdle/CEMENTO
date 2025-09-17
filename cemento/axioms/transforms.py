@@ -19,7 +19,7 @@ from more_itertools import partition
 from cemento.term_matching.transforms import substitute_term, get_term_search_keys
 from itertools import chain, product, filterfalse
 from functools import partial
-from cemento.utils.utils import get_graph_root_nodes
+from cemento.utils.utils import get_graph_root_nodes, get_subgraphs
 from cemento.axioms.modules import MS
 
 
@@ -243,15 +243,18 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     # TODO: check that the restriction graph has no floating nodes
     # TODO: check if the predicates are all the same type as a preprocessing step
     # TODO: handle unknown case
-    for key, values in pivot_node_predicates.items():
-        type_det_value = next(flatten(values))
-        pred_type = None
-        if type_det_value in class_rest_preds:
-            pred_type = "class"
-        elif type_det_value in prop_rest_preds:
-            pred_type = "prop"
-        pivot_node_types[key] = pred_type
-    compressed_graph = graph.copy()
+    pivots_with_types = filter(
+        lambda item: (item_type := next(flatten(item[1]))) in class_rest_preds
+        or item_type in prop_rest_preds,
+        pivot_node_predicates.items(),
+    )
+    prop_pivots, class_pivots = partition(
+        lambda item: next(flatten(item[1])) in class_rest_preds, pivots_with_types
+    )
+    prop_pivots = map(lambda item: (item[0], "prop"), prop_pivots)
+    class_pivots = map(lambda item: (item[0], "class"), class_pivots)
+    pivot_node_types = dict(chain(class_pivots, prop_pivots))
+    compressed_graph = nx.DiGraph()
     compressed_nodes = defaultdict(list)
     visited_combinator = set()
     for intro_term in intro_terms:
@@ -260,8 +263,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             if subj == obj:
                 continue
             pred = graph[subj][obj].get("label", None) if subj != obj else None
-            print(subj, obj, pred, label)
-            if label == 'forward':
+            if label == "forward":
                 if pred == MS.forWhich:
                     current_node = None
                     continue
@@ -269,8 +271,36 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 if subj in repeated_combinators and subj not in visited_combinator:
                     comb_subj = next(graph.predecessors(obj))
                     compressed_node = BNode()
-                    compressed_node_attrs = {"subject": comb_subj, "combinator": repeated_combinators[subj], "combinator_type": pivot_node_types[subj]}
+                    compressed_node_attrs = {
+                        "subject": comb_subj,
+                        "combinator": repeated_combinators[subj],
+                        "combinator_type": pivot_node_types[subj],
+                    }
                     compressed_graph.add_node(compressed_node, **compressed_node_attrs)
+                    compressed_graph.add_edges_from(
+                        [
+                            (
+                                compressed_node,
+                                (
+                                    graph[subj][successor].get("label", None),
+                                    successor,
+                                ),
+                            )
+                            for successor in graph.successors(subj)
+                        ]
+                    )
+                    compressed_graph.add_edges_from(
+                        [
+                            (
+                                (
+                                    graph[predecessor][subj].get("label", None),
+                                    predecessor,
+                                ),
+                                compressed_node,
+                            )
+                            for predecessor in graph.predecessors(subj)
+                        ]
+                    )
                     compressed_nodes[compressed_node] = [subj]
                     visited_combinator.add(subj)
 
@@ -283,7 +313,29 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             else:
                 current_node = None
 
-    pprint(compressed_nodes)
+    compressed_node_successor_keyed = {
+        value[0]: key
+        for key, value in compressed_nodes.items()
+        if value[0] not in repeated_combinators
+    }
+    compressed_node_predecessor_keyed = {
+        value[-1]: key
+        for key, value in compressed_nodes.items()
+        if value[0] not in repeated_combinators
+    }
+    compressed_graph = nx.relabel_nodes(
+        compressed_graph, compressed_node_successor_keyed
+    )
+    compressed_graph = nx.relabel_nodes(
+        compressed_graph, compressed_node_predecessor_keyed
+    )
+
+    for tree in get_subgraphs(compressed_graph):
+        for node in nx.dfs_postorder_nodes(tree):
+            print(node)
+        print()
+
+    # pprint([(subj, obj, data.get('label', None)) for subj, obj, data in compressed_graph.edges(data=True)])
     # for intro_term in intro_terms:
     #     restriction = BNode()
     #     for subj, obj in nx.edge_dfs(graph, intro_term):
