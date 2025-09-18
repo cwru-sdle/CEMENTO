@@ -260,6 +260,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     node_containers = defaultdict(list)
     pivot_subjects = dict()
     # FIXME: adjust algorithm to work for simple graphs (graphs without AND or OR)
+    # FIXME: adjust algorithm to treat all nodes distinctly, repeated nodes don't get parsed
     for intro_term in intro_terms:
         combinator_parents = dict()
         current_pivot = None
@@ -297,11 +298,13 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 node_containers[current_node].append((pred, obj))
             print(f"({subj}, {obj})", current_pivot, current_parent, current_node)
 
-    new_node_containers = dict()
-    for key, values in node_containers.items():
-        new_values = list(filter(lambda tuple: tuple[1] != key, values))
-        new_node_containers[key] = new_values
-    node_containers = new_node_containers
+    nx.draw(compressed_graph, with_labels=True)
+    plt.show()
+    # new_node_containers = dict()
+    # for key, values in node_containers.items():
+    #     new_values = list(filter(lambda tuple: tuple[1] != key, values))
+    #     new_node_containers[key] = new_values
+    # node_containers = new_node_containers
     collection_nodes = set(
         filter(lambda node: isinstance(node, BNode), compressed_graph.nodes)
     )
