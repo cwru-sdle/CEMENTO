@@ -1,3 +1,4 @@
+import sys
 from collections import defaultdict
 from functools import partial
 from itertools import chain, product, filterfalse
@@ -5,6 +6,7 @@ from pprint import pprint
 
 import networkx as nx
 import rdflib
+from matplotlib import pyplot as plt
 from more_itertools import partition
 from more_itertools.more import map_reduce, filter_map
 from more_itertools.recipes import flatten
@@ -257,6 +259,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     pivot_nodes = set(repeated_combinators.keys())
     node_containers = defaultdict(list)
     pivot_subjects = dict()
+    # FIXME: adjust algorithm to work for simple graphs (graphs without AND or OR)
     for intro_term in intro_terms:
         combinator_parents = dict()
         current_pivot = None
@@ -292,12 +295,21 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 compressed_graph.add_edge(current_parent, current_node)
             if obj not in pivot_nodes and subj not in pivot_nodes:
                 node_containers[current_node].append((pred, obj))
+            print(f"({subj}, {obj})", current_pivot, current_parent, current_node)
 
+    new_node_containers = dict()
+    for key, values in node_containers.items():
+        new_values = list(filter(lambda tuple: tuple[1] != key, values))
+        new_node_containers[key] = new_values
+    node_containers = new_node_containers
     collection_nodes = set(
         filter(lambda node: isinstance(node, BNode), compressed_graph.nodes)
     )
     node_bnode_mapping = {node: BNode() for node in compressed_graph.nodes}
+    # nx.draw(compressed_graph, with_labels=True)
+    # plt.show()
     compressed_graph = nx.relabel_nodes(compressed_graph, node_bnode_mapping)
+    pprint(node_containers)
     node_containers = {
         node_bnode_mapping[key]: values for key, values in node_containers.items()
     }
