@@ -6,7 +6,7 @@ from pprint import pprint
 import networkx as nx
 import rdflib
 from more_itertools import partition
-from more_itertools.more import map_reduce
+from more_itertools.more import map_reduce, filter_map
 from more_itertools.recipes import flatten
 from networkx import DiGraph
 from rdflib import Graph, BNode
@@ -14,7 +14,7 @@ from rdflib.collection import Collection
 from rdflib.namespace import RDF, SKOS, OWL, RDFS
 from thefuzz.process import extractOne
 
-from cemento.axioms.modules import MS
+from cemento.axioms.modules import MS, MDS
 from cemento.draw_io.constants import DiagramKey
 from cemento.term_matching.transforms import substitute_term
 from cemento.utils.utils import get_graph_root_nodes, get_subgraphs
@@ -306,6 +306,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     for prefix, namespace_uri in restriction_rdf_graph.namespaces():
         expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
     for tree in trees:
+        terms_to_unwrap = dict()
         for node in nx.dfs_postorder_nodes(tree):
             node_data = tree.nodes[node]
             print(node)
@@ -317,7 +318,6 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 ]
                 members = list(tree.successors(node))
                 inner_node = BNode()
-                Collection(expanded_axiom_rdf_graph, inner_node, members)
                 expanded_axiom_rdf_graph.add((node, pivot_combinator, inner_node))
                 if pivot_type == "prop":
                     for member in members:
@@ -329,7 +329,22 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                     conn_pred = node_containers[members[0]][0][0]
                     expanded_axiom_rdf_graph.add((pivot_subject, conn_pred, node))
 
+                # unwrap singular members and add the unwrapped node to the collection
+                members = set(tree.successors(node))
+                members_to_unwrap = members & terms_to_unwrap.keys()
+                members_to_unwrap = set(
+                    map(lambda node: terms_to_unwrap[node], members_to_unwrap)
+                )
+                rem_members = members - terms_to_unwrap.keys()
+                members = list(rem_members | members_to_unwrap)
+                Collection(expanded_axiom_rdf_graph, inner_node, members)
+
             else:  # else, it is a branch
+                if len(node_containers[node]) == 1:
+                    pred, obj = node_containers[node][0]
+                    if pred in class_rest_preds:
+                        terms_to_unwrap[node] = obj
+                        continue
                 expanded_axiom_rdf_graph.add((node, RDF.type, OWL.Restriction))
                 for pred, obj in node_containers[node]:
                     if pred in class_rest_preds:
@@ -354,6 +369,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                         for collection_triple in collection_triples:
                             expanded_axiom_rdf_graph.add(collection_triple)
                     expanded_axiom_rdf_graph.add((node, pred, obj))
+
             pprint(node_containers[node])
             print()
         print("---" * 10)

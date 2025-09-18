@@ -17,3 +17,5 @@ mds:enumeration rdf:type owl:ObjectProperty .
 mds:tripleSyntaxSugar rdf:type owl:ObjectProperty .
 
 mds:hasCollectionMember rdf:type owl:ObjectProperty .
+
+mds:ToUncaseTerm rdf:type owl:AnnotationProperty .
