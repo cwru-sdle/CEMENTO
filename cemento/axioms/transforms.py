@@ -1,28 +1,23 @@
-import logging
-import re
-import sys
 from collections import defaultdict
-from pkgutil import extend_path
-import matplotlib.pyplot as plt
+from functools import partial
+from itertools import chain, product, filterfalse
 from pprint import pprint
 
-import rdflib
-from more_itertools.more import map_reduce
-from sphinx.cmd.quickstart import nonempty
-from thefuzz.process import extractOne
-from more_itertools.recipes import flatten, unique_everseen
-from rdflib import Graph, BNode, Literal, XSD
-from rdflib.namespace import RDF, SKOS, OWL, RDFS
-from networkx import DiGraph
 import networkx as nx
-from cemento.draw_io.constants import DiagramKey
-from collections.abc import Container
+import rdflib
 from more_itertools import partition
-from cemento.term_matching.transforms import substitute_term, get_term_search_keys
-from itertools import chain, product, filterfalse
-from functools import partial
-from cemento.utils.utils import get_graph_root_nodes, get_subgraphs
+from more_itertools.more import map_reduce
+from more_itertools.recipes import flatten
+from networkx import DiGraph
+from rdflib import Graph, BNode
+from rdflib.collection import Collection
+from rdflib.namespace import RDF, SKOS, OWL, RDFS
+from thefuzz.process import extractOne
+
 from cemento.axioms.modules import MS
+from cemento.draw_io.constants import DiagramKey
+from cemento.term_matching.transforms import substitute_term
+from cemento.utils.utils import get_graph_root_nodes, get_subgraphs
 
 
 def relabel_graph_nodes_with_node_attr(
@@ -290,15 +285,49 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 compressed_graph.add_edge(current_parent, current_node)
             if obj not in pivot_nodes and subj not in pivot_nodes:
                 node_containers[current_node].append((pred, obj))
-            print(f"({subj}, {obj})", current_pivot, current_parent, current_node)
 
+    collection_nodes = set(filter(lambda node: isinstance(node, BNode), compressed_graph.nodes))
     node_bnode_mapping = {node: BNode() for node in compressed_graph.nodes}
     compressed_graph = nx.relabel_nodes(compressed_graph, node_bnode_mapping)
     node_containers = {node_bnode_mapping[key]: values for key, values in node_containers.items()}
-    pprint(compressed_graph.nodes(data=True))
-    nx.draw(compressed_graph, with_labels=True)
-    plt.title("Compressed Graph")
-    plt.show()
+    trees = get_subgraphs(compressed_graph)
+    expanded_axiom_rdf_graph = rdflib.Graph()
+    for prefix, namespace_uri in restriction_rdf_graph.namespaces():
+        expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
+    for tree in trees:
+        for node in nx.dfs_postorder_nodes(tree):
+            node_data = tree.nodes[node]
+            print(node)
+            if node_data: # if there is data, it is a combinator
+                pprint(node_data)
+                pivot_type = node_data["type"]
+                pivot_subject = node_data["subject"]
+                pivot_combinator = node_data["combinator"]
+
+                expanded_axiom_rdf_graph.add((node, RDF.type, OWL.Class)) # change depending on type
+                members = list(tree.successors(node))
+                for member in members:
+                    expanded_axiom_rdf_graph.add((member, OWL.onProperty, pivot_subject)) # change depending on type
+                inner_node = BNode()
+                Collection(expanded_axiom_rdf_graph, inner_node, members)
+                expanded_axiom_rdf_graph.add((node, OWL.intersectionOf, inner_node)) # change depending on combinator
+
+            else: # else, it is a branch
+                expanded_axiom_rdf_graph.add((node, RDF.type, OWL.Restriction))
+                for pred, obj in node_containers[node]:
+                    if pred in ms_ttl_term_mapping:
+                        pred = ms_ttl_term_mapping[pred]
+                    if obj in collection_nodes:
+                        relevant_nodes = restriction_rdf_graph.transitive_objects(obj, None)
+                        relevant_nodes = filter(lambda node: isinstance(node, BNode), relevant_nodes)
+                        collection_triples = flatten(map(lambda node: restriction_rdf_graph.triples((node, None, None)), relevant_nodes))
+                        for collection_triple in collection_triples:
+                            expanded_axiom_rdf_graph.add(collection_triple)
+                    expanded_axiom_rdf_graph.add((node, pred, obj))
+            pprint(node_containers[node])
+            print()
+        print("---"*10)
+
     expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
 
     # remove original chain triples
