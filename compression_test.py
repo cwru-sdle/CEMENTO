@@ -15,7 +15,8 @@ def draw_graph(graph: DiGraph):
 
 if __name__ == "__main__":
     graph = nx.DiGraph()
-    edges = [('z', 'a'), ('a', 'AND-1'), ('AND-1', 'c'), ('c', 'AND-2'), ('AND-2', 'd'), ('d', 'f'), ('f', 'g'), ('AND-2', 'H'), ('AND-1', 'i'), ('i', 'j')]
+    edges = [('a', 'AND-1'), ('AND-1', 'c'), ('c', 'AND-2'), ('AND-2', 'd'), ('d', 'f'), ('f', 'g'), ('AND-2', 'H'), ('AND-1', 'i'), ('i', 'j')]
+    # simple_edges = [('z', 'c'), ('c', 'AND-2'), ('AND-2', 'd'), ('d', 'f'), ('f', 'g'), ('AND-2', 'H')]
     graph.add_edges_from(edges)
 
     node_containers = defaultdict(list)

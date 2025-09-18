@@ -261,6 +261,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     node_containers = defaultdict(list)
     pivot_subjects = dict()
     for intro_term in intro_terms:
+        combinator_parents = dict()
         current_pivot = None
         current_parent = None
         current_node = None
@@ -268,23 +269,33 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
         for subj, obj in nx.dfs_edges(graph, source=intro_term):
             pred = graph[subj][obj].get("label", None)
             if starting:
-                starting_node = BNode()
-                node_containers[starting_node].append((pred, subj))
+                starting_node = subj
+                node_containers[starting_node].append(subj)
+                current_node = starting_node
                 starting = False
             if obj in pivot_nodes or (subj in pivot_nodes and current_pivot != subj):
-                parent_node = BNode()
+                if subj in pivot_nodes:
+                    parent_node = combinator_parents[subj]
+                else:
+                    parent_node = subj
+                    combinator_parents[obj] = parent_node
+                    compressed_graph.add_node(parent_node, subject=subj, combinator=obj, type=pivot_node_types[obj])
                 current_pivot = obj
                 pivot_subjects[obj] = parent_node
                 current_parent = parent_node
                 current_node = None
-            elif obj not in pivot_nodes and subj in pivot_nodes:
-                current_node = BNode()
+            if obj not in pivot_nodes and subj in pivot_nodes:
+                current_node = obj
                 node_containers[current_node].append((pred, obj))
                 compressed_graph.add_edge(current_parent, current_node)
-            elif obj not in pivot_nodes and subj not in pivot_nodes:
+            if obj not in pivot_nodes and subj not in pivot_nodes:
                 node_containers[current_node].append((pred, obj))
+            print(f"({subj}, {obj})", current_pivot, current_parent, current_node)
 
-    pprint(node_containers)
+    node_bnode_mapping = {node: BNode() for node in compressed_graph.nodes}
+    compressed_graph = nx.relabel_nodes(compressed_graph, node_bnode_mapping)
+    node_containers = {node_bnode_mapping[key]: values for key, values in node_containers.items()}
+    pprint(compressed_graph.nodes(data=True))
     nx.draw(compressed_graph, with_labels=True)
     plt.title("Compressed Graph")
     plt.show()
