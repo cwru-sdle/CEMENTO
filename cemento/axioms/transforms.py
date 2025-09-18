@@ -215,6 +215,8 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
         MS.some: OWL.someValuesFrom,
         MS.of: OWL.onClass,
         MS.max: OWL.maxQualifiedCardinality,
+        MS.And: OWL.intersectionOf,
+        MS.Or: OWL.unionOf,
         MS.min: OWL.minQualifiedCardinality,
         MS.only: OWL.allValuesFrom,
     }
@@ -265,7 +267,7 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             pred = graph[subj][obj].get("label", None)
             if starting:
                 starting_node = subj
-                node_containers[starting_node].append(subj)
+                node_containers[starting_node].append((pred, subj))
                 current_node = starting_node
                 starting = False
             if obj in pivot_nodes or (subj in pivot_nodes and current_pivot != subj):
@@ -274,7 +276,12 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 else:
                     parent_node = subj
                     combinator_parents[obj] = parent_node
-                    compressed_graph.add_node(parent_node, subject=subj, combinator=obj, type=pivot_node_types[obj])
+                    compressed_graph.add_node(
+                        parent_node,
+                        subject=subj,
+                        combinator=obj,
+                        type=pivot_node_types[obj],
+                    )
                 current_pivot = obj
                 pivot_subjects[obj] = parent_node
                 current_parent = parent_node
@@ -286,10 +293,14 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             if obj not in pivot_nodes and subj not in pivot_nodes:
                 node_containers[current_node].append((pred, obj))
 
-    collection_nodes = set(filter(lambda node: isinstance(node, BNode), compressed_graph.nodes))
+    collection_nodes = set(
+        filter(lambda node: isinstance(node, BNode), compressed_graph.nodes)
+    )
     node_bnode_mapping = {node: BNode() for node in compressed_graph.nodes}
     compressed_graph = nx.relabel_nodes(compressed_graph, node_bnode_mapping)
-    node_containers = {node_bnode_mapping[key]: values for key, values in node_containers.items()}
+    node_containers = {
+        node_bnode_mapping[key]: values for key, values in node_containers.items()
+    }
     trees = get_subgraphs(compressed_graph)
     expanded_axiom_rdf_graph = rdflib.Graph()
     for prefix, namespace_uri in restriction_rdf_graph.namespaces():
@@ -298,35 +309,54 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
         for node in nx.dfs_postorder_nodes(tree):
             node_data = tree.nodes[node]
             print(node)
-            if node_data: # if there is data, it is a combinator
-                pprint(node_data)
+            if node_data:  # if there is data, it is a combinator
                 pivot_type = node_data["type"]
                 pivot_subject = node_data["subject"]
-                pivot_combinator = node_data["combinator"]
-
-                expanded_axiom_rdf_graph.add((node, RDF.type, OWL.Class)) # change depending on type
+                pivot_combinator = ms_ttl_term_mapping[
+                    repeated_combinators[node_data["combinator"]]
+                ]
                 members = list(tree.successors(node))
-                for member in members:
-                    expanded_axiom_rdf_graph.add((member, OWL.onProperty, pivot_subject)) # change depending on type
                 inner_node = BNode()
                 Collection(expanded_axiom_rdf_graph, inner_node, members)
-                expanded_axiom_rdf_graph.add((node, OWL.intersectionOf, inner_node)) # change depending on combinator
+                expanded_axiom_rdf_graph.add((node, pivot_combinator, inner_node))
+                if pivot_type == "prop":
+                    for member in members:
+                        expanded_axiom_rdf_graph.add(
+                            (member, OWL.onProperty, pivot_subject)
+                        )
+                elif pivot_type == "class":
+                    # assume all members have the same predicate to start
+                    conn_pred = node_containers[members[0]][0][0]
+                    expanded_axiom_rdf_graph.add((pivot_subject, conn_pred, node))
 
-            else: # else, it is a branch
+            else:  # else, it is a branch
                 expanded_axiom_rdf_graph.add((node, RDF.type, OWL.Restriction))
                 for pred, obj in node_containers[node]:
+                    if pred in class_rest_preds:
+                        pred = OWL.onProperty
                     if pred in ms_ttl_term_mapping:
                         pred = ms_ttl_term_mapping[pred]
                     if obj in collection_nodes:
-                        relevant_nodes = restriction_rdf_graph.transitive_objects(obj, None)
-                        relevant_nodes = filter(lambda node: isinstance(node, BNode), relevant_nodes)
-                        collection_triples = flatten(map(lambda node: restriction_rdf_graph.triples((node, None, None)), relevant_nodes))
+                        relevant_nodes = restriction_rdf_graph.transitive_objects(
+                            obj, None
+                        )
+                        relevant_nodes = filter(
+                            lambda node: isinstance(node, BNode), relevant_nodes
+                        )
+                        collection_triples = flatten(
+                            map(
+                                lambda node: restriction_rdf_graph.triples(
+                                    (node, None, None)
+                                ),
+                                relevant_nodes,
+                            )
+                        )
                         for collection_triple in collection_triples:
                             expanded_axiom_rdf_graph.add(collection_triple)
                     expanded_axiom_rdf_graph.add((node, pred, obj))
             pprint(node_containers[node])
             print()
-        print("---"*10)
+        print("---" * 10)
 
     expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
 
