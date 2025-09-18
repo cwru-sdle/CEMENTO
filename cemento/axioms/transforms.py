@@ -3,10 +3,12 @@ import re
 import sys
 from collections import defaultdict
 from pkgutil import extend_path
+import matplotlib.pyplot as plt
 from pprint import pprint
 
 import rdflib
 from more_itertools.more import map_reduce
+from sphinx.cmd.quickstart import nonempty
 from thefuzz.process import extractOne
 from more_itertools.recipes import flatten, unique_everseen
 from rdflib import Graph, BNode, Literal, XSD
@@ -255,110 +257,37 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     class_pivots = map(lambda item: (item[0], "class"), class_pivots)
     pivot_node_types = dict(chain(class_pivots, prop_pivots))
     compressed_graph = nx.DiGraph()
-    compressed_nodes = defaultdict(list)
-    visited_combinator = set()
+    pivot_nodes = set(repeated_combinators.keys())
+    node_containers = defaultdict(list)
+    pivot_subjects = dict()
     for intro_term in intro_terms:
+        current_pivot = None
+        current_parent = None
         current_node = None
-        for subj, obj, label in nx.dfs_labeled_edges(graph, intro_term):
-            if subj == obj:
-                continue
-            pred = graph[subj][obj].get("label", None) if subj != obj else None
-            if label == "forward":
-                if pred == MS.forWhich:
-                    current_node = None
-                    continue
-
-                if subj in repeated_combinators and subj not in visited_combinator:
-                    comb_subj = next(graph.predecessors(obj))
-                    compressed_node = BNode()
-                    compressed_node_attrs = {
-                        "subject": comb_subj,
-                        "combinator": repeated_combinators[subj],
-                        "combinator_type": pivot_node_types[subj],
-                    }
-                    compressed_graph.add_node(compressed_node, **compressed_node_attrs)
-                    compressed_graph.add_edges_from(
-                        [
-                            (
-                                compressed_node,
-                                (
-                                    graph[subj][successor].get("label", None),
-                                    successor,
-                                ),
-                            )
-                            for successor in graph.successors(subj)
-                        ]
-                    )
-                    compressed_graph.add_edges_from(
-                        [
-                            (
-                                (
-                                    graph[predecessor][subj].get("label", None),
-                                    predecessor,
-                                ),
-                                compressed_node,
-                            )
-                            for predecessor in graph.predecessors(subj)
-                        ]
-                    )
-                    compressed_nodes[compressed_node] = [subj]
-                    visited_combinator.add(subj)
-
-                if obj in repeated_combinators:
-                    current_node = None
-
-                if current_node is None:
-                    current_node = BNode()
-                compressed_nodes[current_node].append((pred, obj))
-            else:
+        starting = True
+        for subj, obj in nx.dfs_edges(graph, source=intro_term):
+            pred = graph[subj][obj].get("label", None)
+            if starting:
+                starting_node = BNode()
+                node_containers[starting_node].append((pred, subj))
+                starting = False
+            if obj in pivot_nodes or (subj in pivot_nodes and current_pivot != subj):
+                parent_node = BNode()
+                current_pivot = obj
+                pivot_subjects[obj] = parent_node
+                current_parent = parent_node
                 current_node = None
+            elif obj not in pivot_nodes and subj in pivot_nodes:
+                current_node = BNode()
+                node_containers[current_node].append((pred, obj))
+                compressed_graph.add_edge(current_parent, current_node)
+            elif obj not in pivot_nodes and subj not in pivot_nodes:
+                node_containers[current_node].append((pred, obj))
 
-    compressed_node_successor_keyed = {
-        value[0]: key
-        for key, value in compressed_nodes.items()
-        if value[0] not in repeated_combinators
-    }
-    compressed_node_predecessor_keyed = {
-        value[-1]: key
-        for key, value in compressed_nodes.items()
-        if value[0] not in repeated_combinators
-    }
-    compressed_graph = nx.relabel_nodes(
-        compressed_graph, compressed_node_successor_keyed
-    )
-    compressed_graph = nx.relabel_nodes(
-        compressed_graph, compressed_node_predecessor_keyed
-    )
-
-    for tree in get_subgraphs(compressed_graph):
-        for node in nx.dfs_postorder_nodes(tree):
-            print(node)
-        print()
-
-    # pprint([(subj, obj, data.get('label', None)) for subj, obj, data in compressed_graph.edges(data=True)])
-    # for intro_term in intro_terms:
-    #     restriction = BNode()
-    #     for subj, obj in nx.edge_dfs(graph, intro_term):
-    #         label = graph[subj][obj].get("label", None)
-    #         if subj == intro_term:
-    #             ttl_pred = ms_ttl_term_mapping[label]
-    #             expanded_axiom_rdf_graph.add((intro_term, ttl_pred, restriction))
-    #             print(list(unique_everseen(chain(types, classes))))
-    #             expanded_axiom_rdf_graph.add((restriction, RDF.type, OWL.Restriction))
-    #             expanded_axiom_rdf_graph.add((restriction, OWL.onProperty, obj))
-    #         elif label in ms_ttl_term_mapping: # TODO: support turtle value counterpart as well
-    #             ttl_pred = ms_ttl_term_mapping[label]
-    #             if isinstance(obj, BNode):
-    #                 relevant_nodes = restriction_rdf_graph.transitive_objects(obj, None)
-    #                 relevant_nodes = filter(lambda node: isinstance(node, BNode), relevant_nodes)
-    #                 collection_triples = flatten(map(lambda node: restriction_rdf_graph.triples((node, None, None)), relevant_nodes))
-    #                 for collection_triple in collection_triples:
-    #                     expanded_axiom_rdf_graph.add(collection_triple)
-    #             elif isinstance(obj, Literal) and isinstance(obj.value, str) and (match := re.search(r'(.*)\[(.*)\]', obj.value)):
-    #                 facet = match.group(2)
-    #                 value = match.group(1).strip()
-    #                 obj = Literal(value)
-    #             expanded_axiom_rdf_graph.add((restriction, ttl_pred, obj))
+    pprint(node_containers)
+    nx.draw(compressed_graph, with_labels=True)
+    plt.title("Compressed Graph")
+    plt.show()
     expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
 
     # remove original chain triples
