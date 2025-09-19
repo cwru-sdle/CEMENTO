@@ -5,6 +5,7 @@ from functools import reduce
 
 import networkx as nx
 from networkx import DiGraph
+from rdflib.namespace import split_uri
 
 from cemento.utils.constants import NullTermError
 
@@ -111,3 +112,8 @@ def get_graph_root_nodes(graph: DiGraph) -> list[any]:
         for node in graph.nodes
         if graph.in_degree(node) == 0 or len(graph.nodes) == 1
     ]
+
+def get_uri_ref_str(term, inv_prefixes):
+    ns, abbrev_term = split_uri(term)
+    prefix = inv_prefixes[str(ns)]
+    return f"{prefix}:{abbrev_term}"

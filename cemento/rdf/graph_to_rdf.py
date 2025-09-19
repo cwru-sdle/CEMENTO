@@ -10,7 +10,7 @@ from more_itertools import unique_everseen
 from networkx import DiGraph
 from rdflib import OWL, RDF, BNode, Graph, Literal, URIRef
 
-from cemento.axioms.transforms import expand_axiom_terms
+from cemento.axioms.transforms import convert_axiom_graph_to_rdf
 from cemento.rdf.filters import term_in_search_results, term_not_in_default_namespace
 from cemento.rdf.io import (
     get_diagram_terms_iter,
@@ -316,14 +316,14 @@ def convert_graph_to_rdf_file(
     )
     element_rdf_graph = convert_to_rdf_graph(element_graph)
 
-    manchester_syntax_ref = get_reserved_references_folder()
-    restriction_rdf_graph = convert_to_rdf_graph(
-        restriction_graph,
-        filter_defaults=False,
-        extra_substitution_paths=[manchester_syntax_ref],
-    )
     # Process restriction rdf graph
-    restriction_rdf_graph = expand_axiom_terms(restriction_rdf_graph)
+    restriction_rdf_graph = convert_axiom_graph_to_rdf(
+        restriction_graph,
+        onto_ref_folder,
+        defaults_folder,
+        prefixes_path,
+        log_substitution_path,
+    )
 
     combined_rdf_graph = element_rdf_graph + restriction_rdf_graph
     combined_rdf_graph.serialize(destination=output_path, format=rdf_format)

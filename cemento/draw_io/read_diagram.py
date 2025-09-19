@@ -108,10 +108,6 @@ def read_drawio(
         container_labels,
         base_restriction_box_ids,
         restriction_container_ids,
-        relabel_key,
     )
-    relabel_graph = partial(
-        relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
-    )
-    graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
+    graph = relabel_graph_nodes_with_node_attr(graph, new_attr_label=relabel_key.value)
     return graph, restriction_graph

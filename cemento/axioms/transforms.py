@@ -11,18 +11,50 @@ from more_itertools import partition
 from more_itertools.more import map_reduce, filter_map
 from more_itertools.recipes import flatten
 from networkx import DiGraph
-from rdflib import Graph, BNode
+from rdflib import Graph, BNode, URIRef, Literal
 from rdflib.collection import Collection
 from rdflib.namespace import RDF, SKOS, OWL, RDFS
 from thefuzz.process import extractOne
 
-from cemento.axioms.constants import combinators
+from cemento.axioms.constants import combinators, class_rest_preds, prop_rest_preds
 from cemento.axioms.modules import MS, MDS
 from cemento.draw_io.constants import DiagramKey
+from cemento.rdf.filters import term_not_in_default_namespace, term_in_search_results
 from cemento.rdf.io import get_diagram_terms_iter
-from cemento.rdf.transforms import construct_terms
-from cemento.term_matching.transforms import substitute_term
-from cemento.utils.utils import get_graph_root_nodes, get_subgraphs
+from cemento.rdf.transforms import (
+    construct_terms,
+    get_collection_nodes,
+    get_collection_in_edges,
+    split_collection_graph,
+    get_search_keys,
+    get_graph_diagram_terms_with_pred,
+    construct_literal_terms,
+    get_literal_terms,
+    get_collection_triples_and_targets,
+    add_collection_links_to_graph,
+    get_exact_match_properties,
+    get_ref_graph,
+)
+from cemento.term_matching.constants import get_default_namespace_prefixes
+from cemento.term_matching.io import get_rdf_file_iter
+from cemento.term_matching.transforms import (
+    substitute_term,
+    get_search_terms,
+    get_prefixes,
+)
+from cemento.utils.io import (
+    get_default_defaults_folder,
+    get_default_prefixes_file,
+    get_reserved_references_folder,
+    get_default_references_folder,
+)
+from cemento.utils.utils import (
+    get_graph_root_nodes,
+    get_subgraphs,
+    chain_filter,
+    get_abbrev_term,
+    get_uri_ref_str,
+)
 
 
 def relabel_graph_nodes_with_node_attr(
@@ -103,7 +135,6 @@ def split_restriction_graph(
     container_labels: dict[str, str],
     base_restriction_box_ids: set[str],
     restriction_container_ids: set[str],
-    relabel_key: DiagramKey = DiagramKey.LABEL,
 ):
     element_containers, restriction_containers = partition(
         lambda item: item[0] in restriction_container_ids, containers.items()
@@ -154,60 +185,123 @@ def split_restriction_graph(
     restriction_graph.add_edges_from(restriction_in_edges)
     for subj, _, _ in restriction_in_edges:
         restriction_graph.add_edge(subj, "ms:introTerm", label="ms:belongsTo")
-
-    # TODO: move to own function
-    repeated_nodes = defaultdict(int)
-    combinator_term_add_edges = []
-    for node, data in restriction_graph.nodes(data=True):
-        label = data.get("label", None)
-        # TODO: move refs to constants
-        if (
-            label is not None
-            and label
-            and (
-                substitute_label := extractOne(
-                    label, {"ms:and", "ms:or"}, score_cutoff=90
-                )
-            )
-        ):
-            substitute_label = substitute_label[0]
-            substitute_label_value = substitute_label.replace("ms:", "")
-            repeated_nodes[substitute_label] += 1
-            idx = repeated_nodes[substitute_label]
-            restriction_graph.nodes[node][
-                "label"
-            ] = f"ms:combinator-{substitute_label_value}-iter-{idx}"
-            combinator_term_add_edges.append(
-                (node, substitute_label, {"label": "skos:exactMatch"})
-            )
-    restriction_graph.add_edges_from(combinator_term_add_edges)
     return graph, restriction_graph
 
 
-def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
-    graph = nx.DiGraph()
-    repeated_combinators = restriction_rdf_graph.triples_choices(
-        (None, SKOS.exactMatch, list(combinators))
+def convert_axiom_graph_to_rdf(
+    graph: DiGraph,
+    onto_ref_folder,
+    defaults_folder,
+    prefixes_path,
+    log_substitution_path,
+) -> Graph:
+    onto_ref_folder = (
+        get_default_references_folder() if not onto_ref_folder else onto_ref_folder
     )
-    repeated_combinators = filter(
-        lambda triple: triple[0] not in combinators, repeated_combinators
+    defaults_folder = (
+        get_default_defaults_folder() if not defaults_folder else defaults_folder
     )
-    repeated_combinators = {subj: obj for subj, _, obj in repeated_combinators}
+    prefixes_path = get_default_prefixes_file() if not prefixes_path else prefixes_path
+    prefixes, inv_prefixes = get_prefixes(prefixes_path, onto_ref_folder)
+    collection_nodes = get_collection_nodes(graph)
+    collection_in_edges = get_collection_in_edges(collection_nodes.keys(), graph)
+    collection_in_edge_labels = list(
+        map(
+            lambda x: x[2]["label"],
+            filter(lambda x: "label" in x[2], collection_in_edges),
+        )
+    )
+    graph, collection_subgraph = split_collection_graph(graph, collection_nodes)
+    diagram_term_names = map(
+        lambda item: (
+            item,
+            item if item not in graph.nodes else graph.nodes[item].get("label", item),
+        ),
+        get_diagram_terms_iter(graph),
+    )
+    diagram_term_names = filter(lambda item: item[1] is not None, diagram_term_names)
+    diagram_term_names = chain(
+        diagram_term_names, map(lambda term: (term, term), collection_in_edge_labels)
+    )
+    diagram_term_names = dict(diagram_term_names)
+    all_diagram_terms = list(
+        chain(diagram_term_names.values(), collection_in_edge_labels)
+    )
+    search_keys = get_search_keys(all_diagram_terms, inv_prefixes)
+    search_terms = get_search_terms(
+        inv_prefixes,
+        onto_ref_folder,
+        defaults_folder,
+        extra_paths=[get_reserved_references_folder()],
+    )
+    graph_edge_labels = set(
+        map(lambda edge_tuple: edge_tuple[2]["label"], graph.edges(data=True))
+    )
+    graph_edge_labels |= set(collection_in_edge_labels)
+    all_diagram_terms_with_pred = list(
+        map(lambda term: (term, term in graph_edge_labels), all_diagram_terms)
+    )
+    constructed_terms = construct_terms(
+        all_diagram_terms,
+        all_diagram_terms_with_pred,
+        prefixes,
+        search_keys,
+        search_terms,
+        prefixes_path,
+        log_substitution_path,
+        default_prefix_for_unassigned="ms",
+    )
 
-    intro_terms = list(restriction_rdf_graph.subjects(MS.belongsTo, MS.IntroTerm))
+    expanded_axiom_rdf_graph = Graph()
+    id_to_uri_mapping = {
+        key: constructed_terms[value] for key, value in diagram_term_names.items()
+    }
+    uri_to_id_mapping = {value: key for key, value in id_to_uri_mapping.items()}
+    collection_triples, collection_targets = get_collection_triples_and_targets(
+        collection_nodes,
+        collection_subgraph,
+        expanded_axiom_rdf_graph,
+        id_to_uri_mapping,
+    )
 
-    restriction_rdf_graph.remove((None, RDF.type, None))  # TODO: exempt if intro term
-    restriction_rdf_graph.remove((None, SKOS.exactMatch, None))
-    restriction_rdf_graph.remove((None, MS.belongsTo, None))
-    graph_triples = (
-        (subj, obj, {"label": pred}) for subj, pred, obj in restriction_rdf_graph
+    for triple in collection_triples:
+        expanded_axiom_rdf_graph.add(triple)
+    graph = add_collection_links_to_graph(
+        collection_in_edges, collection_targets, graph
     )
-    graph_triples = filterfalse(
-        lambda triple: isinstance(triple[0], BNode), graph_triples
+
+    output_graph = nx.DiGraph()
+    for subj, obj, data in graph.edges(data=True):
+        pred = data["label"]
+        output_graph.add_edge(subj, obj, label=pred)
+
+    # set partial for converting URIRef to string
+    uri_to_str = partial(get_uri_ref_str, inv_prefixes=inv_prefixes)
+
+    # get intro terms before deleting the triples
+    intro_terms = list(
+        map(
+            lambda edge: edge[0],
+            filter(
+                lambda edge: edge[1] in id_to_uri_mapping
+                and id_to_uri_mapping[edge[1]] == MS.IntroTerm,
+                graph.edges,
+            ),
+        )
     )
-    graph.add_edges_from(list(graph_triples))
-    graph.edges(data=True)
-    restriction_rdf_graph.serialize("intermediate.ttl", format="turtle")
+
+    edge_labels_to_remove = [MS.belongsTo, SKOS.exactMatch, RDF.type]
+    edge_labels_to_remove = set(map(uri_to_str, edge_labels_to_remove))
+    edges_to_remove = list(
+        map(
+            lambda edge: (edge[0], edge[1]),
+            filter(
+                lambda edge: edge[2].get("label", None) in edge_labels_to_remove,
+                graph.edges(data=True),
+            ),
+        )
+    )
+    graph.remove_edges_from(edges_to_remove)
 
     # TODO: add mapping to exact matches in namespace class generator script
     ms_ttl_term_mapping = {
@@ -225,40 +319,39 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     # NOTE: the chains only apply to property restrictions!
     # TODO: add support for just datatype. Datatype facets for property restrictions are supported.
     expanded_axiom_rdf_graph = rdflib.Graph()
-    for prefix, namespace_uri in restriction_rdf_graph.namespaces():
+    for prefix, namespace_uri in prefixes.items():
         expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
 
-    pivot_node_types = dict()
-    pivot_triples = restriction_rdf_graph.triples_choices(
-        (None, MS.forWhich, list(repeated_combinators.keys()))
+    pivot_nodes = list(
+        filter(
+            lambda node: id_to_uri_mapping.get(node, None) in combinators, graph.nodes
+        )
     )
-    pivot_node_predicates = map_reduce(
-        pivot_triples,
-        keyfunc=lambda triple: triple[2],
-        valuefunc=lambda triple: restriction_rdf_graph.predicates(triple[2], None),
-    )
-    class_rest_preds = {MS.equivalentTo, RDF.type, RDFS.subClassOf}
-    prop_rest_preds = {MS.max, MS.only, MS.that, MS.exactly, MS.value}
+    pivot_node_predicates = {
+        pivot_node: list(
+            map(
+                lambda edge: id_to_uri_mapping[edge[2].get("label", edge[2])],
+                graph.out_edges(pivot_node, data=True),
+            )
+        )
+        for pivot_node in pivot_nodes
+    }
     # TODO: check that the restriction graph has no floating nodes
     # TODO: check if the predicates are all the same type as a preprocessing step
-    # TODO: handle unknown case
     pivots_with_types = filter(
-        lambda item: (item_type := next(flatten(item[1]))) in class_rest_preds
-        or item_type in prop_rest_preds,
+        lambda item: item[1][0] in (class_rest_preds | prop_rest_preds),
         pivot_node_predicates.items(),
     )
     prop_pivots, class_pivots = partition(
-        lambda item: next(flatten(item[1])) in class_rest_preds, pivots_with_types
+        lambda item: item[1][0] in class_rest_preds, pivots_with_types
     )
     prop_pivots = map(lambda item: (item[0], "prop"), prop_pivots)
     class_pivots = map(lambda item: (item[0], "class"), class_pivots)
     pivot_node_types = dict(chain(class_pivots, prop_pivots))
     compressed_graph = nx.DiGraph()
-    pivot_nodes = set(repeated_combinators.keys())
     node_containers = defaultdict(list)
     pivot_subjects = dict()
     # FIXME: adjust algorithm to work for simple graphs (graphs without AND or OR)
-    # FIXME: adjust algorithm to treat all nodes distinctly, repeated nodes don't get parsed
     for intro_term in intro_terms:
         combinator_parents = dict()
         current_pivot = None
@@ -294,29 +387,14 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                 compressed_graph.add_edge(current_parent, current_node)
             if obj not in pivot_nodes and subj not in pivot_nodes:
                 node_containers[current_node].append((pred, obj))
-            print(f"({subj}, {obj})", current_pivot, current_parent, current_node)
 
-    nx.draw(compressed_graph, with_labels=True)
-    plt.show()
-    # new_node_containers = dict()
-    # for key, values in node_containers.items():
-    #     new_values = list(filter(lambda tuple: tuple[1] != key, values))
-    #     new_node_containers[key] = new_values
-    # node_containers = new_node_containers
-    collection_nodes = set(
-        filter(lambda node: isinstance(node, BNode), compressed_graph.nodes)
-    )
     node_bnode_mapping = {node: BNode() for node in compressed_graph.nodes}
-    # nx.draw(compressed_graph, with_labels=True)
-    # plt.show()
     compressed_graph = nx.relabel_nodes(compressed_graph, node_bnode_mapping)
     node_containers = {
         node_bnode_mapping[key]: values for key, values in node_containers.items()
     }
+
     trees = get_subgraphs(compressed_graph)
-    expanded_axiom_rdf_graph = rdflib.Graph()
-    for prefix, namespace_uri in restriction_rdf_graph.namespaces():
-        expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
     for tree in trees:
         terms_to_unwrap = dict()
         for node in nx.dfs_postorder_nodes(tree):
@@ -324,9 +402,9 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
             print(node)
             if node_data:  # if there is data, it is a combinator
                 pivot_type = node_data["type"]
-                pivot_subject = node_data["subject"]
+                pivot_subject = id_to_uri_mapping[node_data["subject"]]
                 pivot_combinator = ms_ttl_term_mapping[
-                    repeated_combinators[node_data["combinator"]]
+                    id_to_uri_mapping[node_data["combinator"]]
                 ]
                 members = list(tree.successors(node))
                 inner_node = BNode()
@@ -338,48 +416,36 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
                         )
                 elif pivot_type == "class":
                     # assume all members have the same predicate to start
-                    conn_pred = node_containers[members[0]][0][0]
+                    conn_pred = id_to_uri_mapping[node_containers[members[0]][0][0]]
                     expanded_axiom_rdf_graph.add((pivot_subject, conn_pred, node))
 
                 # unwrap singular members and add the unwrapped node to the collection
                 members = set(tree.successors(node))
                 members_to_unwrap = members & terms_to_unwrap.keys()
                 members_to_unwrap = set(
-                    map(lambda node: terms_to_unwrap[node], members_to_unwrap)
+                    map(
+                        lambda node: id_to_uri_mapping[terms_to_unwrap[node]],
+                        members_to_unwrap,
+                    )
                 )
                 rem_members = members - terms_to_unwrap.keys()
-                members = list(rem_members | members_to_unwrap)
-                Collection(expanded_axiom_rdf_graph, inner_node, members)
+                members = rem_members | members_to_unwrap
+                Collection(expanded_axiom_rdf_graph, inner_node, members)  # STARBOY
 
             else:  # else, it is a branch
                 if len(node_containers[node]) == 1:
                     pred, obj = node_containers[node][0]
-                    if pred in class_rest_preds:
+                    if id_to_uri_mapping[pred] in class_rest_preds:
                         terms_to_unwrap[node] = obj
                         continue
                 expanded_axiom_rdf_graph.add((node, RDF.type, OWL.Restriction))
                 for pred, obj in node_containers[node]:
+                    pred = id_to_uri_mapping.get(pred, pred)
+                    obj = id_to_uri_mapping.get(obj, obj)
                     if pred in class_rest_preds:
                         pred = OWL.onProperty
                     if pred in ms_ttl_term_mapping:
                         pred = ms_ttl_term_mapping[pred]
-                    if obj in collection_nodes:
-                        relevant_nodes = restriction_rdf_graph.transitive_objects(
-                            obj, None
-                        )
-                        relevant_nodes = filter(
-                            lambda node: isinstance(node, BNode), relevant_nodes
-                        )
-                        collection_triples = flatten(
-                            map(
-                                lambda node: restriction_rdf_graph.triples(
-                                    (node, None, None)
-                                ),
-                                relevant_nodes,
-                            )
-                        )
-                        for collection_triple in collection_triples:
-                            expanded_axiom_rdf_graph.add(collection_triple)
                     expanded_axiom_rdf_graph.add((node, pred, obj))
 
             pprint(node_containers[node])
@@ -388,6 +454,4 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
 
     expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
 
-    # remove original chain triples
-
-    return restriction_rdf_graph
+    return expanded_axiom_rdf_graph
