@@ -63,7 +63,6 @@ from cemento.utils.io import (
 )
 from cemento.utils.utils import (
     chain_filter,
-    enforce_camel_case,
     fst,
     get_abbrev_term,
     snd,
@@ -102,12 +101,12 @@ def convert_graph_to_rdf_graph(
     collection_in_edges = get_collection_in_edges(collection_nodes.keys(), graph)
     collection_in_edge_labels = list(
         map(
-            lambda x: enforce_camel_case(x[2]["label"]),
+            lambda x: x[2]["label"],
             filter(lambda x: "label" in x[2], collection_in_edges),
         )
     )
     collection_in_edge_labels_iter = map(
-        lambda x: (enforce_camel_case(x), True), collection_in_edge_labels
+        lambda x: (x, True), collection_in_edge_labels
     )
     nodes_to_remove = set(collection_nodes.keys()) | valid_collection_types
     collection_subgraph = get_collection_subgraph(set(collection_nodes.keys()), graph)
@@ -145,7 +144,6 @@ def convert_graph_to_rdf_graph(
     }
 
     # retrieve list of property terms in file to enforce camel case appropriately
-    # TODO: determine if user can toggle camel case enforcement for their term
     property_terms = get_properties_in_file(
         search_keys,
         chain(get_diagram_terms_iter(graph), collection_in_edge_labels),

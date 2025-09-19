@@ -22,7 +22,6 @@ from cemento.term_matching.transforms import substitute_term_multikey
 from cemento.utils.constants import valid_collection_types
 from cemento.axioms.modules import MS
 from cemento.utils.utils import (
-    enforce_camel_case,
     filter_graph,
     fst,
     snd,
@@ -465,31 +464,3 @@ def add_collection_links_to_graph(
                 label=data["label"],
             )
     return graph
-
-
-
-def enforce_camel_case_in_rdf_graph(
-    rdf_graph: Graph, terms_to_replace: Iterable[URIRef]
-):
-    # TODO: make this more functional, implement immutable rdf_graph copy
-    for term in terms_to_replace:
-        all_triples_with_term = set(
-            chain(
-                rdf_graph.triples((term, None, None)),
-                rdf_graph.triples((None, term, None)),
-                rdf_graph.triples((None, None, term)),
-            )
-        )
-        for subj, pred, obj in all_triples_with_term:
-            ns, abbrev_term = split_uri(term)
-            new_term = URIRef(f"{ns}{enforce_camel_case(abbrev_term)}")
-            replacement = {term: new_term}
-            rdf_graph.remove((subj, pred, obj))
-            rdf_graph.add(
-                (
-                    replacement.get(subj, subj),
-                    replacement.get(pred, pred),
-                    replacement.get(obj, obj),
-                )
-            )
-    return rdf_graph
