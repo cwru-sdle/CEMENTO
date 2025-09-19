@@ -51,10 +51,11 @@ def get_diagram_errors(input_path: str | Path, with_exemptions=True):
         elements,
         term_ids,
         rel_ids,
-        serious_only=True,
         containers=containers,
         container_content=container_content,
+        restriction_container_ids=set(),
         error_exemptions=error_exemptions,
+        serious_only=True,
     )
 
 

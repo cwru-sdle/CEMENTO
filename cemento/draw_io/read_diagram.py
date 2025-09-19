@@ -78,11 +78,11 @@ def read_drawio(
             elements,
             term_ids,
             rel_ids,
+            containers,
+            container_content,
+            restriction_container_ids,
+            error_exemptions,
             serious_only=True,
-            containers=containers,
-            container_content=container_content,
-            restriction_container_ids=restriction_container_ids,
-            error_exemptions=error_exemptions,
         )
         if errors:
             checked_diagram_path = write_error_diagram(input_path, errors)

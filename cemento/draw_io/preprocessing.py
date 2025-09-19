@@ -375,11 +375,11 @@ def find_errors_diagram_content(
     elements: dict[str, dict[str, any]],
     term_ids: set[str],
     rel_ids: set[str],
+    containers: dict[str, list[str]],
+    container_content: Container[str],
+    restriction_container_ids: set[str],
+    error_exemptions: set[str],
     serious_only: bool = False,
-    containers: dict[str, list[str]] = None,
-    container_content: Container[str] = None,
-    restriction_container_ids: set[str] = None,
-    error_exemptions: set[str] = None,
 ) -> list[tuple[str, BaseException]]:
     errors = (
         find_shape_errors_diagram_content(
