@@ -178,11 +178,6 @@ def split_restriction_graph(
                 (node, substitute_label, {"label": "skos:exactMatch"})
             )
     restriction_graph.add_edges_from(combinator_term_add_edges)
-    relabel_graph = partial(
-        relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
-    )
-    graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
-
     return graph, restriction_graph
 
 

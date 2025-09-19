@@ -7,7 +7,11 @@ from pprint import pprint
 from more_itertools import partition
 from networkx import DiGraph
 
-from cemento.axioms.transforms import split_restriction_graph, split_container_ids
+from cemento.axioms.transforms import (
+    split_restriction_graph,
+    split_container_ids,
+    relabel_graph_nodes_with_node_attr,
+)
 from cemento.draw_io.constants import BadDiagramError, DiagramKey
 from cemento.draw_io.io import write_error_diagram
 from cemento.draw_io.preprocessing import (
@@ -106,4 +110,8 @@ def read_drawio(
         restriction_container_ids,
         relabel_key,
     )
+    relabel_graph = partial(
+        relabel_graph_nodes_with_node_attr, new_attr_label=relabel_key.value
+    )
+    graph, restriction_graph = tuple(map(relabel_graph, (graph, restriction_graph)))
     return graph, restriction_graph
