@@ -16,8 +16,11 @@ from rdflib.collection import Collection
 from rdflib.namespace import RDF, SKOS, OWL, RDFS
 from thefuzz.process import extractOne
 
+from cemento.axioms.constants import combinators
 from cemento.axioms.modules import MS, MDS
 from cemento.draw_io.constants import DiagramKey
+from cemento.rdf.io import get_diagram_terms_iter
+from cemento.rdf.transforms import construct_terms
 from cemento.term_matching.transforms import substitute_term
 from cemento.utils.utils import get_graph_root_nodes, get_subgraphs
 
@@ -184,10 +187,10 @@ def split_restriction_graph(
 def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     graph = nx.DiGraph()
     repeated_combinators = restriction_rdf_graph.triples_choices(
-        (None, SKOS.exactMatch, [MS.And, MS.Or])
+        (None, SKOS.exactMatch, list(combinators))
     )
     repeated_combinators = filter(
-        lambda triple: triple[0] not in {MS.And, MS.Or}, repeated_combinators
+        lambda triple: triple[0] not in combinators, repeated_combinators
     )
     repeated_combinators = {subj: obj for subj, _, obj in repeated_combinators}
 

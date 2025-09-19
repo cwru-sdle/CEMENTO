@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from functools import reduce, partial
-from itertools import groupby
+from itertools import groupby, chain
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -16,6 +16,9 @@ from rdflib.namespace import split_uri
 
 from cemento.rdf.io import (
     save_substitute_log,
+    get_diagram_terms_iter,
+    get_properties_in_file,
+    get_diagram_terms_iter_with_pred,
 )
 from cemento.rdf.preprocessing import (
     clean_literal_string,
@@ -29,6 +32,7 @@ from cemento.term_matching.transforms import (
     get_substitute_mapping,
     combine_graphs,
     get_term_types,
+    get_term_search_keys,
 )
 from cemento.utils.constants import valid_collection_types, NullTermError
 from cemento.utils.io import get_default_prefixes_file
@@ -489,7 +493,7 @@ def construct_terms(
     prefixes_path: str | Path,
     log_substitution_path: str | Path,
     default_prefix_for_unassigned="mds",
-) -> list[str, URIRef]:
+) -> dict[str, URIRef]:
 
     # TODO: assign literal terms IDs so identical values get treated separately
     literal_terms = get_literal_terms(all_diagram_terms)
@@ -585,6 +589,7 @@ def construct_literal_terms(all_literal_terms, search_terms):
     }
     return constructed_literal_terms
 
+
 def get_exact_match_properties(exact_match_candidates, ref_graph):
     exact_match_property_predicates = [RDF.type, RDFS.label]
     exact_match_property_tuples = {
@@ -598,10 +603,57 @@ def get_exact_match_properties(exact_match_candidates, ref_graph):
         exact_match_properties[key][prop] = value
     return exact_match_properties
 
+
 def get_ref_graph(*ref_graphs: Graph | str | Path):
     ref_graph = Graph()
-    file_graphs, input_graphs = partition(lambda graph: isinstance(graph, Graph), ref_graphs)
+    file_graphs, input_graphs = partition(
+        lambda graph: isinstance(graph, Graph), ref_graphs
+    )
     ref_graph = reduce(lambda acc, graph: acc + graph, input_graphs, ref_graph)
     for file_path in file_graphs:
         ref_graph.parse(file_path)
     return ref_graph
+
+
+def split_collection_graph(graph, collection_nodes):
+    nodes_to_remove = set(collection_nodes.keys()) | valid_collection_types
+    collection_subgraph = get_collection_subgraph(set(collection_nodes.keys()), graph)
+    graph.remove_nodes_from(nodes_to_remove)
+    return graph, collection_subgraph
+
+
+def get_search_keys(all_diagram_terms, inv_prefixes):
+    return {
+        term: search_key
+        for term, search_key in map(
+            lambda term: (term, get_term_search_keys(term, inv_prefixes)),
+            unique_everseen(all_diagram_terms),
+        )
+    }
+
+
+def get_graph_diagram_terms_with_pred(
+    graph,
+    all_diagram_terms,
+    collection_in_edge_labels,
+    search_keys,
+    inv_prefixes,
+    defaults_folder,
+):
+    collection_in_edge_labels_iter = map(lambda x: (x, True), collection_in_edge_labels)
+    # process search keys now for partial substitution and full substitution later on
+    property_terms = get_properties_in_file(
+        search_keys,
+        all_diagram_terms,
+        graph,
+        defaults_folder,
+        inv_prefixes,
+    )
+
+    all_diagram_terms_with_pred = list(
+        chain(
+            get_diagram_terms_iter_with_pred(graph, property_terms),
+            collection_in_edge_labels_iter,
+        )
+    )
+    return all_diagram_terms_with_pred

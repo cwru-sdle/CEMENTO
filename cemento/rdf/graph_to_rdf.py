@@ -1,5 +1,4 @@
-from collections import defaultdict
-from collections import defaultdict
+from copy import deepcopy
 from copy import deepcopy
 from functools import partial, reduce
 from itertools import chain, filterfalse
@@ -9,14 +8,12 @@ import networkx as nx
 import rdflib
 from more_itertools import unique_everseen
 from networkx import DiGraph
-from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, URIRef
+from rdflib import OWL, RDF, BNode, Graph, Literal, URIRef
 
 from cemento.axioms.transforms import expand_axiom_terms
 from cemento.rdf.filters import term_in_search_results, term_not_in_default_namespace
 from cemento.rdf.io import (
     get_diagram_terms_iter,
-    get_diagram_terms_iter_with_pred,
-    get_properties_in_file,
 )
 from cemento.rdf.preprocessing import (
     get_term_aliases,
@@ -30,7 +27,6 @@ from cemento.rdf.transforms import (
     get_class_terms,
     get_collection_in_edges,
     get_collection_nodes,
-    get_collection_subgraph,
     get_collection_triples_and_targets,
     get_domains_ranges,
     remove_generic_property,
@@ -39,18 +35,19 @@ from cemento.rdf.transforms import (
     get_literal_terms,
     get_exact_match_properties,
     get_ref_graph,
+    split_collection_graph,
+    get_graph_diagram_terms_with_pred,
+    get_search_keys,
 )
 from cemento.term_matching.constants import get_default_namespace_prefixes
 from cemento.term_matching.io import get_rdf_file_iter
 from cemento.term_matching.transforms import (
     add_exact_matches,
-    combine_graphs,
     get_prefixes,
     get_search_terms,
-    get_term_search_keys,
     get_term_types,
 )
-from cemento.utils.constants import RDFFormat, valid_collection_types
+from cemento.utils.constants import RDFFormat
 from cemento.utils.io import (
     get_default_defaults_folder,
     get_default_prefixes_file,
@@ -99,35 +96,18 @@ def convert_graph_to_rdf_graph(
             filter(lambda x: "label" in x[2], collection_in_edges),
         )
     )
-    nodes_to_remove = set(collection_nodes.keys()) | valid_collection_types
-    collection_subgraph = get_collection_subgraph(set(collection_nodes.keys()), graph)
-    graph.remove_nodes_from(nodes_to_remove)
+    graph, collection_subgraph = split_collection_graph(graph, collection_nodes)
     all_diagram_terms = list(
         chain(get_diagram_terms_iter(graph), collection_in_edge_labels)
     )
-    collection_in_edge_labels_iter = map(lambda x: (x, True), collection_in_edge_labels)
-
-    # process search keys now for partial substitution and full substitution later on
-    search_keys = {
-        term: search_key
-        for term, search_key in map(
-            lambda term: (term, get_term_search_keys(term, inv_prefixes)),
-            unique_everseen(all_diagram_terms),
-        )
-    }
-    property_terms = get_properties_in_file(
-        search_keys,
-        all_diagram_terms,
+    search_keys = get_search_keys(all_diagram_terms, inv_prefixes)
+    all_diagram_terms_with_pred = get_graph_diagram_terms_with_pred(
         graph,
-        defaults_folder,
+        all_diagram_terms,
+        collection_in_edge_labels,
+        search_keys,
         inv_prefixes,
-    )
-
-    all_diagram_terms_with_pred = list(
-        chain(
-            get_diagram_terms_iter_with_pred(graph, property_terms),
-            collection_in_edge_labels_iter,
-        )
+        defaults_folder,
     )
     aliases = {
         term: aliases
@@ -247,7 +227,9 @@ def convert_graph_to_rdf_graph(
                 term_not_in_default_namespace_filter,
             )
         )
-        exact_match_properties = get_exact_match_properties(exact_match_candidates, ref_graph)
+        exact_match_properties = get_exact_match_properties(
+            exact_match_candidates, ref_graph
+        )
         rdf_graph = reduce(
             lambda rdf_graph, graph_term: add_exact_matches(
                 term=graph_term,
@@ -324,7 +306,6 @@ def convert_graph_to_rdf_file(
     log_substitution_path: str | Path = None,
 ):
     rdf_format = get_rdf_format(output_path, file_format=file_format)
-    manchester_syntax_ref = get_reserved_references_folder()
     convert_to_rdf_graph = partial(
         convert_graph_to_rdf_graph,
         onto_ref_folder=onto_ref_folder,
@@ -334,12 +315,13 @@ def convert_graph_to_rdf_file(
         log_substitution_path=log_substitution_path,
     )
     element_rdf_graph = convert_to_rdf_graph(element_graph)
+
+    manchester_syntax_ref = get_reserved_references_folder()
     restriction_rdf_graph = convert_to_rdf_graph(
         restriction_graph,
         filter_defaults=False,
         extra_substitution_paths=[manchester_syntax_ref],
     )
-
     # Process restriction rdf graph
     restriction_rdf_graph = expand_axiom_terms(restriction_rdf_graph)
 
