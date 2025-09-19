@@ -1,13 +1,14 @@
 import re
+from collections import defaultdict
 from collections.abc import Callable, Iterable
-from functools import reduce
+from functools import reduce, partial
 from itertools import groupby
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
 import networkx as nx
-from more_itertools import unique_everseen
+from more_itertools import unique_everseen, partition
 from networkx import DiGraph
 from rdflib import OWL, RDF, RDFS, SKOS, XSD, BNode, Graph, Literal, Namespace, URIRef
 from rdflib.collection import Collection
@@ -22,9 +23,12 @@ from cemento.rdf.preprocessing import (
     remove_suppression_key,
 )
 from cemento.term_matching.constants import RANK_PROPS
+from cemento.term_matching.io import get_rdf_file_iter
 from cemento.term_matching.transforms import (
     substitute_term_multikey,
     get_substitute_mapping,
+    combine_graphs,
+    get_term_types,
 )
 from cemento.utils.constants import valid_collection_types, NullTermError
 from cemento.utils.io import get_default_prefixes_file
@@ -580,3 +584,24 @@ def construct_literal_terms(all_literal_terms, search_terms):
         for term in all_literal_terms
     }
     return constructed_literal_terms
+
+def get_exact_match_properties(exact_match_candidates, ref_graph):
+    exact_match_property_predicates = [RDF.type, RDFS.label]
+    exact_match_property_tuples = {
+        (term, prop, value)
+        for term in exact_match_candidates
+        for prop in exact_match_property_predicates
+        for value in list(ref_graph.objects(term, prop))
+    }
+    exact_match_properties = defaultdict(dict)
+    for key, prop, value in exact_match_property_tuples:
+        exact_match_properties[key][prop] = value
+    return exact_match_properties
+
+def get_ref_graph(*ref_graphs: Graph | str | Path):
+    ref_graph = Graph()
+    file_graphs, input_graphs = partition(lambda graph: isinstance(graph, Graph), ref_graphs)
+    ref_graph = reduce(lambda acc, graph: acc + graph, input_graphs, ref_graph)
+    for file_path in file_graphs:
+        ref_graph.parse(file_path)
+    return ref_graph

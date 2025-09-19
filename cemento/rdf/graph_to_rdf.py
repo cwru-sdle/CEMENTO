@@ -37,6 +37,8 @@ from cemento.rdf.transforms import (
     construct_terms,
     construct_literal_terms,
     get_literal_terms,
+    get_exact_match_properties,
+    get_ref_graph,
 )
 from cemento.term_matching.constants import get_default_namespace_prefixes
 from cemento.term_matching.io import get_rdf_file_iter
@@ -206,8 +208,8 @@ def convert_graph_to_rdf_graph(
 
     # if the term is a predicate and is not part of the default namespaces, add an object property type to the ttl file
     ref_graph = deepcopy(rdf_graph)
-    if onto_ref_folder:
-        ref_graph += combine_graphs(get_rdf_file_iter(onto_ref_folder))
+    if onto_ref_folder is not None:
+        ref_graph += get_ref_graph(*get_rdf_file_iter(onto_ref_folder))
     term_types = get_term_types(ref_graph)
     term_not_in_default_namespace_filter = partial(
         term_not_in_default_namespace,
@@ -238,7 +240,6 @@ def convert_graph_to_rdf_graph(
     )
 
     if onto_ref_folder:
-        exact_match_property_predicates = [RDF.type, RDFS.label]
         exact_match_candidates = list(
             chain_filter(
                 all_terms,
@@ -246,16 +247,7 @@ def convert_graph_to_rdf_graph(
                 term_not_in_default_namespace_filter,
             )
         )
-        exact_match_property_tuples = {
-            (term, prop, value)
-            for term in exact_match_candidates
-            for prop in exact_match_property_predicates
-            for value in list(ref_graph.objects(term, prop))
-        }
-        exact_match_properties = defaultdict(dict)
-        for key, prop, value in exact_match_property_tuples:
-            exact_match_properties[key][prop] = value
-
+        exact_match_properties = get_exact_match_properties(exact_match_candidates, ref_graph)
         rdf_graph = reduce(
             lambda rdf_graph, graph_term: add_exact_matches(
                 term=graph_term,
