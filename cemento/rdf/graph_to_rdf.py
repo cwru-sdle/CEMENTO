@@ -1,10 +1,9 @@
-import sys
+from collections import defaultdict
 from collections import defaultdict
 from copy import deepcopy
 from functools import partial, reduce
-from itertools import chain, filterfalse, starmap
+from itertools import chain, filterfalse
 from pathlib import Path
-from pprint import pprint
 
 import networkx as nx
 import rdflib
@@ -18,7 +17,6 @@ from cemento.rdf.io import (
     get_diagram_terms_iter,
     get_diagram_terms_iter_with_pred,
     get_properties_in_file,
-    save_substitute_log,
 )
 from cemento.rdf.preprocessing import (
     get_term_aliases,
@@ -29,18 +27,16 @@ from cemento.rdf.transforms import (
     add_labels,
     add_rdf_triples,
     bind_prefixes,
-    construct_literal,
-    construct_term_uri,
     get_class_terms,
     get_collection_in_edges,
     get_collection_nodes,
     get_collection_subgraph,
     get_collection_triples_and_targets,
     get_domains_ranges,
-    get_literal_data_type,
-    get_literal_lang_annotation,
-    get_xsd_terms,
     remove_generic_property,
+    construct_terms,
+    construct_literal_terms,
+    get_literal_terms,
 )
 from cemento.term_matching.constants import get_default_namespace_prefixes
 from cemento.term_matching.io import get_rdf_file_iter
@@ -49,11 +45,10 @@ from cemento.term_matching.transforms import (
     combine_graphs,
     get_prefixes,
     get_search_terms,
-    get_substitute_mapping,
     get_term_search_keys,
     get_term_types,
 )
-from cemento.utils.constants import NullTermError, RDFFormat, valid_collection_types
+from cemento.utils.constants import RDFFormat, valid_collection_types
 from cemento.utils.io import (
     get_default_defaults_folder,
     get_default_prefixes_file,
@@ -63,9 +58,6 @@ from cemento.utils.io import (
 )
 from cemento.utils.utils import (
     chain_filter,
-    fst,
-    get_abbrev_term,
-    snd,
 )
 
 
@@ -105,46 +97,22 @@ def convert_graph_to_rdf_graph(
             filter(lambda x: "label" in x[2], collection_in_edges),
         )
     )
-    collection_in_edge_labels_iter = map(
-        lambda x: (x, True), collection_in_edge_labels
-    )
     nodes_to_remove = set(collection_nodes.keys()) | valid_collection_types
     collection_subgraph = get_collection_subgraph(set(collection_nodes.keys()), graph)
     graph.remove_nodes_from(nodes_to_remove)
-    all_diagram_terms = list(chain(get_diagram_terms_iter(graph), collection_in_edge_labels))
-    aliases = {
-        term: aliases
-        for term, aliases in map(
-            lambda term: (term, get_term_aliases(term)),
-            unique_everseen(
-                all_diagram_terms
-            ),
-        )
-    }
-
-    # TODO: assign literal terms IDs so identical values get treated separately
-    literal_terms = {
-        term
-        for term in filter(
-            lambda term: ('"' in term),
-            unique_everseen(
-                all_diagram_terms
-            ),
-        )
-    }
+    all_diagram_terms = list(
+        chain(get_diagram_terms_iter(graph), collection_in_edge_labels)
+    )
+    collection_in_edge_labels_iter = map(lambda x: (x, True), collection_in_edge_labels)
 
     # process search keys now for partial substitution and full substitution later on
     search_keys = {
         term: search_key
         for term, search_key in map(
             lambda term: (term, get_term_search_keys(term, inv_prefixes)),
-            unique_everseen(
-                all_diagram_terms
-            ),
+            unique_everseen(all_diagram_terms),
         )
     }
-
-    # retrieve list of property terms in file to enforce camel case appropriately
     property_terms = get_properties_in_file(
         search_keys,
         all_diagram_terms,
@@ -153,72 +121,32 @@ def convert_graph_to_rdf_graph(
         inv_prefixes,
     )
 
-    # get the list of terms from which to construct URIRefs and Literals and create them
-    construct_term_inputs = list(
-        filter(
-            lambda x: fst(x) not in literal_terms,
-            chain(
-                get_diagram_terms_iter_with_pred(graph, property_terms),
-                collection_in_edge_labels_iter,
-            ),
+    all_diagram_terms_with_pred = list(
+        chain(
+            get_diagram_terms_iter_with_pred(graph, property_terms),
+            collection_in_edge_labels_iter,
         )
     )
-    try:
-        constructed_terms = {
-            term: term_uri_ref
-            for term, term_uri_ref in map(
-                lambda term_info: (
-                    fst(term_info),
-                    construct_term_uri(
-                        *get_abbrev_term(
-                            fst(term_info),
-                            is_predicate=snd(term_info),
-                            default_prefix=default_prefix_for_unassigned,
-                        ),
-                        prefixes=prefixes,
-                    ),
-                ),
-                construct_term_inputs,
-            )
-        }
-    except KeyError as e:
-        offending_key = e.args[0]
-        if prefixes_path:
-            if Path(prefixes_path) == get_default_prefixes_file():
-                raise ValueError(
-                    f"The prefix {offending_key} was used but it was not in the default_prefixes.json file. Please consider making your own file and adding it there. Don't forget to set '--prefixes-file-path' when using the cli or setting 'prefixes_path' arguments when scripting."
-                ) from KeyError
-            else:
-                raise ValueError(
-                    f"The prefix {offending_key} was used but it was not in the prefix.json file located in {prefixes_path}. Please consider adding it there."
-                ) from KeyError
-        else:
-            raise ValueError(
-                f"The prefix {offending_key} was used but it is not part of the default namespace. Consider creating a prefixes.json file and add set the prefixes_path argument."
-            ) from KeyError
-    except NullTermError:
-        raise NullTermError(
-            "A null term has been detected. Please make sure all your arrows and shapes are labelled properly."
-        ) from NullTermError
-
-    substitution_results = get_substitute_mapping(
+    aliases = {
+        term: aliases
+        for term, aliases in map(
+            lambda term: (term, get_term_aliases(term)),
+            unique_everseen(all_diagram_terms),
+        )
+    }
+    constructed_literal_terms = construct_literal_terms(
+        get_literal_terms(all_diagram_terms), search_terms
+    )
+    constructed_terms = construct_terms(
+        all_diagram_terms,
+        all_diagram_terms_with_pred,
+        prefixes,
         search_keys,
         search_terms,
-        all_diagram_terms,
-        log_results=bool(log_substitution_path),
+        prefixes_path,
+        log_substitution_path,
+        default_prefix_for_unassigned=default_prefix_for_unassigned,
     )
-
-    if log_substitution_path:
-        save_substitute_log(substitution_results, log_substitution_path)
-        substitution_results = {
-            key: matched_term
-            for key, (
-                matched_term,
-                _,
-                _,
-            ) in substitution_results.items()
-            if matched_term is not None
-        }
 
     preferred_alias_keyed_inv_constructed_terms = dict()
     for key, value in constructed_terms.items():
@@ -226,21 +154,6 @@ def convert_graph_to_rdf_graph(
         preferred_alias_keyed_inv_constructed_terms[value] = max(
             compare_value, key, key=len
         )
-
-    constructed_terms.update(substitution_results)
-
-    # get datatypes in graph first
-    datatype_search_terms = get_xsd_terms()
-    datatype_search_terms.update(search_terms)
-    constructed_literal_terms = {
-        term: construct_literal(
-            term,
-            lang=get_literal_lang_annotation(term),
-            datatype=get_literal_data_type(term, datatype_search_terms),
-        )
-        for term in literal_terms
-    }
-    constructed_terms.update(constructed_literal_terms)
 
     # # create the rdf graph to store the ttl output
     rdf_graph = rdflib.Graph()

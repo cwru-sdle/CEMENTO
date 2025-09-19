@@ -1,30 +1,38 @@
-from pprint import pprint
 import re
 from collections.abc import Callable, Iterable
 from functools import reduce
-from itertools import chain, groupby
+from itertools import groupby
+from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 import networkx as nx
+from more_itertools import unique_everseen
 from networkx import DiGraph
 from rdflib import OWL, RDF, RDFS, SKOS, XSD, BNode, Graph, Literal, Namespace, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import split_uri
 
-from cemento.axioms.modules import MDS
+from cemento.rdf.io import (
+    save_substitute_log,
+)
 from cemento.rdf.preprocessing import (
     clean_literal_string,
     format_literal,
     remove_suppression_key,
 )
 from cemento.term_matching.constants import RANK_PROPS
-from cemento.term_matching.transforms import substitute_term_multikey
-from cemento.utils.constants import valid_collection_types
-from cemento.axioms.modules import MS
+from cemento.term_matching.transforms import (
+    substitute_term_multikey,
+    get_substitute_mapping,
+)
+from cemento.utils.constants import valid_collection_types, NullTermError
+from cemento.utils.io import get_default_prefixes_file
 from cemento.utils.utils import (
     filter_graph,
     fst,
     snd,
+    get_abbrev_term,
 )
 
 
@@ -373,7 +381,9 @@ def get_collection_in_edges(
         for collection_id in collection_nodes
         for (subj, obj, attr) in graph.in_edges(collection_id, data=True)
         if subj not in valid_collection_types
-        and ("label" not in attr or attr["label"] != "mds:hasCollectionMember") # TODO: convert string comparisons with namespace-class based symbol
+        and (
+            "label" not in attr or attr["label"] != "mds:hasCollectionMember"
+        )  # TODO: convert string comparisons with namespace-class based symbol
     ]
 
 
@@ -464,3 +474,109 @@ def add_collection_links_to_graph(
                 label=data["label"],
             )
     return graph
+
+
+def construct_terms(
+    all_diagram_terms: list[str],
+    all_diagram_terms_with_pred: list[tuple[str, bool]],
+    prefixes: tuple[dict[str, Any], dict[Any, str]],
+    search_keys: dict[str, list[str]],
+    search_terms: dict[str, URIRef],
+    prefixes_path: str | Path,
+    log_substitution_path: str | Path,
+    default_prefix_for_unassigned="mds",
+) -> list[str, URIRef]:
+
+    # TODO: assign literal terms IDs so identical values get treated separately
+    literal_terms = get_literal_terms(all_diagram_terms)
+    # get the list of terms from which to construct URIRefs and Literals and create them
+    construct_term_inputs = list(
+        filter(lambda x: fst(x) not in literal_terms, all_diagram_terms_with_pred)
+    )
+    try:
+        constructed_terms = {
+            term: term_uri_ref
+            for term, term_uri_ref in map(
+                lambda term_info: (
+                    fst(term_info),
+                    construct_term_uri(
+                        *get_abbrev_term(
+                            fst(term_info),
+                            is_predicate=snd(term_info),
+                            default_prefix=default_prefix_for_unassigned,
+                        ),
+                        prefixes=prefixes,
+                    ),
+                ),
+                construct_term_inputs,
+            )
+        }
+    except KeyError as e:
+        offending_key = e.args[0]
+        if prefixes_path:
+            if Path(prefixes_path) == get_default_prefixes_file():
+                raise ValueError(
+                    f"The prefix {offending_key} was used but it was not in the default_prefixes.json file. Please consider making your own file and adding it there. Don't forget to set '--prefixes-file-path' when using the cli or setting 'prefixes_path' arguments when scripting."
+                ) from KeyError
+            else:
+                raise ValueError(
+                    f"The prefix {offending_key} was used but it was not in the prefix.json file located in {prefixes_path}. Please consider adding it there."
+                ) from KeyError
+        else:
+            raise ValueError(
+                f"The prefix {offending_key} was used but it is not part of the default namespace. Consider creating a prefixes.json file and add set the prefixes_path argument."
+            ) from KeyError
+    except NullTermError:
+        raise NullTermError(
+            "A null term has been detected. Please make sure all your arrows and shapes are labelled properly."
+        ) from NullTermError
+
+    substitution_results = get_substitute_mapping(
+        search_keys,
+        search_terms,
+        all_diagram_terms,
+        log_results=bool(log_substitution_path),
+    )
+
+    if log_substitution_path:
+        save_substitute_log(substitution_results, log_substitution_path)
+        substitution_results = {
+            key: matched_term
+            for key, (
+                matched_term,
+                _,
+                _,
+            ) in substitution_results.items()
+            if matched_term is not None
+        }
+
+    constructed_terms.update(substitution_results)
+    constructed_literal_terms = construct_literal_terms(literal_terms, search_terms)
+    constructed_terms.update(constructed_literal_terms)
+
+    return constructed_terms
+
+
+def get_literal_terms(all_diagram_terms):
+    return {
+        term
+        for term in filter(
+            lambda term: ('"' in term),
+            unique_everseen(all_diagram_terms),
+        )
+    }
+
+
+def construct_literal_terms(all_literal_terms, search_terms):
+    # get datatypes in graph first
+    datatype_search_terms = get_xsd_terms()
+    datatype_search_terms.update(search_terms)
+    constructed_literal_terms = {
+        term: construct_literal(
+            term,
+            lang=get_literal_lang_annotation(term),
+            datatype=get_literal_data_type(term, datatype_search_terms),
+        )
+        for term in all_literal_terms
+    }
+    return constructed_literal_terms
