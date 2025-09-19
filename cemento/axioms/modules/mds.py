@@ -9,6 +9,5 @@ class MDS(DefinedNamespace):
     Ontology: URIRef
     hasCollectionMember: URIRef
     enumeration: URIRef
-    ToUncaseTerm: URIRef
 
     _NS = Namespace("https://cwrusdle.bitbucket.io/mds/")

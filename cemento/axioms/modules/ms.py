@@ -25,6 +25,7 @@ class MS(DefinedNamespace):
     minExclusive: URIRef
     Irreflexive: URIRef
     And: URIRef
+    Single: URIRef
     maxExclusive: URIRef
     Transitive: URIRef
     Not: URIRef

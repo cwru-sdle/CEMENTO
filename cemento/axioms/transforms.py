@@ -3,10 +3,11 @@ from collections import defaultdict
 from collections import defaultdict
 from functools import partial
 from itertools import chain, product
-from pprint import pprint
+from uuid import uuid4
 
 import networkx as nx
 import rdflib
+from matplotlib import pyplot as plt
 from more_itertools import partition
 from more_itertools.recipes import flatten
 from networkx import DiGraph
@@ -191,6 +192,7 @@ def convert_axiom_graph_to_rdf(
     )
     prefixes_path = get_default_prefixes_file() if not prefixes_path else prefixes_path
     prefixes, inv_prefixes = get_prefixes(prefixes_path, onto_ref_folder)
+
     collection_nodes = get_collection_nodes(graph)
     collection_in_edges = get_collection_in_edges(collection_nodes.keys(), graph)
     collection_in_edge_labels = list(
@@ -290,6 +292,44 @@ def convert_axiom_graph_to_rdf(
     )
     graph.remove_edges_from(edges_to_remove)
 
+    # expand the graph to conform to the standard format
+    edges_to_remove = []
+    edges_to_add = []
+    nodes_to_add = []
+    for intro_term in intro_terms:
+        intro_term_out_edges = graph.out_edges(intro_term)
+        for subj, obj in intro_term_out_edges:
+            edge_data = graph[subj][obj]
+            pred = edge_data.get("label", None)
+            if pred != uri_to_str(MS.forWhich):
+                combinator = MS.And
+                if len(intro_term_out_edges) == 1:
+                    combinator
+                new_node_id = str(uuid4())
+                new_node_data = {
+                    "term_id": new_node_id,
+                    "label": uri_to_str(combinator),
+                }
+                new_edge_id = str(uuid4())
+                new_edge_data = {
+                    "pred_id": new_edge_id,
+                    "label": uri_to_str(MS.forWhich),
+                }
+
+                id_to_uri_mapping[new_node_id] = combinator
+
+                edges_to_remove.append((subj, obj))
+                nodes_to_add.append((new_node_id, new_node_data))
+                edges_to_add.append((subj, new_node_id, new_edge_data))
+                edges_to_add.append((new_node_id, obj, edge_data))
+    graph.add_nodes_from(nodes_to_add)
+    graph.add_edges_from(edges_to_add)
+    graph.remove_edges_from(edges_to_remove)
+
+    graph = relabel_graph_nodes_with_node_attr(graph)
+    nx.draw(graph, with_labels=True)
+    plt.show()
+
     # TODO: add mapping to exact matches in namespace class generator script
     ms_ttl_term_mapping = {
         MS.equivalentTo: OWL.equivalentClass,
@@ -300,6 +340,7 @@ def convert_axiom_graph_to_rdf(
         MS.Or: OWL.unionOf,
         MS.min: OWL.minQualifiedCardinality,
         MS.only: OWL.allValuesFrom,
+        MS.Single: OWL.unionOf,
     }
 
     # initiate chain
@@ -337,7 +378,6 @@ def convert_axiom_graph_to_rdf(
     compressed_graph = nx.DiGraph()
     node_containers = defaultdict(list)
     pivot_subjects = dict()
-    # FIXME: adjust algorithm to work for simple graphs (graphs without AND or OR)
     for intro_term in intro_terms:
         combinator_parents = dict()
         current_pivot = None
@@ -403,6 +443,9 @@ def convert_axiom_graph_to_rdf(
                     # assume all members have the same predicate to start
                     conn_pred = id_to_uri_mapping[node_containers[members[0]][0][0]]
                     expanded_axiom_rdf_graph.add((pivot_subject, conn_pred, node))
+                    for member in members:
+                        member_prop = id_to_uri_mapping[node_containers[member][0][1]]
+                        expanded_axiom_rdf_graph.add((member, OWL.onProperty, member_prop))
 
                 # unwrap singular members and add the unwrapped node to the collection
                 members = set(tree.successors(node))
