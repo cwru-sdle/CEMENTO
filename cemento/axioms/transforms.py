@@ -1,25 +1,22 @@
 import sys
 from collections import defaultdict
+from collections import defaultdict
 from functools import partial
-from itertools import chain, product, filterfalse
+from itertools import chain, product
 from pprint import pprint
 
 import networkx as nx
 import rdflib
-from matplotlib import pyplot as plt
 from more_itertools import partition
-from more_itertools.more import map_reduce, filter_map
 from more_itertools.recipes import flatten
 from networkx import DiGraph
-from rdflib import Graph, BNode, URIRef, Literal
+from rdflib import Graph, BNode
 from rdflib.collection import Collection
-from rdflib.namespace import RDF, SKOS, OWL, RDFS
-from thefuzz.process import extractOne
+from rdflib.namespace import RDF, SKOS, OWL
 
 from cemento.axioms.constants import combinators, class_rest_preds, prop_rest_preds
-from cemento.axioms.modules import MS, MDS
+from cemento.axioms.modules import MS
 from cemento.draw_io.constants import DiagramKey
-from cemento.rdf.filters import term_not_in_default_namespace, term_in_search_results
 from cemento.rdf.io import get_diagram_terms_iter
 from cemento.rdf.transforms import (
     construct_terms,
@@ -27,16 +24,9 @@ from cemento.rdf.transforms import (
     get_collection_in_edges,
     split_collection_graph,
     get_search_keys,
-    get_graph_diagram_terms_with_pred,
-    construct_literal_terms,
-    get_literal_terms,
     get_collection_triples_and_targets,
     add_collection_links_to_graph,
-    get_exact_match_properties,
-    get_ref_graph,
 )
-from cemento.term_matching.constants import get_default_namespace_prefixes
-from cemento.term_matching.io import get_rdf_file_iter
 from cemento.term_matching.transforms import (
     substitute_term,
     get_search_terms,
@@ -51,8 +41,6 @@ from cemento.utils.io import (
 from cemento.utils.utils import (
     get_graph_root_nodes,
     get_subgraphs,
-    chain_filter,
-    get_abbrev_term,
     get_uri_ref_str,
 )
 
@@ -256,7 +244,6 @@ def convert_axiom_graph_to_rdf(
     id_to_uri_mapping = {
         key: constructed_terms[value] for key, value in diagram_term_names.items()
     }
-    uri_to_id_mapping = {value: key for key, value in id_to_uri_mapping.items()}
     collection_triples, collection_targets = get_collection_triples_and_targets(
         collection_nodes,
         collection_subgraph,
@@ -318,7 +305,6 @@ def convert_axiom_graph_to_rdf(
     # initiate chain
     # NOTE: the chains only apply to property restrictions!
     # TODO: add support for just datatype. Datatype facets for property restrictions are supported.
-    expanded_axiom_rdf_graph = rdflib.Graph()
     for prefix, namespace_uri in prefixes.items():
         expanded_axiom_rdf_graph.bind(prefix, namespace_uri)
 
@@ -399,7 +385,6 @@ def convert_axiom_graph_to_rdf(
         terms_to_unwrap = dict()
         for node in nx.dfs_postorder_nodes(tree):
             node_data = tree.nodes[node]
-            print(node)
             if node_data:  # if there is data, it is a combinator
                 pivot_type = node_data["type"]
                 pivot_subject = id_to_uri_mapping[node_data["subject"]]
@@ -430,7 +415,7 @@ def convert_axiom_graph_to_rdf(
                 )
                 rem_members = members - terms_to_unwrap.keys()
                 members = rem_members | members_to_unwrap
-                Collection(expanded_axiom_rdf_graph, inner_node, members)  # STARBOY
+                Collection(expanded_axiom_rdf_graph, inner_node, members)
 
             else:  # else, it is a branch
                 if len(node_containers[node]) == 1:
@@ -446,11 +431,7 @@ def convert_axiom_graph_to_rdf(
                         pred = OWL.onProperty
                     if pred in ms_ttl_term_mapping:
                         pred = ms_ttl_term_mapping[pred]
-                    expanded_axiom_rdf_graph.add((node, pred, obj))
-
-            pprint(node_containers[node])
-            print()
-        print("---" * 10)
+                        expanded_axiom_rdf_graph.add((node, pred, obj))
 
     expanded_axiom_rdf_graph.serialize("axiom_intermediate.ttl", format="turtle")
 
