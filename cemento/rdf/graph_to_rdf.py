@@ -111,12 +111,13 @@ def convert_graph_to_rdf_graph(
     nodes_to_remove = set(collection_nodes.keys()) | valid_collection_types
     collection_subgraph = get_collection_subgraph(set(collection_nodes.keys()), graph)
     graph.remove_nodes_from(nodes_to_remove)
+    all_diagram_terms = list(chain(get_diagram_terms_iter(graph), collection_in_edge_labels))
     aliases = {
         term: aliases
         for term, aliases in map(
             lambda term: (term, get_term_aliases(term)),
             unique_everseen(
-                chain(get_diagram_terms_iter(graph), collection_in_edge_labels)
+                all_diagram_terms
             ),
         )
     }
@@ -127,7 +128,7 @@ def convert_graph_to_rdf_graph(
         for term in filter(
             lambda term: ('"' in term),
             unique_everseen(
-                chain(get_diagram_terms_iter(graph), collection_in_edge_labels)
+                all_diagram_terms
             ),
         )
     }
@@ -138,7 +139,7 @@ def convert_graph_to_rdf_graph(
         for term, search_key in map(
             lambda term: (term, get_term_search_keys(term, inv_prefixes)),
             unique_everseen(
-                chain(get_diagram_terms_iter(graph), collection_in_edge_labels)
+                all_diagram_terms
             ),
         )
     }
@@ -146,7 +147,7 @@ def convert_graph_to_rdf_graph(
     # retrieve list of property terms in file to enforce camel case appropriately
     property_terms = get_properties_in_file(
         search_keys,
-        chain(get_diagram_terms_iter(graph), collection_in_edge_labels),
+        all_diagram_terms,
         graph,
         defaults_folder,
         inv_prefixes,
@@ -203,7 +204,7 @@ def convert_graph_to_rdf_graph(
     substitution_results = get_substitute_mapping(
         search_keys,
         search_terms,
-        chain(get_diagram_terms_iter(graph), collection_in_edge_labels),
+        all_diagram_terms,
         log_results=bool(log_substitution_path),
     )
 

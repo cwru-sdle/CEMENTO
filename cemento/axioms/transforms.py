@@ -307,7 +307,6 @@ def expand_axiom_terms(restriction_rdf_graph: Graph) -> Graph:
     # nx.draw(compressed_graph, with_labels=True)
     # plt.show()
     compressed_graph = nx.relabel_nodes(compressed_graph, node_bnode_mapping)
-    pprint(node_containers)
     node_containers = {
         node_bnode_mapping[key]: values for key, values in node_containers.items()
     }
