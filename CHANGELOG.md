@@ -18,7 +18,13 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
-## [0.12.0] - 2025-10-01
+## [0.12.2] - 2025-10-01
+
+### Fixed
+
+- missing dependency `more_itertools`
+
+## [0.12.1] - 2025-10-01
 
 ### Fixed
 
