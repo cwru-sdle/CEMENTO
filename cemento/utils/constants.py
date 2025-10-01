@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Self
 
 
 class RDFFormatException(BaseException):
@@ -16,7 +15,7 @@ class RDFFormat(Enum):
     N3 = "n3"
 
     @classmethod
-    def from_input(cls: Self, input_format: str) -> Self:
+    def from_input(cls, input_format: str):
         format_mapping = {
             "turtle": RDFFormat.TURTLE,
             "ttl": RDFFormat.TURTLE,
@@ -38,7 +37,7 @@ class RDFFormat(Enum):
         return format_mapping[input_format]
 
     @classmethod
-    def from_ext(cls: Self, file_ext: str) -> Self:
+    def from_ext(cls, file_ext: str):
         format_mapping = {
             ".ttl": RDFFormat.TURTLE,
             ".xml": RDFFormat.XML,
