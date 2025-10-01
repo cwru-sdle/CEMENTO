@@ -18,6 +18,12 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.12.3] - 2025-10-01
+
+### Hotfix
+
+- added `more_itertools` to `pyproject.toml` as a dependency
+
 ## [0.12.2] - 2025-10-01
 
 ### Fixed

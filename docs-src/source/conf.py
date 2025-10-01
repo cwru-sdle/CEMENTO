@@ -14,7 +14,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "cemento"))
 project = "CEMENTO"
 copyright = "2025, CWRU SDLE-MDS3 Center of Excellence"
 author = "Gabriel Obsequio Ponon"
-release = "0.12.2"
+release = "0.12.3"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
