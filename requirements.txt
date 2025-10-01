@@ -5,6 +5,7 @@ pandas
 rdflib
 thefuzz
 tldextract
+more_itertools
 build
 twine
 pytest
