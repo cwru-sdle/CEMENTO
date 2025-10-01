@@ -18,6 +18,12 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.12.0] - 2025-10-01
+
+### Fixed
+
+- `Self` object from `typing` causing incompatibility with python 3.10.
+
 ## [0.12.0] - 2025-08-16
 
 ### Added

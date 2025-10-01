@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cemento"
-version = "0.12.0"
+version = "0.12.1"
 authors = [{ name = "Gabriel Obsequio Ponon", email = "gop2@case.edu" }]
 description = "A package to view and write ontologies directly from draw.io diagram files."
 readme = "README.md"
