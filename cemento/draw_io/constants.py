@@ -4,6 +4,14 @@ from enum import Enum
 from math import atan2, pi
 from typing import NamedTuple
 
+from more_itertools import flatten
+from rdflib import URIRef
+
+
+class TermCase(Enum):
+    PASCAL_CASE = "pascal"
+    CAMEL_CASE = "camel_case"
+
 
 class DiagramKey(Enum):
     TERM_ID = "term_id"
@@ -359,3 +367,8 @@ class FloatingContainerError(BaseContainerError):
         self.header = f"The container with id: {container_id} and content: {container_value} and members with ids: {member_ids} and corresponding values: {member_values}"
         self.message = f"{self.header} does not have any connections."
         super().__init__(self.message)
+
+
+def get_namespace_terms(*namespaces) -> set[URIRef]:
+    namespace_terms = map(dir, namespaces)
+    return set(filter(lambda term: isinstance(term, URIRef), flatten(namespace_terms)))

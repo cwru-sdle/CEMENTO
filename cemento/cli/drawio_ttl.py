@@ -75,6 +75,5 @@ def run(args):
         defaults_folder=args.defaults_folder_path,
         prefixes_path=args.prefix_file_path,
         check_errors=args.dont_check_errors,
-        collect_domains_ranges=args.collect_domains_ranges,
         log_substitution_path=args.log_substitution_path,
     )

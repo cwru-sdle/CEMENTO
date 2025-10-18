@@ -36,7 +36,7 @@ from cemento.utils.utils import (
 
 
 class TermCase(Enum):
-    PASCAL_CASE = ("pascal",)
+    PASCAL_CASE = "pascal"
     CAMEL_CASE = "camel_case"
 
 

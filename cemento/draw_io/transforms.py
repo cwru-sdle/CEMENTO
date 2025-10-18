@@ -17,7 +17,6 @@ from cemento.draw_io.constants import (
     ClassShape,
     Connector,
     DiagramInfo,
-    DiagramKey,
     DiagramObject,
     InstanceShape,
     Label,
@@ -33,8 +32,6 @@ from cemento.draw_io.preprocessing import (
     clean_term_preserving_quotes,
     remove_predicate_quotes,
 )
-from cemento.term_matching.constants import RANK_PROPS
-from cemento.term_matching.transforms import substitute_term
 from cemento.utils.utils import (
     filter_graph,
     fst,
@@ -184,86 +181,6 @@ def extract_elements(
     return term_ids, rel_ids
 
 
-def generate_graph(
-    elements: dict[str, dict[str, any]],
-    term_ids: set[str],
-    relationship_ids: set[str],
-    strat_terms: set[str] = None,
-    exempted_elements: set[str] = None,
-    inverted_rank_arrow: bool = False,
-) -> DiGraph:
-    # for identified connectors, extract relationship information
-    graph = nx.DiGraph()
-    # add all terms
-    term_ids = filter(
-        lambda element_id: exempted_elements is None
-        or element_id not in exempted_elements,
-        term_ids,
-    )
-    relationship_ids = filter(
-        lambda element_id: exempted_elements is None
-        or element_id not in exempted_elements,
-        relationship_ids,
-    )
-    for term_id in term_ids:
-        term = elements[term_id]["value"]
-        # TODO: find more sophisticated method to detect literals, or mention method in the docs
-        graph.add_node(
-            term_id,
-            term_id=term_id,
-            label=term,
-            is_literal=('"' in term or "&quot;" in term),
-            parent=(
-                term_info["parent"]
-                if "parent" in (term_info := elements[term_id])
-                else None
-            ),
-        )
-
-    # add all relationships
-    for rel_id in relationship_ids:
-        try:
-            subj_id = elements[rel_id]["source"]
-            obj_id = elements[rel_id]["target"]
-        except KeyError as e:
-            raise ValueError(
-                f"cannot access {e.args[0]} from the attributes of a relationship in the elements dictionary. Please take a look at relationship with id {rel_id}"
-            ) from KeyError
-
-        pred = elements[rel_id]["value"]
-
-        if strat_terms:
-            pred, is_strat = substitute_term(pred, strat_terms)
-        else:
-            # default to just taking rank terms, which are always known
-            is_strat = pred in RANK_PROPS
-        # TODO: add set to a list on constants, dynamically retrieve
-        pred, is_rank = substitute_term(pred, {"rdfs:subClassOf", "rdf:type"})
-        # arrow conventions are inverted for rank relationships, flip assignments to conform
-        if inverted_rank_arrow and is_strat:
-            temp = subj_id
-            subj_id = obj_id
-            obj_id = temp
-
-        graph.add_edge(
-            subj_id,
-            obj_id,
-            label=pred,
-            pred_id=rel_id,
-            is_strat=is_strat,
-            is_rank=is_rank,
-            is_predicate=True,
-        )
-
-    return graph
-
-
-def add_node_to_digraph(graph: DiGraph, node: tuple[any, dict[str, any]]) -> DiGraph:
-    new_graph = graph.copy()
-    new_graph.add_node(node)
-    return new_graph
-
-
 # function for generating container lists
 # just store the ids
 def parse_containers(elements: dict[str, dict[str, any]]) -> dict[str, list[str]]:
@@ -285,58 +202,6 @@ def get_container_values(
         )
         for container_id in containers.keys()
     }
-
-
-def link_container_members(graph: DiGraph, containers: dict[str, list[str]]) -> DiGraph:
-    graph = graph.copy()
-    for container_id, items in containers.items():
-        for item in items:
-            graph.add_edge(container_id, item, label="mds:hasCollectionMember")
-    return graph
-
-
-def get_container_collection_types(
-    graph: DiGraph, container_labels: dict[str, str], containers: dict[str, list[str]]
-) -> dict[str, str]:
-    graph = graph.copy()
-    for container_id in containers.keys():
-        container_type = container_labels[container_id]
-        if not container_type.strip():
-            container_type = "mds:tripleSyntaxSugar"
-        else:
-            # TODO: move search terms to constants file
-            valid_collection_types = {
-                "owl:unionOf",
-                "owl:intersectionOf",
-                "owl:complementOf",
-                "mds:tripleSyntaxSugar",
-            }
-            container_type, did_substitute = substitute_term(
-                container_type,
-                valid_collection_types,
-            )
-            # TODO: move to error check
-            if not did_substitute:
-                raise ValueError(
-                    f"The provided collection header does not seem to match any of the valid collection types. Choose between: {valid_collection_types} or leaving the header blank."
-                )
-        graph.add_edge(container_type, container_id)
-    return graph
-
-
-def relabel_graph_nodes_with_node_attr(
-    graph: DiGraph, new_attr_label: str = DiagramKey.TERM_ID.value
-) -> DiGraph:
-    node_info = nx.get_node_attributes(graph, new_attr_label)
-    relabel_mapping = {
-        current_node_label: (
-            node_info[current_node_label]
-            if current_node_label in node_info
-            else current_node_label
-        )
-        for current_node_label in graph.nodes
-    }
-    return nx.relabel_nodes(graph, relabel_mapping)
 
 
 def get_non_ranked_strat_edges(graph: DiGraph) -> Iterable[tuple[any, any]]:

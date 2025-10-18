@@ -1,9 +1,9 @@
 from itertools import chain
 from pathlib import Path
 
-from networkx import DiGraph
+from more_itertools import unique_everseen
 
-from cemento.draw_io.constants import BadDiagramError, DiagramKey
+from cemento.draw_io.constants import BadDiagramError
 from cemento.draw_io.io import write_error_diagram
 from cemento.draw_io.preprocessing import (
     find_errors_diagram_content,
@@ -11,38 +11,13 @@ from cemento.draw_io.preprocessing import (
 )
 from cemento.draw_io.transforms import (
     extract_elements,
-    generate_graph,
-    get_container_collection_types,
     get_container_values,
-    link_container_members,
     parse_containers,
     parse_elements,
-    relabel_graph_nodes_with_node_attr,
-)
-from cemento.term_matching.transforms import get_prefixes, get_strat_predicates_str
-from cemento.utils.io import (
-    get_default_defaults_folder,
-    get_default_prefixes_file,
-    get_default_references_folder,
 )
 
 
-def read_drawio(
-    input_path: str | Path,
-    onto_ref_folder: str | Path = None,
-    prefixes_file: str | Path = None,
-    defaults_folder: str | Path = None,
-    relabel_key: DiagramKey = DiagramKey.LABEL,
-    check_errors: bool = False,
-    inverted_rank_arrow: bool = False,
-) -> DiGraph:
-    prefixes_file = get_default_prefixes_file() if not prefixes_file else prefixes_file
-    defaults_folder = (
-        get_default_defaults_folder() if not defaults_folder else defaults_folder
-    )
-    onto_ref_folder = (
-        get_default_references_folder() if not onto_ref_folder else onto_ref_folder
-    )
+def read_drawio(input_path: str | Path, check_errors: bool = False):
 
     elements = parse_elements(input_path)
     containers = parse_containers(elements)
@@ -51,12 +26,7 @@ def read_drawio(
     non_container_elements = dict(
         filter(lambda item: item[0] not in containers.keys(), elements.items())
     )
-    term_ids, rel_ids = extract_elements(non_container_elements)
-    strat_props = None
-    prefixes, inv_prefixes = get_prefixes(prefixes_file, onto_ref_folder)
-    strat_props = get_strat_predicates_str(
-        onto_ref_folder, defaults_folder, inv_prefixes
-    )
+    term_ids, property_ids = extract_elements(non_container_elements)
 
     error_exemptions = get_diagram_error_exemptions(non_container_elements)
 
@@ -65,7 +35,7 @@ def read_drawio(
         errors = find_errors_diagram_content(
             elements,
             term_ids,
-            rel_ids,
+            property_ids,
             serious_only=True,
             containers=containers,
             container_content=container_content,
@@ -80,16 +50,13 @@ def read_drawio(
                 print(elem_id, error)
             raise BadDiagramError(checked_diagram_path)
 
-    print("generating graph...")
-    graph = generate_graph(
-        non_container_elements,
-        term_ids,
-        rel_ids,
-        strat_terms=strat_props,
-        exempted_elements=error_exemptions,
-        inverted_rank_arrow=inverted_rank_arrow,
-    )
-    graph = get_container_collection_types(graph, container_labels, containers)
-    graph = link_container_members(graph, containers)
-    graph = relabel_graph_nodes_with_node_attr(graph, new_attr_label=relabel_key.value)
-    return graph
+    triples = [
+        (
+            elements[triple_id]["source"],
+            triple_id,
+            elements[triple_id]["target"],
+        )
+        for triple_id in property_ids
+    ]
+    all_terms = unique_everseen(chain(term_ids, property_ids))
+    return elements, all_terms, triples

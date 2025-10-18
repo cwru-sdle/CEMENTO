@@ -3,6 +3,7 @@ from collections import defaultdict
 from collections.abc import Container, Iterable
 from functools import partial, reduce
 from itertools import chain
+from operator import itemgetter
 from pathlib import Path
 
 import tldextract
@@ -10,6 +11,7 @@ from more_itertools import unique_everseen
 from rdflib import OWL, RDF, RDFS, SKOS, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import split_uri
 from thefuzz import fuzz, process
+from thefuzz.process import extractOne
 
 from cemento.term_matching.constants import (
     FALLBACK_STRAT_TYPES,
@@ -19,8 +21,6 @@ from cemento.term_matching.constants import (
 from cemento.term_matching.io import (
     get_rdf_file_iter,
     get_rdf_graph,
-    get_search_terms_from_defaults,
-    get_search_terms_from_graph,
     read_prefixes_from_graph,
     read_prefixes_from_json,
 )
@@ -63,64 +63,28 @@ def get_term_matches(
 
 
 def substitute_term(
-    term: str, search_terms: set[str], score_cutoff=90
-) -> tuple[str, bool]:
-    matched_rank_term, score = (
-        match_res if (match_res := get_term_matches(term, search_terms)) else (None, 0)
+    search_keys: list[str] | str, search_pool: set[tuple[URIRef, str]]
+) -> URIRef | None:
+    if isinstance(search_keys, str):
+        search_keys = [search_keys]
+    results = map(
+        partial(
+            extractOne,
+            choices=search_pool,
+            processor=lambda item: item[1] if isinstance(item, tuple) else item,
+            scorer=fuzz.token_sort_ratio,
+            score_cutoff=90,
+        ),
+        search_keys,
     )
-    return (
-        matched_rank_term if (meets_cutoff := score > score_cutoff) else term,
-        meets_cutoff,
-    )
+    results = filter(lambda item: item is not None, results)
+    best_match = max(results, key=itemgetter(1), default=None)
 
-
-def substitute_term_multikey(
-    search_keys: Iterable[str],
-    search_terms: dict[str, URIRef],
-    score_cutoff: int = 80,
-    log_results: bool = False,
-    suppression_key: str = "*",
-) -> URIRef | tuple[URIRef, list[tuple[URIRef, int]]]:
-
-    if any([suppression_key in key for key in search_keys]):
-        if log_results:
-            return (None, [None], [(None, None)])
+    if best_match is None:
         return None
 
-    search_keys = search_keys if not log_results else list(search_keys)
-    search_results = search_similar_terms_multikey(
-        search_keys, search_terms.keys(), score_cutoff=score_cutoff
-    )
-    best_match, _ = max(
-        search_results,
-        key=lambda x: x[1] if x is not None else -1,
-        default=(None, -1),
-    )
-    term_substitute = search_terms[best_match] if best_match else None
-    if log_results:
-        return (term_substitute, search_keys, search_results)
-    return term_substitute
-
-
-def get_substitute_mapping(
-    search_keys: dict[str, list[str]],
-    search_pool: dict[str, URIRef],
-    terms: Iterable[str],
-    log_results: bool = False,
-):
-    return {
-        term: substituted_value
-        for term, substituted_value in map(
-            lambda term: (
-                term,
-                substitute_term_multikey(
-                    search_keys[term], search_pool, log_results=log_results
-                ),
-            ),
-            unique_everseen(terms),
-        )
-        if substituted_value is not None
-    }
+    (best_match, _), _ = best_match
+    return best_match
 
 
 def get_term_search_keys(term: str, inv_prefix: dict[URIRef, str]) -> list[str]:
@@ -136,33 +100,6 @@ def get_term_search_keys(term: str, inv_prefix: dict[URIRef, str]) -> list[str]:
     return [key.strip() for key in search_keys]
 
 
-def get_term_search_result(
-    term: URIRef,
-    inv_prefixes: dict[URIRef | Namespace, str],
-    search_terms: dict[str, URIRef],
-) -> URIRef:
-    ns, abbrev_term = split_uri(term)
-    prefix = inv_prefixes[str(ns)]
-    search_term = f"{prefix}:{abbrev_term}"
-    if search_term in search_terms:
-        return search_terms[search_term]
-    return None
-
-
-def add_exact_matches(
-    term: URIRef, match_properties: dict[URIRef, URIRef | None], rdf_graph: Graph
-) -> Graph:
-    # if the term is already imported from somewhere else
-    # get the type and label if available and add to the ttl file
-    for match_property, value in match_properties.items():
-        if value:
-            rdf_graph.add((term, match_property, value))
-
-    # add an exact match to the ttl file for easier cross-referencing
-    rdf_graph.add((term, SKOS.exactMatch, term))
-    return rdf_graph
-
-
 def get_aliases(rdf_graph: Graph) -> dict[URIRef, Literal]:
     label_tuples = list(
         chain(
@@ -175,14 +112,6 @@ def get_aliases(rdf_graph: Graph) -> dict[URIRef, Literal]:
     for key, value in label_tuples:
         aliases[key].append(value)
     return aliases
-
-
-def get_term_types(rdf_graph: Graph) -> dict[URIRef, URIRef]:
-    return {subj: obj for subj, pred, obj in rdf_graph if pred == RDF.type}
-
-
-def combine_graphs(graphs: Iterable[Graph]) -> Graph:
-    return reduce(lambda acc, graph: acc + graph, graphs, Graph())
 
 
 def generate_residual_prefixes(
@@ -285,30 +214,6 @@ def get_default_terms(defaults_folder: str | Path = None):
         filter(lambda x: isinstance(x, URIRef), default_terms_from_lib)
     )
     return default_terms_from_lib
-
-
-def get_search_terms(
-    inv_prefixes: dict[URIRef, str],
-    onto_ref_folder: str | Path = None,
-    defaults_folder: str | Path = None,
-):
-    search_terms = get_search_terms_from_defaults(get_default_namespace_prefixes())
-
-    if defaults_folder:
-        defaults_file_search_terms = map(
-            partial(get_search_terms_from_graph, inv_prefixes=inv_prefixes),
-            get_rdf_file_iter(defaults_folder),
-        )
-        search_terms |= merge_dictionaries(defaults_file_search_terms)
-
-    if onto_ref_folder:
-        file_search_terms = map(
-            partial(get_search_terms_from_graph, inv_prefixes=inv_prefixes),
-            get_rdf_file_iter(onto_ref_folder),
-        )
-        search_terms |= merge_dictionaries(file_search_terms)
-
-    return search_terms
 
 
 def get_prop_family(rdf_graph: Graph, prop: URIRef) -> set[URIRef]:
@@ -445,28 +350,3 @@ def get_strat_predicates(
             )
         )
     )
-
-
-def get_strat_predicates_str(
-    onto_ref_folder: str | Path,
-    defaults_folder: str | Path,
-    inv_prefixes: dict[URIRef | Namespace, str],
-) -> set[str]:
-    strat_preds = get_strat_predicates(onto_ref_folder, defaults_folder, inv_prefixes)
-    stat_pred_aliases = (
-        get_term_aliases_from_graph(graph, pred)
-        for graph in get_rdf_file_iter(onto_ref_folder)
-        for pred in strat_preds
-    )
-    stat_preds_str = map(
-        partial(get_abbrev_uri, inv_prefixes=inv_prefixes), strat_preds
-    )
-    aliased_stat_preds_str = (
-        get_abbrev_prefixed_literal(term, alias, inv_prefixes)
-        for term, aliases in stat_pred_aliases
-        for alias in aliases
-    )
-    rank_props_str = map(
-        partial(get_abbrev_uri, inv_prefixes=inv_prefixes), get_rank_props()
-    )
-    return set(chain(stat_preds_str, aliased_stat_preds_str, rank_props_str))

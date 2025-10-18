@@ -1,3 +1,4 @@
+from more_itertools import flatten
 from rdflib import DCTERMS, OWL, RDF, RDFS, SKOS, Namespace, URIRef
 
 default_namespaces = [RDF, RDFS, OWL, DCTERMS, SKOS]
@@ -26,3 +27,8 @@ def get_default_namespace_prefixes() -> tuple[str, URIRef | Namespace]:
             default_namespace_prefixes, default_namespaces, strict=True
         )
     }
+
+
+def get_namespace_terms(*namespaces) -> set[URIRef]:
+    namespace_terms = map(dir, namespaces)
+    return set(filter(lambda term: isinstance(term, URIRef), flatten(namespace_terms)))
