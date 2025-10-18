@@ -9,3 +9,5 @@ sandbox/
 /*.drawio
 /*.ttl
 *-error_check.drawio
+*.ttl
+sandbox
