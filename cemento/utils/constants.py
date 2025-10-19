@@ -1,5 +1,7 @@
 from enum import Enum
 
+from rdflib import URIRef, OWL
+
 
 class RDFFormatException(BaseException):
     def __init__(self, message="Error when parsing RDF format"):
@@ -77,9 +79,5 @@ class NullTermError(ValueError):
     pass
 
 
-valid_collection_types = {
-    "owl:unionOf",
-    "owl:intersectionOf",
-    "owl:complementOf",
-    "mds:tripleSyntaxSugar",
-}
+def invert_tuple(input_tuple: tuple[any, any]) -> tuple[any, any]:
+    return ((item[1], item[0]) for item in input_tuple)

@@ -21,7 +21,6 @@ def read_drawio(input_path: str | Path, check_errors: bool = False):
 
     elements = parse_elements(input_path)
     containers = parse_containers(elements)
-    container_content = set(chain(*containers.values()))
     container_labels = get_container_values(containers, elements)
     non_container_elements = dict(
         filter(lambda item: item[0] not in containers.keys(), elements.items())
@@ -32,6 +31,7 @@ def read_drawio(input_path: str | Path, check_errors: bool = False):
 
     if check_errors:
         print("Checking for diagram errors...")
+        container_content = set(chain(*containers.values()))
         errors = find_errors_diagram_content(
             elements,
             term_ids,
@@ -50,6 +50,9 @@ def read_drawio(input_path: str | Path, check_errors: bool = False):
                 print(elem_id, error)
             raise BadDiagramError(checked_diagram_path)
 
+    output_containers = {
+        key: (container_labels[key], containers[key]) for key in containers
+    }
     triples = [
         (
             elements[triple_id]["source"],
@@ -59,4 +62,4 @@ def read_drawio(input_path: str | Path, check_errors: bool = False):
         for triple_id in property_ids
     ]
     all_terms = unique_everseen(chain(term_ids, property_ids))
-    return elements, all_terms, triples
+    return elements, all_terms, triples, output_containers
