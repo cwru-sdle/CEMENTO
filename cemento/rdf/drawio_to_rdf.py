@@ -3,12 +3,13 @@ from functools import reduce
 from itertools import chain
 from pathlib import Path
 
+import pandas as pd
 from more_itertools import partition
 from rdflib import RDF, RDFS, Graph, Literal
 from rdflib import SKOS, XSD
 
 from cemento.draw_io.read_diagram import read_drawio
-from cemento.rdf.io import aggregate_graphs
+from cemento.rdf.io import aggregate_graphs, save_substitution_log
 from cemento.rdf.preprocessing import extract_aliases
 from cemento.rdf.transforms import (
     construct_literal,
@@ -147,6 +148,15 @@ def convert_graph_to_rdf_graph(
             if key in not_substituted.keys()
         }
     )
+
+    if log_substitution_path is not None:
+        save_substitution_log(
+            uriref_terms,
+            term_search_keys,
+            term_substitution,
+            substituted.keys(),
+            log_substitution_path,
+        )
 
     literal_terms = dict(literal_terms)
 
