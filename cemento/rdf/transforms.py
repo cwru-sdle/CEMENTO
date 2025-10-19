@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import networkx as nx
 from networkx import DiGraph
-from rdflib import Graph, Literal, Namespace, URIRef, RDFS, RDF, Node, SKOS
+from rdflib import Graph, Literal, Namespace, URIRef, RDFS, RDF, Node, SKOS, BNode, OWL
 from rdflib.namespace import split_uri
 
 from cemento.rdf.preprocessing import (
@@ -26,6 +26,17 @@ def construct_literal(term: str, lang="en", datatype=None) -> Literal:
 
 def get_literal_lang_annotation(literal_term: str, default=None) -> str:
     return res[0] if (res := re.findall(r"@(\w+)", literal_term)) else default
+
+
+def get_child_type(
+    classes: set[URIRef], instances: set[URIRef], child: Node
+) -> URIRef | None:
+    if isinstance(child, BNode):
+        return OWL.Nothing
+    child_type = None
+    if child in classes or child in instances:
+        child_type = OWL.Class if child in classes else OWL.NamedIndividual
+    return child_type
 
 
 def get_term_search_pool(

@@ -2,7 +2,6 @@ import re
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from pprint import pprint
 
 from more_itertools import partition
 from rdflib import RDF, RDFS, Graph, Literal, BNode, OWL
@@ -18,6 +17,7 @@ from cemento.rdf.transforms import (
     get_term_search_pool,
     replace_term_in_triples,
     get_classes_instances,
+    get_child_type,
 )
 from cemento.term_matching.constants import (
     get_namespace_terms,
@@ -214,18 +214,31 @@ def convert_graph_to_rdf_graph(
             continue
         rdf_graph.add(triple)
 
+    ## get classes and instances to classify collection members and annotate later
+    classes, instances = get_classes_instances(rdf_graph)
+
     # add the collections to the graph
     for key, (label, children) in containers.items():
         label = substitute_term(
             label, set(invert_tuple(valid_collection_types.items()))
         )
         children = [term_substitution[item] for item in children]
+        first_child_type = get_child_type(classes, instances, children[0])
+        if any(
+            (child_type := get_child_type(classes, instances, term)) != first_child_type
+            and child_type != OWL.Nothing
+            for term in children
+        ):
+            raise ValueError(
+                "Cannot combine terms with different types in a collection. Combinations should only be BNodes, OWL.Class or OWL.NamedIndividual..."
+            )
         collection_bnode = BNode()
         Collection(rdf_graph, collection_bnode, children)
-        rdf_graph.add((collection_headers[key], RDF.type, OWL.Class))
+        if first_child_type is not None:
+            rdf_graph.add((collection_headers[key], RDF.type, first_child_type))
         rdf_graph.add((collection_headers[key], label, collection_bnode))
 
-    ## replace all properties with lowercase equivalents
+    ## retrieve all defined properties for annotation logic
     property_classes = defaults_graph.transitive_subjects(
         predicate=RDFS.subClassOf, object=RDF.Property
     )
@@ -245,12 +258,22 @@ def convert_graph_to_rdf_graph(
     }
 
     graph_prop_urirefs = set(graph_properties.values())
+
+    ## remove properties from classes and instances when annotating types
+    classes -= graph_prop_urirefs
+    instances -= graph_prop_urirefs
+
+    ## replace all properties with lowercase equivalents
     if enforce_camel_case:
         prop_rename_dict = {
-            key: convert_str_uriref(
-                convert_uriref_str(prop, inv_prefixes),
-                prefixes,
-                case=TermCase.CAMEL_CASE,
+            key: (
+                prop
+                if key in exclude_term
+                else convert_str_uriref(
+                    convert_uriref_str(prop, inv_prefixes),
+                    prefixes,
+                    case=TermCase.CAMEL_CASE,
+                )
             )
             for key, prop in graph_properties.items()
         }
@@ -258,20 +281,15 @@ def convert_graph_to_rdf_graph(
         prop_updated_iri_dict = {
             prop: prop_rename_dict[key] for key, prop in graph_properties.items()
         }
-        graph_prop_urirefs = set(prop_updated_iri_dict.values())
         for prop, new_iri in prop_updated_iri_dict.items():
             rdf_graph = replace_term_in_triples(rdf_graph, prop, new_iri)
-
-    ## add class or type annotation for terms in graph
-    classes, instances = get_classes_instances(rdf_graph)
-    classes -= graph_prop_urirefs
-    instances -= graph_prop_urirefs
 
     ## add term types to the graph
     for term in classes:
         rdf_graph.add((term, RDF.type, OWL.Class))
     for term in instances:
         rdf_graph.add((term, RDF.type, OWL.NamedIndividual))
+
     ## add labels for terms with labels
     for term, aliases in aliases.items():
         label = aliases.pop(0)
