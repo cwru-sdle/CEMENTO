@@ -43,10 +43,6 @@ def chain_filter(iterable: Iterable, *filters: Callable[[any], any]):
     )
 
 
-def enforce_camel_case(input: str) -> str:
-    return f"{input[0].lower()}{input[1:] if len(input) > 1 else ''}"
-
-
 def get_abbrev_term(
     term: str, is_predicate=False, default_prefix="mds"
 ) -> tuple[str, str]:

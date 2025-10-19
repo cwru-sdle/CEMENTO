@@ -1,12 +1,11 @@
 import re
-import sys
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
 from pprint import pprint
 
 from more_itertools import partition
-from rdflib import RDF, RDFS, Graph, Literal, BNode, OWL, URIRef
+from rdflib import RDF, RDFS, Graph, Literal, BNode, OWL
 from rdflib import SKOS, XSD
 from rdflib.collection import Collection
 
@@ -86,6 +85,7 @@ def convert_graph_to_rdf_graph(
     defaults_folder: str | Path = None,
     prefixes_path: str | Path = None,
     log_substitution_path: str | Path = None,
+    enforce_camel_case: bool = True,
 ) -> Graph:
     onto_ref_folder = (
         get_default_references_folder() if not onto_ref_folder else onto_ref_folder
@@ -104,6 +104,8 @@ def convert_graph_to_rdf_graph(
         lambda item: '"' in item[1], term_dict.items()
     )
     ref_graph = aggregate_graphs(onto_ref_folder)
+    defaults_graph = aggregate_graphs(defaults_folder)
+    ref_graph += defaults_graph
     ref_search_pool = get_term_search_pool(ref_graph, inv_prefixes)
 
     default_prefix = "mds"
@@ -224,14 +226,11 @@ def convert_graph_to_rdf_graph(
         rdf_graph.add((collection_headers[key], label, collection_bnode))
 
     ## replace all properties with lowercase equivalents
-    defaults_graph = aggregate_graphs(defaults_folder)
     property_classes = defaults_graph.transitive_subjects(
         predicate=RDFS.subClassOf, object=RDF.Property
     )
     property_classes = list(property_classes)
-    property_triples = list(
-        rdf_graph.triples_choices((None, None, property_classes))
-    )
+    property_triples = list(rdf_graph.triples_choices((None, None, property_classes)))
     graph_properties = chain(
         map(lambda item: item[0], property_triples), rdf_graph.predicates()
     )
@@ -244,20 +243,29 @@ def convert_graph_to_rdf_graph(
         for term, value in not_substituted.items()
         if value in graph_properties
     }
-    prop_rename_mapping = dict()
-    for key, prop in graph_properties.items():
-        new_uri = convert_str_uriref(
-            convert_uriref_str(prop, inv_prefixes), prefixes, case=TermCase.CAMEL_CASE
-        )
-        term_substitution[key] = new_uri
-        prop_rename_mapping[prop] = new_uri
-        rdf_graph = replace_term_in_triples(rdf_graph, prop, new_uri)
+
+    graph_prop_urirefs = set(graph_properties.values())
+    if enforce_camel_case:
+        prop_rename_dict = {
+            key: convert_str_uriref(
+                convert_uriref_str(prop, inv_prefixes),
+                prefixes,
+                case=TermCase.CAMEL_CASE,
+            )
+            for key, prop in graph_properties.items()
+        }
+        term_substitution.update(prop_rename_dict)
+        prop_updated_iri_dict = {
+            prop: prop_rename_dict[key] for key, prop in graph_properties.items()
+        }
+        graph_prop_urirefs = set(prop_updated_iri_dict.values())
+        for prop, new_iri in prop_updated_iri_dict.items():
+            rdf_graph = replace_term_in_triples(rdf_graph, prop, new_iri)
 
     ## add class or type annotation for terms in graph
     classes, instances = get_classes_instances(rdf_graph)
-    defined_graph_props = set(prop_rename_mapping.values())
-    classes -= defined_graph_props
-    instances -= defined_graph_props
+    classes -= graph_prop_urirefs
+    instances -= graph_prop_urirefs
 
     ## add term types to the graph
     for term in classes:
@@ -275,7 +283,7 @@ def convert_graph_to_rdf_graph(
     ## import properties for substituted terms
     for _, term in substituted.items():
         imported_triples = get_corresponding_triples(
-            ref_graph, term, RDFS.label, RDFS.subClassOf, RDF.type
+            ref_graph, term, RDFS.label, RDF.type, RDFS.domain, RDFS.range
         )
         for triple in imported_triples:
             rdf_graph.add(triple)
