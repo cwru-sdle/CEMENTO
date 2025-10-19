@@ -19,6 +19,7 @@ FALLBACK_STRAT_TYPES = {
     OWL.DatatypeProperty,
 }
 
+SUPPRESSION_KEY = "*"
 
 def get_default_namespace_prefixes() -> tuple[str, URIRef | Namespace]:
     return {

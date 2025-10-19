@@ -11,11 +11,6 @@ def clean_literal_string(literal_term: str) -> str:
     return new_literal_term
 
 
-# TODO: set supppression key as constant
-def remove_suppression_key(term: str) -> str:
-    return term.replace("*", "")
-
-
 def extract_aliases(term: str):
     return [
         alias.strip()

@@ -4,9 +4,15 @@ from enum import Enum
 from rdflib import URIRef, Graph
 from rdflib.namespace import split_uri
 
+from cemento.term_matching.constants import SUPPRESSION_KEY
+
 
 def merge_dictionaries(dict_list: list[dict[any, any]]) -> dict[any, any]:
     return {key: value for each_dict in dict_list for key, value in each_dict.items()}
+
+
+def remove_suppression_key(term: str, suppression_key=SUPPRESSION_KEY) -> str:
+    return term.replace(suppression_key, "")
 
 
 class TermCase(Enum):

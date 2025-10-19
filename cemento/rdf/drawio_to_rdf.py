@@ -15,7 +15,7 @@ from cemento.rdf.transforms import (
     get_literal_lang_annotation,
     get_term_search_pool,
 )
-from cemento.term_matching.constants import get_namespace_terms
+from cemento.term_matching.constants import get_namespace_terms, SUPPRESSION_KEY
 from cemento.term_matching.preprocessing import (
     get_uriref_abbrev_term,
     convert_str_uriref,
@@ -23,6 +23,7 @@ from cemento.term_matching.preprocessing import (
     convert_uriref_str,
     TermCase,
     get_corresponding_triples,
+    remove_suppression_key,
 )
 from cemento.term_matching.transforms import (
     get_prefixes,
@@ -81,6 +82,9 @@ def convert_graph_to_rdf_graph(
     defaults_folder = (
         get_default_defaults_folder() if not defaults_folder else defaults_folder
     )
+    log_substitution_path = (
+        Path(log_substitution_path) if log_substitution_path else None
+    )
     prefixes_path = get_default_prefixes_file() if not prefixes_path else prefixes_path
     prefixes, inv_prefixes = get_prefixes(prefixes_path, onto_ref_folder)
 
@@ -114,13 +118,22 @@ def convert_graph_to_rdf_graph(
     uriref_terms = chain(unlabeled_urirefs, cleaned_labeled_urirefs)
     uriref_terms = dict(uriref_terms)
 
+    ## exclude terms with suppression key in term_search_keys
+    exclude_term = dict(
+        filter(lambda item: SUPPRESSION_KEY in item[1], uriref_terms.items())
+    )
+
     term_search_keys = map(
         lambda item: (item[0], get_term_search_keys(item[1], inv_prefixes)),
         uriref_terms.items(),
     )
     term_search_keys = dict(term_search_keys)
     term_substitution = {
-        key: substitute_term(search_keys, set(ref_search_pool))
+        key: (
+            None
+            if key in exclude_term
+            else substitute_term(search_keys, set(ref_search_pool))
+        )
         for key, search_keys in term_search_keys.items()
     }
     substituted, not_substituted = partition(
@@ -129,7 +142,7 @@ def convert_graph_to_rdf_graph(
     not_substituted, substituted = dict(not_substituted), dict(substituted)
     term_substitution.update(
         {
-            key: convert_str_uriref(uriref_terms[key], prefixes)
+            key: convert_str_uriref(remove_suppression_key(uriref_terms[key]), prefixes)
             for key, value in term_substitution.items()
             if key in not_substituted.keys()
         }
