@@ -8,7 +8,7 @@ from rdflib import URIRef, Graph
 
 
 def aggregate_graphs(folder_path: str | Path):
-    files = Path("cemento/data").rglob("*.ttl")
+    files = Path(folder_path).rglob("*.ttl")
     graph = Graph()
     return reduce(lambda acc, item: acc.parse(item), files, graph)
 

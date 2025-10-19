@@ -1,10 +1,12 @@
 import re
+import sys
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
+from pprint import pprint
 
 from more_itertools import partition
-from rdflib import RDF, RDFS, Graph, Literal, BNode, OWL
+from rdflib import RDF, RDFS, Graph, Literal, BNode, OWL, URIRef
 from rdflib import SKOS, XSD
 from rdflib.collection import Collection
 
@@ -16,6 +18,7 @@ from cemento.rdf.transforms import (
     get_literal_lang_annotation,
     get_term_search_pool,
     replace_term_in_triples,
+    get_classes_instances,
 )
 from cemento.term_matching.constants import (
     get_namespace_terms,
@@ -226,7 +229,9 @@ def convert_graph_to_rdf_graph(
         predicate=RDFS.subClassOf, object=RDF.Property
     )
     property_classes = list(property_classes)
-    property_triples = rdf_graph.triples_choices((None, RDF.type, property_classes))
+    property_triples = list(
+        rdf_graph.triples_choices((None, None, property_classes))
+    )
     graph_properties = chain(
         map(lambda item: item[0], property_triples), rdf_graph.predicates()
     )
@@ -239,13 +244,26 @@ def convert_graph_to_rdf_graph(
         for term, value in not_substituted.items()
         if value in graph_properties
     }
+    prop_rename_mapping = dict()
     for key, prop in graph_properties.items():
         new_uri = convert_str_uriref(
             convert_uriref_str(prop, inv_prefixes), prefixes, case=TermCase.CAMEL_CASE
         )
         term_substitution[key] = new_uri
+        prop_rename_mapping[prop] = new_uri
         rdf_graph = replace_term_in_triples(rdf_graph, prop, new_uri)
 
+    ## add class or type annotation for terms in graph
+    classes, instances = get_classes_instances(rdf_graph)
+    defined_graph_props = set(prop_rename_mapping.values())
+    classes -= defined_graph_props
+    instances -= defined_graph_props
+
+    ## add term types to the graph
+    for term in classes:
+        rdf_graph.add((term, RDF.type, OWL.Class))
+    for term in instances:
+        rdf_graph.add((term, RDF.type, OWL.NamedIndividual))
     ## add labels for terms with labels
     for term, aliases in aliases.items():
         label = aliases.pop(0)
@@ -263,7 +281,7 @@ def convert_graph_to_rdf_graph(
             rdf_graph.add(triple)
         rdf_graph.add((term, SKOS.exactMatch, term))
 
-    ## remove triples that already deal with default terms
+    # remove triples that already deal with default terms
     rdf_graph -= defaults_graph
     for triple in rdf_graph.triples_choices(
         (list(defaults_graph.subjects()), None, None)

@@ -216,6 +216,20 @@ def get_uuid():
     return str(uuid4()).split("-")[-1]
 
 
+def get_classes_instances(rdf_graph: Graph) -> tuple[set[URIRef], set[URIRef]]:
+    classes = set()
+    instances = set()
+    for subj, pred, obj in rdf_graph:
+        if isinstance(subj, URIRef) and isinstance(obj, URIRef):
+            if pred == RDFS.subClassOf:
+                classes.update({subj, obj})
+
+            if pred == RDF.type:
+                instances.add(subj)
+    instances -= classes
+    return classes, instances
+
+
 def replace_term_in_triples(rdf_graph: Graph, old_term: Node, new_term: Node) -> Graph:
     triples_to_add = []
     triples_to_remove = []
