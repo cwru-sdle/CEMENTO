@@ -8,7 +8,7 @@ from pathlib import Path
 
 import tldextract
 from more_itertools import unique_everseen
-from rdflib import OWL, RDF, RDFS, SKOS, Graph, Literal, Namespace, URIRef
+from rdflib import OWL, RDF, RDFS, SKOS, Graph, Literal, Namespace, URIRef, Node
 from rdflib.namespace import split_uri
 from thefuzz import fuzz, process
 from thefuzz.process import extractOne
@@ -63,7 +63,7 @@ def get_term_matches(
 
 
 def substitute_term(
-    search_keys: list[str] | str, search_pool: set[tuple[URIRef, str]]
+    search_keys: list[str] | str, search_pool: set[tuple[Node, str]]
 ) -> URIRef | None:
     if isinstance(search_keys, str):
         search_keys = [search_keys]

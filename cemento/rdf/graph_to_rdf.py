@@ -4,16 +4,18 @@ from itertools import chain
 from pathlib import Path
 
 from more_itertools import partition
-from rdflib import RDF, RDFS, Graph, Literal, URIRef
+from rdflib import RDF, RDFS, Graph, Literal
 from rdflib import SKOS, XSD
 
+from cemento.rdf.io import aggregate_graphs
+from cemento.rdf.preprocessing import extract_aliases
 from cemento.rdf.transforms import (
     construct_literal,
     get_literal_lang_annotation,
+    get_term_search_pool,
 )
 from cemento.term_matching.constants import get_namespace_terms
 from cemento.term_matching.preprocessing import (
-    get_uriref_prefix,
     get_uriref_abbrev_term,
     convert_str_uriref,
     get_datatype_annotation,
@@ -58,42 +60,8 @@ def convert_graph_to_rdf_graph(
     uriref_terms, literal_terms = partition(
         lambda item: '"' in item[1], term_dict.items()
     )
-    search_pool_files = Path("cemento/data").rglob("*.ttl")
-    ref_graph = Graph()
-    ref_graph = reduce(lambda acc, item: acc.parse(item), search_pool_files, ref_graph)
-    search_pool_terms = chain(
-        ref_graph.subjects(predicate=RDFS.subClassOf),
-        ref_graph.subjects(predicate=RDF.type),
-    )
-    search_pool_terms = filter(lambda term: isinstance(term, URIRef), search_pool_terms)
-    search_pool_term_prefixes = {
-        term: get_uriref_prefix(term, inv_prefixes) for term in search_pool_terms
-    }
-    search_pool_terms = filter(
-        lambda item: item[1] is not None, search_pool_term_prefixes.items()
-    )
-    search_pool_terms = list(map(fst, search_pool_terms))
-    labels = map(
-        lambda item: (item, ref_graph.value(subject=item, predicate=RDFS.label)),
-        search_pool_terms,
-    )
-    alt_labels = map(
-        lambda item: (item, ref_graph.objects(subject=item, predicate=SKOS.altLabel)),
-        search_pool_terms,
-    )
-    alt_labels = ((key, value) for key, values in alt_labels for value in values)
-    abbrev_terms = map(
-        lambda item: (item, get_uriref_abbrev_term(item)), search_pool_terms
-    )
-    ref_search_pool = filter(
-        lambda item: item[1] is not None, chain(labels, alt_labels, abbrev_terms)
-    )
-    ref_search_pool = map(lambda item: (item[0], str(item[1])), ref_search_pool)
-    ref_search_pool = map(
-        lambda item: (item[0], f"{search_pool_term_prefixes[item[0]]}:{item[1]}"),
-        ref_search_pool,
-    )
-    ref_search_pool = set(ref_search_pool)
+    ref_graph = aggregate_graphs(onto_ref_folder)
+    ref_search_pool = get_term_search_pool(ref_graph, inv_prefixes)
 
     default_prefix = "mds"
     uriref_terms = map(
@@ -108,20 +76,12 @@ def convert_graph_to_rdf_graph(
         lambda item: re.search(r".*\(.*\)", item[1]) is not None, uriref_terms
     )
     labeled_urirefs = list(labeled_urirefs)
-    aliases = {
-        key: [
-            alias.strip()
-            for alias in re.match(r".*\((.*)\)", value).group(1).split(",")
-            if alias.strip()
-        ]
-        for key, value in labeled_urirefs
-    }
-
-    labeled_urirefs = map(
+    aliases = dict(map(lambda item: (item[0], extract_aliases(item[1])), labeled_urirefs))
+    cleaned_labeled_urirefs = map(
         lambda item: (item[0], re.match(r"(.*)\(.*\)", item[1]).group(1).strip()),
         labeled_urirefs,
     )
-    uriref_terms = chain(unlabeled_urirefs, labeled_urirefs)
+    uriref_terms = chain(unlabeled_urirefs, cleaned_labeled_urirefs)
     uriref_terms = dict(uriref_terms)
 
     term_search_keys = map(
@@ -130,7 +90,7 @@ def convert_graph_to_rdf_graph(
     )
     term_search_keys = dict(term_search_keys)
     term_substitution = {
-        key: substitute_term(search_keys, ref_search_pool)
+        key: substitute_term(search_keys, set(ref_search_pool))
         for key, search_keys in term_search_keys.items()
     }
     substituted, not_substituted = partition(
@@ -154,13 +114,15 @@ def convert_graph_to_rdf_graph(
         lambda item: (item[0], f"xsd:{item[1]}" if item[1] else None),
         datatype_search_terms,
     )
+    datatype_search_terms = dict(datatype_search_terms)
+    datatype_search_terms.update(ref_search_pool)
     literal_type_annotations = map(
         lambda item: (item[0], get_datatype_annotation(item[1])), literal_terms.items()
     )
     literal_datatype = map(
         lambda item: (
             item[0],
-            substitute_term(item[1], datatype_search_terms),
+            substitute_term(item[1], set(datatype_search_terms.items())),
         ),
         literal_type_annotations,
     )
@@ -265,10 +227,10 @@ def convert_graph_to_rdf_graph(
 
 
 def convert_graph_to_rdf_file(
-    output_path: str | Path,
     elements,
     all_terms,
     triples,
+    output_path: str | Path,
     file_format: str | RDFFormat = None,
     onto_ref_folder: str | Path = None,
     defaults_folder: str | Path = None,

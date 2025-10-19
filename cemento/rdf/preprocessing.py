@@ -16,13 +16,12 @@ def remove_suppression_key(term: str) -> str:
     return term.replace("*", "")
 
 
-def get_term_aliases(term: str) -> list[str]:
-    match = re.search(r"\(([^)]*)\)", term)
-    if match:
-        alt_term_string = match.group(1)
-        alt_term_string = alt_term_string.split(",")
-        return [term.strip() for term in alt_term_string]
-    return []
+def extract_aliases(term: str):
+    return [
+        alias.strip()
+        for alias in re.match(r".*\((.*)\)", term).group(1).split(",")
+        if alias.strip()
+    ]
 
 
 def format_literal(literal: Literal, prefix: str) -> str:

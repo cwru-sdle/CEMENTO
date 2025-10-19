@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 
 from rdflib import URIRef, Graph

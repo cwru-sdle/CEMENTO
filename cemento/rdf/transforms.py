@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import networkx as nx
 from networkx import DiGraph
-from rdflib import OWL, BNode, Graph, Literal, Namespace, URIRef
+from rdflib import OWL, BNode, Graph, Literal, Namespace, URIRef, RDFS, RDF, Node, SKOS
 from rdflib.collection import Collection
 from rdflib.namespace import split_uri
 
@@ -14,10 +14,15 @@ from cemento.rdf.preprocessing import (
     format_literal,
 )
 from cemento.term_matching.constants import RANK_PROPS
+from cemento.term_matching.preprocessing import (
+    get_uriref_prefix,
+    get_uriref_abbrev_term,
+)
 from cemento.utils.constants import valid_collection_types
 from cemento.utils.utils import (
     enforce_camel_case,
     filter_graph,
+    fst,
 )
 
 
@@ -27,6 +32,42 @@ def construct_literal(term: str, lang="en", datatype=None) -> Literal:
 
 def get_literal_lang_annotation(literal_term: str, default=None) -> str:
     return res[0] if (res := re.findall(r"@(\w+)", literal_term)) else default
+
+
+def get_term_search_pool(ref_graph: Graph, inv_prefixes: dict[str, str]) -> dict[Node, str]:
+    search_pool_terms = chain(
+        ref_graph.subjects(predicate=RDFS.subClassOf),
+        ref_graph.subjects(predicate=RDF.type),
+    )
+    search_pool_terms = filter(lambda term: isinstance(term, URIRef), search_pool_terms)
+    search_pool_term_prefixes = {
+        term: get_uriref_prefix(term, inv_prefixes) for term in search_pool_terms
+    }
+    search_pool_terms = filter(
+        lambda item: item[1] is not None, search_pool_term_prefixes.items()
+    )
+    search_pool_terms = list(map(fst, search_pool_terms))
+    labels = map(
+        lambda item: (item, ref_graph.value(subject=item, predicate=RDFS.label)),
+        search_pool_terms,
+    )
+    alt_labels = map(
+        lambda item: (item, ref_graph.objects(subject=item, predicate=SKOS.altLabel)),
+        search_pool_terms,
+    )
+    alt_labels = ((key, value) for key, values in alt_labels for value in values)
+    abbrev_terms = map(
+        lambda item: (item, get_uriref_abbrev_term(item)), search_pool_terms
+    )
+    ref_search_pool = filter(
+        lambda item: item[1] is not None, chain(labels, alt_labels, abbrev_terms)
+    )
+    ref_search_pool = map(lambda item: (item[0], str(item[1])), ref_search_pool)
+    ref_search_pool = map(
+        lambda item: (item[0], f"{search_pool_term_prefixes[item[0]]}:{item[1]}"),
+        ref_search_pool,
+    )
+    return set(ref_search_pool)
 
 
 def get_graph_relabel_mapping(
