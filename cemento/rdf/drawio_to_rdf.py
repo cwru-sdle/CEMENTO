@@ -222,6 +222,10 @@ def convert_graph_to_rdf_graph(
         label = substitute_term(
             label, set(invert_tuple(valid_collection_types.items()))
         )
+        if label is None:
+            raise ValueError(
+                f"The chosen label is not a valid collection type. Please choose from: {valid_collection_types.keys()}"
+            )
         children = [term_substitution[item] for item in children]
         first_child_type = get_child_type(classes, instances, children[0])
         if any(
