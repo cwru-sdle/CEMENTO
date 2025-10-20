@@ -27,7 +27,7 @@ def parse_item(
 
 
 def parse_chain_tuple(
-    collection_headers, term_substitution, facet_substitution, ms_turtle_mapping, input_tuple
+    input_tuple, collection_headers, term_substitution, facet_substitution, ms_turtle_mapping
 ):
     parse_tuple_item = partial(
         parse_item,
@@ -38,17 +38,7 @@ def parse_chain_tuple(
     )
     return tuple(map(parse_tuple_item, input_tuple))
 
-
-def extract_axiom_graph(
-    rdf_graph,
-    term_graph,
-    term_substitution,
-    restriction_nodes,
-    collection_headers,
-    intro_restriction_triples,
-    faceted_terms,
-) -> Graph:
-    ## preprocess faceted terms first since they become bnodes
+def retrieve_facet_nodes(facet_graph, term_substitution, faceted_terms) -> tuple[Graph, dict[str, BNode]]:
     symbol_mapping = {
         "pattern": XSD.pattern,
         ">=": XSD.maxInclusive,
@@ -59,7 +49,6 @@ def extract_axiom_graph(
         "maxLength": XSD.maxLength,
         "length": XSD.length,
     }
-    facet_graph = Graph()
     facet_nodes = dict()
     for key, facet in faceted_terms.items():
         facet = re.match(r".*\[(.*)\]", facet).group(1)
@@ -78,15 +67,28 @@ def extract_axiom_graph(
         facet_graph.add((restriction_node, RDF.type, RDFS.Datatype))
         facet_graph.add((restriction_node, OWL.onDatatype, term_substitution[key]))
         facet_graph.add((restriction_node, OWL.withRestrictions, collection_head))
-        facet_collection = Collection(rdf_graph, collection_head)
+        facet_collection = Collection(facet_graph, collection_head)
         for term, value in facet_pairs:
             facet_key = substitute_term(term, facet_term_search_pool)
-            print(term, facet_key)
             if facet_key is None:
-                raise ValueError(f"The facet key must be one of: {symbol_mapping.keys()}")
+                raise ValueError(
+                    f"The facet key must be one of: {symbol_mapping.keys()}"
+                )
             item_bnode = BNode()
             facet_graph.add((item_bnode, facet_key, Literal(value)))
             facet_collection.append(item_bnode)
+        return facet_graph, facet_nodes
+
+def extract_axiom_graph(
+    rdf_graph,
+    term_graph,
+    term_substitution,
+    restriction_nodes,
+    collection_headers,
+    intro_restriction_triples,
+    faceted_terms,
+) -> Graph:
+    ## preprocess faceted terms first since they become bnodes
 
     ## traverse the axiom subgraphs and make connections
     pivot_terms = {MS.And, MS.Or, MS.Single}
@@ -96,13 +98,6 @@ def extract_axiom_graph(
         map(lambda node: term_graph.successors(node), restriction_nodes)
     )
     ms_turtle_mapping = get_ms_turtle_mapping()
-    parse_axiom_item = partial(
-        parse_item,
-        collection_headers=collection_headers,
-        term_substitution=term_substitution,
-        facet_substitution=facet_nodes,
-        ms_turtle_mapping=ms_turtle_mapping,
-    )
     chain_containers = defaultdict(list)
     pivot_chain_mapping = defaultdict(list)
     compressed_graph = DiGraph()
@@ -122,8 +117,27 @@ def extract_axiom_graph(
     # FIXME: find a way to pass multiple bnode headers and process them
     # FIXME: compressed graph edges between a node and a pivot not being added correctly
     axiom_graph = Graph()
+    facet_graph = Graph()
+    facet_graph, facet_nodes = retrieve_facet_nodes(facet_graph, term_substitution, faceted_terms)
     axiom_graph += facet_graph
+
+    parse_axiom_item = partial(
+        parse_item,
+        collection_headers=collection_headers,
+        term_substitution=term_substitution,
+        facet_substitution=facet_nodes,
+        ms_turtle_mapping=ms_turtle_mapping,
+    )
+    parse_axiom_tuple = partial(
+        parse_chain_tuple,
+        collection_headers=collection_headers,
+        term_substitution=term_substitution,
+        facet_substitution=facet_nodes,
+        ms_turtle_mapping=ms_turtle_mapping,
+    )
+
     compressed_subtrees = get_subgraphs(compressed_graph)
+
     axiom_combination_bnodes = dict()
     axiom_header = dict()
     for tree in compressed_subtrees:
@@ -142,13 +156,7 @@ def extract_axiom_graph(
                 )
                 if len(successor_pivots) > 0:
                     apply_tuple = chain_containers[node].pop()
-                    pred, obj = parse_chain_tuple(
-                        collection_headers,
-                        term_substitution,
-                        facet_nodes,
-                        ms_turtle_mapping,
-                        apply_tuple,
-                    )
+                    pred, obj = parse_axiom_tuple(apply_tuple)
                     successor_pivot_bnodes = flatten(
                         map(
                             lambda node: axiom_combination_bnodes[node],
@@ -161,13 +169,7 @@ def extract_axiom_graph(
                     axiom_header[node] = axiom_header[next(iter(successor_pivots))]
                 for pred, obj in chain_containers[node]:
                     axiom_graph.add((header, RDF.type, OWL.Restriction))
-                    pred, obj = parse_chain_tuple(
-                        collection_headers,
-                        term_substitution,
-                        facet_nodes,
-                        ms_turtle_mapping,
-                        (pred, obj),
-                    )
+                    pred, obj = parse_axiom_tuple((pred, obj))
                     axiom_graph.add((header, pred, obj))
             else:
                 pivot_node_children = tree.successors(node)
@@ -180,6 +182,7 @@ def extract_axiom_graph(
                     Collection(axiom_graph, collection_bnode, child_bnodes)
                     parsed_label = parse_axiom_item(node)
                     rdf_graph.add((header, parsed_label, collection_bnode))
+                    rdf_graph.add((header, RDF.type, OWL.Class))
                 else:
                     axiom_header[node] = next(iter(child_bnodes), header)
 
