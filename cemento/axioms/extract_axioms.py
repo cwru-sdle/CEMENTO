@@ -5,10 +5,10 @@ from functools import partial
 import networkx as nx
 from more_itertools.recipes import flatten
 from networkx import DiGraph
-from rdflib import RDF, Graph, BNode, OWL, URIRef, XSD, Literal, RDFS
+from rdflib import RDF, Graph, BNode, OWL, URIRef, Literal, RDFS
 from rdflib.collection import Collection
 
-from cemento.axioms.constants import get_ms_turtle_mapping
+from cemento.axioms.constants import get_ms_turtle_mapping, symbol_mapping
 from cemento.axioms.modules import MS
 from cemento.rdf.transforms import (
     get_uuid,
@@ -21,13 +21,21 @@ from cemento.utils.utils import fst, get_subgraphs
 def parse_item(
     item, collection_headers, term_substitution, facet_substitution, ms_turtle_mapping
 ) -> URIRef:
-    parsed_item = facet_substitution.get(item, None) or collection_headers.get(item, None) or term_substitution.get(item)
+    parsed_item = (
+        facet_substitution.get(item, None)
+        or collection_headers.get(item, None)
+        or term_substitution.get(item)
+    )
     parsed_item = ms_turtle_mapping.get(parsed_item, parsed_item)
     return parsed_item
 
 
 def parse_chain_tuple(
-    input_tuple, collection_headers, term_substitution, facet_substitution, ms_turtle_mapping
+    input_tuple,
+    collection_headers,
+    term_substitution,
+    facet_substitution,
+    ms_turtle_mapping,
 ):
     parse_tuple_item = partial(
         parse_item,
@@ -38,17 +46,10 @@ def parse_chain_tuple(
     )
     return tuple(map(parse_tuple_item, input_tuple))
 
-def retrieve_facet_nodes(facet_graph, term_substitution, faceted_terms) -> tuple[Graph, dict[str, BNode]]:
-    symbol_mapping = {
-        "pattern": XSD.pattern,
-        ">=": XSD.maxInclusive,
-        ">": XSD.maxExclusive,
-        "<=": XSD.minInclusive,
-        "<": XSD.minExclusive,
-        "minLength": XSD.minLength,
-        "maxLength": XSD.maxLength,
-        "length": XSD.length,
-    }
+
+def retrieve_facet_nodes(
+    facet_graph, term_substitution, faceted_terms
+) -> tuple[Graph, dict[str, BNode]]:
     facet_nodes = dict()
     for key, facet in faceted_terms.items():
         facet = re.match(r".*\[(.*)\]", facet).group(1)
@@ -78,6 +79,7 @@ def retrieve_facet_nodes(facet_graph, term_substitution, faceted_terms) -> tuple
             facet_graph.add((item_bnode, facet_key, Literal(value)))
             facet_collection.append(item_bnode)
         return facet_graph, facet_nodes
+
 
 def extract_axiom_graph(
     rdf_graph,
@@ -118,7 +120,9 @@ def extract_axiom_graph(
     # FIXME: compressed graph edges between a node and a pivot not being added correctly
     axiom_graph = Graph()
     facet_graph = Graph()
-    facet_graph, facet_nodes = retrieve_facet_nodes(facet_graph, term_substitution, faceted_terms)
+    facet_graph, facet_nodes = retrieve_facet_nodes(
+        facet_graph, term_substitution, faceted_terms
+    )
     axiom_graph += facet_graph
 
     parse_axiom_item = partial(
