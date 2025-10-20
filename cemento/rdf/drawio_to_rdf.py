@@ -1,22 +1,18 @@
 import re
-import sys
-from uuid import uuid4
-from collections import defaultdict
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from pprint import pprint
 
 import networkx as nx
+from more_itertools import partition
 from more_itertools.recipes import flatten
 from networkx import DiGraph
-from more_itertools import partition
 from rdflib import RDF, RDFS, Graph, Literal, BNode, OWL
 from rdflib import SKOS, XSD
 from rdflib.collection import Collection
 
+from cemento.axioms.extract_axioms import extract_axiom_graph
 from cemento.draw_io.read_diagram import read_drawio
-from cemento.modules import MS
 from cemento.rdf.io import aggregate_graphs, save_substitution_log
 from cemento.rdf.preprocessing import extract_aliases
 from cemento.rdf.transforms import (
@@ -26,7 +22,6 @@ from cemento.rdf.transforms import (
     replace_term_in_triples,
     get_classes_instances,
     get_child_type,
-    get_uuid,
 )
 from cemento.term_matching.constants import (
     get_namespace_terms,
@@ -238,6 +233,14 @@ def convert_graph_to_rdf_graph(
         restriction_nodes,
     )
     restriction_triples = set(flatten(restriction_triples))
+    intro_restriction_triples = list(
+        filter(
+            lambda triple: triple[1] in restriction_nodes, term_graph.edges(data=True)
+        )
+    )
+    restriction_triples |= set(
+        map(lambda item: (item[0], item[1]), intro_restriction_triples)
+    )
     triples = filter(
         lambda triple: (triple[0], triple[2]) not in restriction_triples, triples
     )
@@ -276,6 +279,17 @@ def convert_graph_to_rdf_graph(
         if first_child_type is not None:
             rdf_graph.add((collection_headers[key], RDF.type, first_child_type))
         rdf_graph.add((collection_headers[key], label, collection_bnode))
+
+    ## expand axiom terms
+    axiom_graph = extract_axiom_graph(
+        rdf_graph,
+        term_graph,
+        term_substitution,
+        restriction_nodes,
+        collection_headers,
+        intro_restriction_triples,
+    )
+    rdf_graph += axiom_graph
 
     ## retrieve all defined properties for annotation logic
     property_classes = defaults_graph.transitive_subjects(
@@ -321,46 +335,6 @@ def convert_graph_to_rdf_graph(
         }
         for prop, new_iri in prop_updated_iri_dict.items():
             rdf_graph = replace_term_in_triples(rdf_graph, prop, new_iri)
-
-    ## expand axiom terms
-    pivot_terms = {MS.And, MS.Or, MS.Single}
-    pivot_nodes = filter(lambda item: item[1] in pivot_terms, term_substitution.items())
-    pivot_nodes = set(map(fst, pivot_nodes))
-    head_nodes = flatten(
-        map(lambda node: term_graph.successors(node), restriction_nodes)
-    )
-    chain_containers = defaultdict(list)
-    pivot_chain_mapping = defaultdict(list)
-    compressed_graph = DiGraph()
-    for head_node in head_nodes:
-        current_node = None
-        for subj, obj in nx.dfs_edges(term_graph, source=head_node):
-            pred = term_graph[subj][obj].get("label", None)
-            if subj in pivot_nodes:
-                current_node = get_uuid()
-                pivot_chain_mapping[subj].append(current_node)
-                compressed_graph.add_edge(subj, current_node)
-            if obj in pivot_nodes:
-                compressed_graph.add_edge(current_node, obj)
-                continue
-            chain_containers[current_node].append((pred, obj))
-
-    for key, value in pivot_chain_mapping.items():
-        print(term_substitution[key], value)
-    print()
-    for key, values in chain_containers.items():
-        print(key)
-        for value in values:
-            print(tuple(map(lambda term: term_substitution[term], value)))
-        print()
-
-    for subj, obj in compressed_graph.edges:
-        print(term_substitution.get(subj, subj), term_substitution.get(obj, obj))
-
-    for subj, obj in nx.dfs_edges(compressed_graph):
-        pass
-
-    sys.exit()
 
     ## add term types to the graph
     for term in classes:

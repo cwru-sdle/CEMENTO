@@ -1,6 +1,6 @@
-
 from rdflib.namespace import DefinedNamespace, Namespace
 from rdflib.term import URIRef
+
 
 class MS(DefinedNamespace):
 
