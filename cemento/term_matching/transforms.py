@@ -63,8 +63,10 @@ def get_term_matches(
 
 
 def substitute_term(
-    search_keys: list[str] | str, search_pool: set[tuple[Node, str]]
+    search_keys: list[str] | str | None, search_pool: set[tuple[Node, str]]
 ) -> URIRef | None:
+    if search_keys is None:
+        return None
     if isinstance(search_keys, str):
         search_keys = [search_keys]
     results = map(

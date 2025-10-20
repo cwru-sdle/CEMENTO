@@ -1,6 +1,7 @@
 {
     "cco": "https://www.commoncoreontologies.org/",
     "mds": "https://cwrusdle.bitbucket.io/mds/",
+    "ms": "https://cwrusdle.bitbucket.io/mds/manchester-syntax/",
     "owl": "http://www.w3.org/2002/07/owl#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "ncit": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#",

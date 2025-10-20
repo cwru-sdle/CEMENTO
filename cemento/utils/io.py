@@ -19,6 +19,10 @@ def get_default_references_folder() -> Path:
     return get_default_path("references")
 
 
+def get_default_reserved_folder() -> Path:
+    return get_default_path("reserved")
+
+
 def get_default_prefixes_file() -> Path:
     return get_default_path("default_prefixes.json")
 
