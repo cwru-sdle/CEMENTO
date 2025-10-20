@@ -1,5 +1,7 @@
 import re
+import sys
 from collections.abc import Iterable
+from functools import reduce, partial
 from itertools import chain
 from pathlib import Path
 
@@ -36,6 +38,7 @@ from cemento.term_matching.preprocessing import (
     TermCase,
     get_corresponding_triples,
     remove_suppression_key,
+    remove_facet_info,
 )
 from cemento.term_matching.transforms import (
     get_prefixes,
@@ -114,6 +117,17 @@ def convert_graph_to_rdf_graph(
     reserved_graph = aggregate_graphs(reserved_folder)
     ref_graph += defaults_graph + reserved_graph
     ref_search_pool = get_term_search_pool(ref_graph, inv_prefixes)
+    datatype_search_terms = map(
+        lambda item: (item, get_uriref_abbrev_term(item)), get_namespace_terms(XSD)
+    )
+    datatype_search_terms = map(
+        lambda item: (item[0], f"xsd:{item[1]}" if item[1] else None),
+        datatype_search_terms,
+    )
+    datatype_search_terms = dict(datatype_search_terms)
+    datatype_search_terms.update(ref_search_pool)
+
+    ref_search_pool.update(datatype_search_terms.items())
 
     default_prefix = "mds"
     uriref_terms = map(
@@ -160,9 +174,13 @@ def convert_graph_to_rdf_graph(
         lambda item: item[1] is None, term_substitution.items()
     )
     not_substituted, substituted = dict(not_substituted), dict(substituted)
+    cleaning_steps = [remove_suppression_key, remove_facet_info]
+    clean_term = partial(
+        lambda item: reduce(lambda val, func: func(val), cleaning_steps, item)
+    )
     term_substitution.update(
         {
-            key: convert_str_uriref(remove_suppression_key(uriref_terms[key]), prefixes)
+            key: convert_str_uriref(clean_term(uriref_terms[key]), prefixes)
             for key, value in term_substitution.items()
             if key in not_substituted.keys()
         }
@@ -179,15 +197,6 @@ def convert_graph_to_rdf_graph(
 
     literal_terms = dict(literal_terms)
 
-    datatype_search_terms = map(
-        lambda item: (item, get_uriref_abbrev_term(item)), get_namespace_terms(XSD)
-    )
-    datatype_search_terms = map(
-        lambda item: (item[0], f"xsd:{item[1]}" if item[1] else None),
-        datatype_search_terms,
-    )
-    datatype_search_terms = dict(datatype_search_terms)
-    datatype_search_terms.update(ref_search_pool)
     literal_type_annotations = map(
         lambda item: (item[0], get_datatype_annotation(item[1])), literal_terms.items()
     )
@@ -201,7 +210,7 @@ def convert_graph_to_rdf_graph(
     literal_datatype = dict(literal_datatype)
     literal_substitution = {
         key: construct_literal(
-            literal_str,
+            clean_term(literal_str),
             lang=get_literal_lang_annotation(literal_str),
             datatype=literal_datatype[key],
         )
@@ -281,6 +290,12 @@ def convert_graph_to_rdf_graph(
         rdf_graph.add((collection_headers[key], label, collection_bnode))
 
     ## expand axiom terms
+    ### first extract faceted terms to process
+    faceted_terms = filter(
+        lambda item: re.search(r".*\[.*\]", item[1]),
+        chain(uriref_terms.items(), literal_terms.items()),
+    )
+    faceted_terms = dict(faceted_terms)
     axiom_graph = extract_axiom_graph(
         rdf_graph,
         term_graph,
@@ -288,6 +303,7 @@ def convert_graph_to_rdf_graph(
         restriction_nodes,
         collection_headers,
         intro_restriction_triples,
+        faceted_terms,
     )
     rdf_graph += axiom_graph
 

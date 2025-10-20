@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from enum import Enum
 
 from rdflib import URIRef, OWL
@@ -79,5 +80,5 @@ class NullTermError(ValueError):
     pass
 
 
-def invert_tuple(input_tuple: tuple[any, any]) -> tuple[any, any]:
+def invert_tuple(input_tuple: Iterable[tuple[any, any]]) -> Iterable[tuple[any, any]]:
     return ((item[1], item[0]) for item in input_tuple)

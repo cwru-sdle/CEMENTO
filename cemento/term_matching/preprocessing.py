@@ -14,6 +14,10 @@ def merge_dictionaries(dict_list: list[dict[any, any]]) -> dict[any, any]:
 def remove_suppression_key(term: str, suppression_key=SUPPRESSION_KEY) -> str:
     return term.replace(suppression_key, "")
 
+def remove_facet_info(term: str) -> str:
+    return re.sub(r'\[.*\]',"", term).strip()
+
+
 
 class TermCase(Enum):
     PASCAL_CASE = "pascal"
