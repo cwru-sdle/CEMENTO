@@ -109,14 +109,68 @@ def extract_axiom_graph(
 ) -> Graph:
     ## preprocess faceted terms first since they become bnodes
 
-    ## traverse the axiom subgraphs and make connections
+    # pre-retrieve all relevant terms
     pivot_terms = {MS.And, MS.Or, MS.Single}
     pivot_nodes = filter(lambda item: item[1] in pivot_terms, term_substitution.items())
     pivot_nodes = set(map(fst, pivot_nodes))
+    ms_turtle_mapping = get_ms_turtle_mapping()
+
+    ## expand the tree to include relevant pivots
+    triples_to_add = []
+    triples_to_remove = []
+    node_labels = dict()
+    for restriction_node in restriction_nodes:
+        for node in nx.bfs_tree(term_graph, source=restriction_node):
+            descendants = list(term_graph.successors(node))
+            if len(descendants) > 1 and node not in pivot_nodes:
+                new_pivot_node = get_uuid()
+                node_labels[new_pivot_node] = MS.And  # default to intersection
+                triples_to_add.append((node, new_pivot_node))
+                triples_to_add.extend(
+                    [
+                        (new_pivot_node, child, term_graph[node][child])
+                        for child in descendants
+                    ]
+                )
+                triples_to_remove.extend([(node, child) for child in descendants])
+
+    term_graph.remove_edges_from(triples_to_remove)
+    term_graph.add_edges_from(triples_to_add)
+
+    ### add the new_pivots into the key variables
+    pivot_nodes.update(set(node_labels.keys()))
+    term_substitution.update(node_labels)
+
+    triples_to_add, triples_to_remove = [], []
+    for restriction_node in restriction_nodes:
+        next_successor = next(term_graph.successors(restriction_node), None)
+        if next_successor not in pivot_nodes:
+            new_pivot_node = get_uuid()
+            node_labels[new_pivot_node] = MS.Single
+            triples_to_add.append((restriction_node, new_pivot_node))
+            triples_to_add.append(
+                (
+                    new_pivot_node,
+                    next_successor,
+                    term_graph[restriction_node][next_successor],
+                )
+            )
+            triples_to_remove.append((restriction_node, next_successor))
+
+    term_graph.remove_edges_from(triples_to_remove)
+    term_graph.add_edges_from(triples_to_add)
+
+    ### add the new_pivots into the key variables
+    pivot_nodes.update(set(node_labels.keys()))
+    term_substitution.update(node_labels)
+
+    # update head nodes for the expanded graph
     head_nodes = flatten(
         map(lambda node: term_graph.successors(node), restriction_nodes)
     )
-    ms_turtle_mapping = get_ms_turtle_mapping()
+    head_nodes = set(head_nodes)
+
+    ## traverse the axiom subgraphs and make connections
     chain_containers = defaultdict(list)
     pivot_chain_mapping = defaultdict(list)
     compressed_graph = DiGraph()
