@@ -22,7 +22,7 @@ dependencies = [
   "rdflib",
   "thefuzz",
   "tldextract",
-  "more_itertools"
+  "more_itertools",
 ]
 
 [project.scripts]
