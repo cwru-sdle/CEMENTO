@@ -141,20 +141,3 @@ ms:minExclusive rdf:type owl:DatatypeProperty ;
 
 ms:maxExclusive rdf:type owl:DatatypeProperty ;
     skos:exactMatch xsd:maxExclusive .
-
-#<=
-#<
-#>=
-#>
-
-#Punctutation/Structural
-#
-#enumerations {}
-#grouping ()
-#separator ,
-#inverse
-#
-#Special Constants
-#
-#Thing
-#Nothing
