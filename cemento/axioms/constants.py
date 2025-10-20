@@ -4,7 +4,6 @@ from cemento.rdf.io import aggregate_graphs
 from cemento.utils.io import get_default_reserved_folder
 
 symbol_mapping = {
-    "pattern": XSD.pattern,
     ">=": XSD.maxInclusive,
     ">": XSD.maxExclusive,
     "<=": XSD.minInclusive,
@@ -13,6 +12,7 @@ symbol_mapping = {
     "maxLength": XSD.maxLength,
     "length": XSD.length,
 }
+
 
 def get_ms_turtle_mapping() -> dict[URIRef, URIRef]:
     reserved_folder = get_default_reserved_folder()

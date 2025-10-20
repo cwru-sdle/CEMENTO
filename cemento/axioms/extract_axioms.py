@@ -3,9 +3,10 @@ from collections import defaultdict
 from functools import partial
 
 import networkx as nx
+import pandas as pd
 from more_itertools.recipes import flatten
 from networkx import DiGraph
-from rdflib import RDF, Graph, BNode, OWL, URIRef, Literal, RDFS
+from rdflib import RDF, Graph, BNode, OWL, URIRef, Literal, RDFS, XSD
 from rdflib.collection import Collection
 
 from cemento.axioms.constants import get_ms_turtle_mapping, symbol_mapping
@@ -47,6 +48,16 @@ def parse_chain_tuple(
     return tuple(map(parse_tuple_item, input_tuple))
 
 
+def infer_number_str_type(number_str: str) -> URIRef:
+    try:
+        number_str_sample = pd.to_numeric(number_str, errors="raise")
+    except ValueError as e:
+        raise ValueError("The input facet number is not a number.") from e
+    number_str_class = str(type(number_str_sample))
+    value_type = XSD.decimal if "float" in number_str_class else XSD.integer
+    return value_type
+
+
 def retrieve_facet_nodes(
     facet_graph, term_substitution, faceted_terms
 ) -> tuple[Graph, dict[str, BNode]]:
@@ -76,7 +87,13 @@ def retrieve_facet_nodes(
                     f"The facet key must be one of: {symbol_mapping.keys()}"
                 )
             item_bnode = BNode()
-            facet_graph.add((item_bnode, facet_key, Literal(value)))
+            facet_graph.add(
+                (
+                    item_bnode,
+                    facet_key,
+                    Literal(value, datatype=infer_number_str_type(value)),
+                )
+            )
             facet_collection.append(item_bnode)
         return facet_graph, facet_nodes
 
