@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from functools import partial
+from itertools import chain
 
 import networkx as nx
 import pandas as pd
@@ -98,24 +99,11 @@ def retrieve_facet_nodes(
         return facet_graph, facet_nodes
 
 
-def extract_axiom_graph(
-    rdf_graph,
-    term_graph,
-    term_substitution,
-    restriction_nodes,
-    collection_headers,
-    intro_restriction_triples,
-    faceted_terms,
-) -> Graph:
-    ## preprocess faceted terms first since they become bnodes
-
-    # pre-retrieve all relevant terms
-    pivot_terms = {MS.And, MS.Or, MS.Single}
-    pivot_nodes = filter(lambda item: item[1] in pivot_terms, term_substitution.items())
-    pivot_nodes = set(map(fst, pivot_nodes))
-    ms_turtle_mapping = get_ms_turtle_mapping()
-
+def expand_tree(
+    term_graph, restriction_nodes, pivot_nodes
+) -> tuple[DiGraph, dict[str, URIRef]]:
     ## expand the tree to include relevant pivots
+    ### expand for non-pivot nodes that have more than one descendant
     triples_to_add = []
     triples_to_remove = []
     node_labels = dict()
@@ -137,10 +125,9 @@ def extract_axiom_graph(
     term_graph.remove_edges_from(triples_to_remove)
     term_graph.add_edges_from(triples_to_add)
 
-    ### add the new_pivots into the key variables
     pivot_nodes.update(set(node_labels.keys()))
-    term_substitution.update(node_labels)
 
+    ### add a pivot node for remaining trees with no pivots
     triples_to_add, triples_to_remove = [], []
     for restriction_node in restriction_nodes:
         next_successor = next(term_graph.successors(restriction_node), None)
@@ -160,11 +147,27 @@ def extract_axiom_graph(
     term_graph.remove_edges_from(triples_to_remove)
     term_graph.add_edges_from(triples_to_add)
 
-    ### add the new_pivots into the key variables
+    return term_graph, node_labels
+
+
+def extract_axiom_graph(
+    term_graph,
+    term_substitution,
+    restriction_nodes,
+    collection_headers,
+    intro_restriction_triples,
+    faceted_terms,
+) -> Graph:
+    # pre-retrieve all relevant terms
+    pivot_terms = {MS.And, MS.Or, MS.Single}
+    pivot_nodes = filter(lambda item: item[1] in pivot_terms, term_substitution.items())
+    pivot_nodes = set(map(fst, pivot_nodes))
+    ms_turtle_mapping = get_ms_turtle_mapping()
+
+    term_graph, node_labels = expand_tree(term_graph, restriction_nodes, pivot_nodes)
+    ### update variables for expanded graph
     pivot_nodes.update(set(node_labels.keys()))
     term_substitution.update(node_labels)
-
-    # update head nodes for the expanded graph
     head_nodes = flatten(
         map(lambda node: term_graph.successors(node), restriction_nodes)
     )
@@ -256,8 +259,8 @@ def extract_axiom_graph(
                     collection_bnode = BNode()
                     Collection(axiom_graph, collection_bnode, child_bnodes)
                     parsed_label = parse_axiom_item(node)
-                    rdf_graph.add((header, parsed_label, collection_bnode))
-                    rdf_graph.add((header, RDF.type, OWL.Class))
+                    axiom_graph.add((header, parsed_label, collection_bnode))
+                    axiom_graph.add((header, RDF.type, OWL.Class))
                 else:
                     axiom_header[node] = next(iter(child_bnodes), header)
 
@@ -270,4 +273,23 @@ def extract_axiom_graph(
         subj = parse_axiom_item(subj)
         pred = parse_axiom_item(data["label"])
         axiom_graph.add((subj, pred, obj))
+
+    ## translate pattern-based Manchester constructs
+    ### replace for property chains
+    property_chain_properties = [OWL.propertyChainAxiom, MS.subPropertyChain]
+    replace_triples = list(
+        axiom_graph.triples_choices((None, property_chain_properties, None))
+    )
+    replace_tuples = set(map(lambda item: (item[0], item[2]), replace_triples))
+    for subj, obj in replace_tuples:
+        collection_node = BNode()
+        collection_members = [obj] + list(
+            axiom_graph.transitive_objects(subject=obj, predicate=MS.o)
+        )
+        Collection(axiom_graph, collection_node, collection_members)
+        axiom_graph.add((subj, OWL.propertyChainAxiom, collection_node))
+    ### remove old triples
+    o_triples = axiom_graph.triples((None, MS.o, None))
+    for triple in chain(replace_triples, o_triples):
+        axiom_graph.remove(triple)
     return axiom_graph

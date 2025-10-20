@@ -1,5 +1,4 @@
 import re
-import sys
 from collections.abc import Iterable
 from functools import reduce, partial
 from itertools import chain
@@ -298,7 +297,6 @@ def convert_graph_to_rdf_graph(
     )
     faceted_terms = dict(faceted_terms)
     axiom_graph = extract_axiom_graph(
-        rdf_graph,
         term_graph,
         term_substitution,
         restriction_nodes,
@@ -315,11 +313,13 @@ def convert_graph_to_rdf_graph(
     property_classes = list(property_classes)
     property_triples = list(rdf_graph.triples_choices((None, None, property_classes)))
     property_object_preds = [MS.onProperty, OWL.onProperty]
-    property_objects = list(rdf_graph.triples_choices((None, property_object_preds, None)))
+    property_objects = list(
+        rdf_graph.triples_choices((None, property_object_preds, None))
+    )
     graph_properties = chain(
         map(lambda item: item[0], property_triples),
         map(lambda item: item[2], property_objects),
-        rdf_graph.predicates()
+        rdf_graph.predicates(),
     )
     not_substituted = {term: term_substitution[term] for term in not_substituted}
     graph_properties = set(

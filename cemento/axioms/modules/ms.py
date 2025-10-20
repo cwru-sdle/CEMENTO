@@ -19,6 +19,7 @@ class MS(DefinedNamespace):
     Or: URIRef
     value: URIRef
     that: URIRef
+    o: URIRef
     onProperty: URIRef
     max: URIRef
     InverseFunctional: URIRef
@@ -27,6 +28,7 @@ class MS(DefinedNamespace):
     minExclusive: URIRef
     Irreflexive: URIRef
     And: URIRef
+    subPropertyChain: URIRef
     Single: URIRef
     maxExclusive: URIRef
     Transitive: URIRef
