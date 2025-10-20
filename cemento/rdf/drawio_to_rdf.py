@@ -14,6 +14,7 @@ from rdflib import SKOS, XSD
 from rdflib.collection import Collection
 
 from cemento.axioms.extract_axioms import extract_axiom_graph
+from cemento.axioms.modules import MS
 from cemento.draw_io.read_diagram import read_drawio
 from cemento.rdf.io import aggregate_graphs, save_substitution_log
 from cemento.rdf.preprocessing import extract_aliases
@@ -313,8 +314,12 @@ def convert_graph_to_rdf_graph(
     )
     property_classes = list(property_classes)
     property_triples = list(rdf_graph.triples_choices((None, None, property_classes)))
+    property_object_preds = [MS.onProperty, OWL.onProperty]
+    property_objects = list(rdf_graph.triples_choices((None, property_object_preds, None)))
     graph_properties = chain(
-        map(lambda item: item[0], property_triples), rdf_graph.predicates()
+        map(lambda item: item[0], property_triples),
+        map(lambda item: item[2], property_objects),
+        rdf_graph.predicates()
     )
     not_substituted = {term: term_substitution[term] for term in not_substituted}
     graph_properties = set(

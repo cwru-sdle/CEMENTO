@@ -19,6 +19,7 @@ class MS(DefinedNamespace):
     Or: URIRef
     value: URIRef
     that: URIRef
+    onProperty: URIRef
     max: URIRef
     InverseFunctional: URIRef
     Symmetric: URIRef
