@@ -1,0 +1,160 @@
+@prefix ms: <https://cwrusdle.bitbucket.io/mds/manchester-syntax/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mds: <https://cwrusdle.bitbucket.io/mds/> .
+
+###################### Ontology Information ##############################
+ms:Ontology a owl:Ontology ;
+    rdfs:label "MDS-Onto Manchester Syntax" ;
+    dcterms:creator "Gabriel Obsequio Ponón" ;
+    dcterms:description "A light ontology for the semantic use of manchester syntax keywords in turtle-format-based constructs." ;
+    dcterms:title "MDS-Onto-MS" ;
+    dcterms:license <https://creativecommons.org/licenses/by-sa/4.0/> ;
+    owl:versionInfo "0.1.0" .
+
+### Class Properties
+
+ms:And rdf:type rdf:Property ;
+       skos:exactMatch owl:intersectionOf .
+
+ms:Or rdf:type rdf:Property ;
+      skos:exactMatch owl:unionOf .
+
+ms:Not rdf:type rdf:Property .
+
+ms:some rdf:type rdf:Property ;
+        skos:exactMatch owl:someValuesFrom .
+
+ms:only rdf:type rdf:Property ;
+        skos:exactMatch owl:allValuesFrom .
+
+ms:value rdf:type rdf:Property ;
+         skos:exactMatch owl:hasValue .
+
+ms:Self rdf:type rdf:Property .
+
+ms:min rdf:type rdf:Property ;
+       skos:exactMatch owl:minQualifiedCardinality .
+
+ms:max rdf:type rdf:Property ;
+       skos:exactMatch owl:maxQualifiedCardinality .
+
+ms:exactly rdf:type rdf:Property ;
+           skos:exactMatch owl:cardinality .
+
+ms:that rdf:type rdf:Property .
+
+ms:o rdf:type rdf:Property .
+
+# contrived reserved keywords
+
+ms:onProperty rdf:type rdf:Property ;
+              skos:exactMatch owl:onProperty .
+
+ms:subPropertyChain rdf:type rdf:Property ;
+                    skos:exactMatch owl:propertyChainAxiom .
+
+ms:onClass rdf:type rdf:Property ;
+    skos:exactMatch owl:onClass .
+
+ms:of rdf:type rdf:Property ;
+    skos:exactMatch owl:onClass .
+
+ms:IntroTerm rdf:type owl:Class .
+
+ms:belongsTo rdf:type owl:ObjectProperty .
+
+ms:equivalentTo rdf:type rdf:Property ;
+    skos:exactMatch owl:equivalentClass .
+
+ms:forWhich rdf:type rdf:Property .
+
+#Class Relationship Keywords
+#
+##SubClassOf
+#DisjointWith
+#DisjoinUnionOf
+
+#Property Relationship Keywords
+#
+#SubPropertyOf
+#EquivalentTo
+#DisjointWith
+#InverseOf
+#Domain
+#Range
+#Characteristics
+
+### Property Characteristics
+
+ms:Functional rdf:type owl:ObjectProperty . 
+
+ms:InverseFunctional rdf:type owl:ObjectProperty . 
+
+ms:Reflexive rdf:type owl:ObjectProperty . 
+
+ms:Irreflexive rdf:type owl:ObjectProperty . 
+
+ms:Symmetric rdf:type owl:ObjectProperty . 
+
+ms:Asymmetric rdf:type owl:ObjectProperty . 
+
+ms:Transitive rdf:type owl:ObjectProperty . 
+
+
+### Individual Keywords
+
+##Types
+#Facts
+ms:SameAs rdf:type owl:AnnotationProperty . 
+
+ms:DifferentFrom rdf:type owl:AnnotationProperty . 
+
+### Facet Keywords (for datatype restrictions)
+
+ms:length rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:length .
+
+ms:minLength rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:minLength .
+
+ms:maxLength rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:maxLength .
+
+ms:pattern rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:pattern .
+
+rdf:langRange rdf:type owl:AnnotationProperty .
+
+ms:minInclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:minInclusive .
+
+ms:maxInclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:maxInclusive .
+
+ms:minExclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:minExclusive .
+
+ms:maxExclusive rdf:type owl:DatatypeProperty ;
+    skos:exactMatch xsd:maxExclusive .
+
+#<=
+#<
+#>=
+#>
+
+#Punctutation/Structural
+#
+#enumerations {}
+#grouping ()
+#separator ,
+#inverse
+#
+#Special Constants
+#
+#Thing
+#Nothing
