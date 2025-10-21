@@ -1,63 +1,85 @@
-@prefix cco: <https://www.commoncoreontologies.org/> .
-@prefix mds: <https://cwrusdle.bitbucket.io/mds/> .
-@prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix cco:  <https://www.commoncoreontologies.org/> .
+@prefix mds:  <https://cwrusdle.bitbucket.io/mds/> .
+@prefix obo:  <http://purl.obolibrary.org/obo/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
-mds:ActOfPlayingGolf a owl:Class ;
+mds:ActOfPlayingGolf
+    a               owl:Class ;
     obo:BFO_0000057 mds:HappyGilmore ;
     rdfs:subClassOf cco:ont00000005 .
 
-mds:NicknameOfHappyGilmore a cco:ont00000990 ;
+mds:NicknameOfHappyGilmore
+    a               owl:NamedIndividual, cco:ont00000990 ;
     cco:ont00001761 "Happy"^^xsd:string ;
     cco:ont00001916 mds:HappyGilmore .
 
-mds:hasCatchphrase a owl:ObjectProperty ;
-    skos:definition "a relation that holds between a person p and a linguistic expression e at time t iff p exhibits a pattern of verbal behavior that realizes e with sufficient frequency and consistency to constitute a characteristic identifier of p's communicative disposition within relevant social contexts."@en .
+mds:hasCatchphrase
+    a owl:ObjectProperty ;
+    skos:definition
+      "a relation that holds between a person p and a linguistic expression e at time t iff p exhibits a pattern of verbal behavior that realizes e with sufficient frequency and consistency to constitute a characteristic identifier of p's communicative disposition within relevant social contexts."@en .
 
-obo:BFO_0000057 a owl:ObjectProperty ;
-    rdfs:label "has participant"@en ;
+obo:BFO_0000057
+    a               owl:ObjectProperty ;
+    rdfs:label      "has participant"@en ;
+    rdfs:domain     obo:BFO_0000015 ;
+    rdfs:range      [ ] ;
     skos:exactMatch obo:BFO_0000057 .
 
-mds:CatchPhrase a owl:Class ;
-    rdfs:label "catch phrase" ;
+skos:definition
+    a               owl:AnnotationProperty ;
+    skos:exactMatch skos:definition .
+
+mds:CatchPhrase
+    a               owl:Class ;
+    rdfs:label      "catch phrase" ;
     rdfs:subClassOf cco:ont00000958 ;
-    skos:altLabel "slogan" ;
+    skos:altLabel   "slogan" ;
     skos:definition "a well-known sentence or phrase, especially one that is associated with a particular famous person."@en .
 
-mds:CatchPhraseOfHappyGilmore a mds:CatchPhrase ;
+mds:CatchPhraseOfHappyGilmore
+    a               owl:NamedIndividual, mds:CatchPhrase ;
     cco:ont00001761 "¿Por que no te vas a casa? ¡Eso es tu casa"@es .
 
-mds:HappyPerson a owl:Class ;
+mds:HappyPerson
+    a               owl:Class ;
     rdfs:subClassOf cco:ont00001262 ;
     skos:definition "someone who experiences frequent positive emotions, a sense of satisfaction with their life, and a positive outlook on life"@en .
 
-cco:ont00001761 a owl:AnnotationProperty ;
-    rdfs:label "is tokenized by"@en ;
+cco:ont00001761
+    a               owl:AnnotationProperty ;
+    rdfs:label      "is tokenized by"@en ;
     skos:exactMatch cco:ont00001761 .
 
-cco:ont00001916 a owl:ObjectProperty ;
-    rdfs:label "designates"@en ;
+cco:ont00001916
+    a               owl:ObjectProperty ;
+    rdfs:label      "designates"@en ;
+    rdfs:domain     cco:ont00000686 ;
     skos:exactMatch cco:ont00001916 .
 
-mds:HappyGilmore a mds:HappyPerson ;
+mds:HappyGilmore
+    a                  owl:NamedIndividual, mds:HappyPerson ;
     mds:hasCatchphrase mds:CatchPhraseOfHappyGilmore .
 
-cco:ont00000005 a owl:Class ;
-    rdfs:label "Act"@en ;
+cco:ont00000005
+    a               owl:Class ;
+    rdfs:label      "Act"@en ;
     skos:exactMatch cco:ont00000005 .
 
-cco:ont00000958 a owl:Class ;
-    rdfs:label "Information Content Entity"@en ;
+cco:ont00000958
+    a               owl:Class ;
+    rdfs:label      "Information Content Entity"@en ;
     skos:exactMatch cco:ont00000958 .
 
-cco:ont00000990 a owl:Class ;
-    rdfs:label "Nickname"@en ;
+cco:ont00000990
+    a               owl:Class ;
+    rdfs:label      "Nickname"@en ;
     skos:exactMatch cco:ont00000990 .
 
-cco:ont00001262 a owl:Class ;
-    rdfs:label "Person"@en ;
+cco:ont00001262
+    a               owl:Class ;
+    rdfs:label      "Person"@en ;
     skos:exactMatch cco:ont00001262 .
 
