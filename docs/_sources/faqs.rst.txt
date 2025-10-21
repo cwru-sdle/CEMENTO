@@ -48,11 +48,7 @@ Usage
 
 .. dropdown:: How do I add axioms and restrictions?
 
-    This version of the package currently does not support axioms and restrictions. We are still searching for a way to define them visually that is most appropriate and clear for domain scientists. We found the solution provided by the `Chowlk <https://github.com/oeg-upm/Chowlk>`_ package to be elegant (using element pallettes) but doing so limits users to developer-defined capabilities rather than catering to OWL/RDF syntax globally. Thus, we would rather find a working design solution first instead of implementing what they already have and duplicating their work.
-    
-    If axioms are crucial, please defer to that project instead. It does what we do but without term matching, but it requires server setup for local deployment.
-
-    Another alternative is `OWLAx <https://github.com/md-k-sarker/OWLAx>`_ plug-in which also does what we while being integrated into the `Protégé <https://protege.stanford.edu/>`_ software application. This package won't take a draw.io as input, but they do have an interface for drawing ontology diagrams.
+    CEMENTO makes use of a hybrid form of Manchester syntax to describe axioms and restrictions. This allows you to describe axiomatic concepts in a coherent and logically consistent way without sacrificing readability in the diagram. A full page dedicated to explaining axiom and restriction declaration is currently being written. The link will also be here when it gets uploaded.
 
 Inaccurate outputs
 ====================

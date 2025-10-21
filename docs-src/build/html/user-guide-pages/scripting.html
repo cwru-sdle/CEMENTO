@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Scripting &#8212; CEMENTO 0.12.3 documentation</title>
+    <title>Scripting &#8212; CEMENTO 0.13.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=56343b9b"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -511,42 +511,6 @@
 </pre></div>
 </div>
 </section>
-<section id="converting-draw-io-to-a-networkx-digraph">
-<h2>Converting draw.io to a <code class="docutils literal notranslate"><span class="pre">networkx</span></code> DiGraph<a class="headerlink" href="#converting-draw-io-to-a-networkx-digraph" title="Link to this heading">#</a></h2>
-<p>We used a directed networkx graph (DiGraph) as an intermediary data structure that provides a much richer interface for graph manipulation than the default <code class="docutils literal notranslate"><span class="pre">rdflib</span></code> Graph. If you are interested in using this data structure, you are free to use the functions shown below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cemento.draw_io.read_diagram</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_drawio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cemento.draw_io.write_diagram</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw_tree</span>
-
-<span class="n">INPUT_PATH</span> <span class="o">=</span> <span class="s2">&quot;happy-example.drawio&quot;</span>
-<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s2">&quot;sample.drawio&quot;</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="c1"># reads a drawio file and converts it to a networkx graph</span>
-    <span class="n">graph</span> <span class="o">=</span> <span class="n">read_drawio</span><span class="p">(</span>
-        <span class="n">INPUT_PATH</span><span class="p">,</span>
-        <span class="n">check_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">inverted_rank_arrow</span><span class="o">=</span><span class="kc">False</span> <span class="c1"># set whether the rdfs:subClassOf and rdf:type were inverted</span>
-    <span class="p">)</span>
-    <span class="c1"># reads a networkx graph and draws a draw.io diagram</span>
-    <span class="n">draw_tree</span><span class="p">(</span>
-        <span class="n">graph</span><span class="p">,</span>
-        <span class="n">OUTPUT_PATH</span><span class="p">,</span>
-        <span class="n">translate_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">translate_y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">classes_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">demarcate_boxes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">horizontal_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
-</pre></div>
-</div>
-<p>In fact, the functions <code class="docutils literal notranslate"><span class="pre">read_drawio</span></code> and <code class="docutils literal notranslate"><span class="pre">convert_rdf_to_graph</span></code> are actually wrapped around to form the <code class="docutils literal notranslate"><span class="pre">convert_rdf_to_drawio</span></code> and <code class="docutils literal notranslate"><span class="pre">convert_drawio_to_rdf</span></code> functions. You are already using the former pair when using the latter.</p>
-<section id="a-note-on-unique-literals">
-<h3>A Note on “Unique” Literals<a class="headerlink" href="#a-note-on-unique-literals" title="Link to this heading">#</a></h3>
-<p>By default, the package will not treat all literals as being unique from one another. Classes and instances, by design, have singular, unique IRIs so they are treated to be the same if drawn in multiple locations. By default, literals will be treated the same way even though they don’t have unique IRIs.</p>
-<p>To make unique literals (which don’t come with IRIs), the package can append all literal terms with a unique ID that prevents merging. To do so, set the <code class="docutils literal notranslate"><span class="pre">set_unique_literals</span></code> argument when using the functions <code class="docutils literal notranslate"><span class="pre">convert_ttl_to_drawio</span></code> and <code class="docutils literal notranslate"><span class="pre">convert_ttl_to_graph</span></code>.</p>
-<p>You are free to remove them using <code class="docutils literal notranslate"><span class="pre">remove_literal_id</span></code> which is just one of the functions we wrote in <code class="docutils literal notranslate"><span class="pre">cemento.draw_io.preprocessing</span></code>. You are also free to implement your own algorithm as well.</p>
-</section>
-</section>
 <section id="using-other-modules">
 <span id="module-structure"></span><h2>Using Other Modules<a class="headerlink" href="#using-other-modules" title="Link to this heading">#</a></h2>
 <p>This package was built along the paradigms of <a class="reference external" href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a> which is only possible in Python through a <a class="reference external" href="https://docs.python.org/3/howto/functional.html">hybrid approach</a>. The modules are divided by four main logical groupings, and are as follows:</p>
@@ -576,14 +540,13 @@
 <ul class="simple">
 <li><p><strong>preprocessing</strong> - contains functions that deal with cleaning and organizing terms prior to use in other functions.</p></li>
 <li><p><strong>transforms</strong> - deals with data transformations, aggregations and splitting for both final and intermediate data.</p></li>
-<li><p><strong>filters</strong> - some functions that filter data that ended up being reused across modules.</p></li>
 <li><p><strong>io</strong> - handles file or data loading from file or library sources.</p></li>
 <li><p><strong>constants</strong> - contains fixed constants and definitions for dataclasses and enums.</p></li>
 </ul>
 <p>As you can imagine, these combinations can help navigate the function you probably want to inspect. For example, you can bet that <code class="docutils literal notranslate"><span class="pre">cemento.draw_io.io</span></code> and <code class="docutils literal notranslate"><span class="pre">cemento.draw_io.transforms</span></code> will contain the functions for actually reading and writing a draw.io diagram.</p>
 <section id="the-api-guide">
 <h3>The API guide<a class="headerlink" href="#the-api-guide" title="Link to this heading">#</a></h3>
-<p>We invite you to read through our <a class="reference internal" href="../modules.html"><span class="doc">API guide</span></a> to get an in-depth understanding of what each of the functions do. This codebase is more than 2,000 lines, and is still in active development. We cannot guarantee that all functions will have documentation, but we will slowly add as many of them as possible starting with the major functions for conversion.</p>
+<p>We invite you to read through our <a class="reference internal" href="../modules.html"><span class="doc">API guide</span></a> to get an in-depth understanding of what each of the functions do. This codebase is more than 3,000 lines, and is still in active development. We cannot guarantee that all functions will have documentation, but we will slowly add as many of them as possible starting with the major functions for conversion.</p>
 </section>
 </section>
 </section>
@@ -637,10 +600,6 @@
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#converting-draw-io-to-rdf-files">Converting draw.io to RDF files</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#converting-rdf-files-to-draw-io-files">Converting RDF files to draw.io files</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#converting-draw-io-to-a-networkx-digraph">Converting draw.io to a <code class="docutils literal notranslate"><span class="pre">networkx</span></code> DiGraph</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-unique-literals">A Note on “Unique” Literals</a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-other-modules">Using Other Modules</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-api-guide">The API guide</a></li>
 </ul>
@@ -672,7 +631,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>

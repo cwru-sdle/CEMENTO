@@ -51,50 +51,6 @@ This case is very similiar to the previous one. The RDF was assumed to contain t
             demarcate_boxes=True, # sets whether to move all instances to A-box and classes to T-box
         )
 
-
-Converting draw.io to a ``networkx`` DiGraph
-============================================
-
-We used a directed networkx graph (DiGraph) as an intermediary data structure that provides a much richer interface for graph manipulation than the default ``rdflib`` Graph. If you are interested in using this data structure, you are free to use the functions shown below:
-
-
-.. code-block:: python
-
-    from cemento.draw_io.read_diagram import read_drawio
-    from cemento.draw_io.write_diagram import draw_tree
-
-    INPUT_PATH = "happy-example.drawio"
-    OUTPUT_PATH = "sample.drawio"
-
-    if __name__ == "__main__":
-        # reads a drawio file and converts it to a networkx graph
-        graph = read_drawio(
-            INPUT_PATH,
-            check_errors=True,
-            inverted_rank_arrow=False # set whether the rdfs:subClassOf and rdf:type were inverted
-        )
-        # reads a networkx graph and draws a draw.io diagram
-        draw_tree(
-            graph,
-            OUTPUT_PATH,
-            translate_x=0,
-            translate_y=0,
-            classes_only=False,
-            demarcate_boxes=False,
-            horizontal_tree=False,
-        )
-
-In fact, the functions ``read_drawio`` and ``convert_rdf_to_graph`` are actually wrapped around to form the ``convert_rdf_to_drawio`` and ``convert_drawio_to_rdf`` functions. You are already using the former pair when using the latter.
-
-A Note on "Unique" Literals
----------------------------
-
-By default, the package will not treat all literals as being unique from one another. Classes and instances, by design, have singular, unique IRIs so they are treated to be the same if drawn in multiple locations. By default, literals will be treated the same way even though they don't have unique IRIs.
-
-To make unique literals (which don't come with IRIs), the package can append all literal terms with a unique ID that prevents merging. To do so, set the ``set_unique_literals`` argument when using the functions ``convert_ttl_to_drawio`` and ``convert_ttl_to_graph``.
-
-You are free to remove them using ``remove_literal_id`` which is just one of the functions we wrote in ``cemento.draw_io.preprocessing``. You are also free to implement your own algorithm as well.
-
 .. _module-structure:
 
 Using Other Modules
@@ -115,7 +71,6 @@ Each module is again subdivided into different submodules that envelope function
 
 * **preprocessing** - contains functions that deal with cleaning and organizing terms prior to use in other functions.
 * **transforms** - deals with data transformations, aggregations and splitting for both final and intermediate data.
-* **filters** - some functions that filter data that ended up being reused across modules.
 * **io** - handles file or data loading from file or library sources.
 * **constants** - contains fixed constants and definitions for dataclasses and enums.
 
@@ -124,4 +79,4 @@ As you can imagine, these combinations can help navigate the function you probab
 The API guide
 --------------
 
-We invite you to read through our :doc:`API guide </modules>` to get an in-depth understanding of what each of the functions do. This codebase is more than 2,000 lines, and is still in active development. We cannot guarantee that all functions will have documentation, but we will slowly add as many of them as possible starting with the major functions for conversion.
+We invite you to read through our :doc:`API guide </modules>` to get an in-depth understanding of what each of the functions do. This codebase is more than 3,000 lines, and is still in active development. We cannot guarantee that all functions will have documentation, but we will slowly add as many of them as possible starting with the major functions for conversion.

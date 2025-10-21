@@ -40,8 +40,8 @@ CEMENTO
 
 - Match and substitute for terms in ontologies YOU provide.
 - Create coherent tree-based layouts for visualizing ontology class and instance relationships (even with multiple inheritance).
+- Read **nested collections**, **axioms**, and **restrictions** directly from your draw.io sketch (output into draw.io pending).
 - Support URI prefixes (via binding), literal annotations and property definitions.
-- Collect domain and range instances as used in your ontology *(class inference coming soon)*.
 - Point you to your diagram errors by highlighting faulty entities. Your errors show all at once.
 - Support for multiple pages in a draw.io file, for when you want to organize terms your way.
 
@@ -100,6 +100,22 @@ CEMENTO
 
             To the API Reference
 
+    .. grid-item-card::
+        :img-top: _static/video.svg
+
+        Video Tutorials
+        ^^^^^^^^^^^^^
+
+        Prefer to watch a video instead? We got you covered.
+
+        +++
+
+        .. button-link:: https://www.youtube.com/playlist?list=PLU6yj7NiDk9bByMG_xJMudeHUR1_vIyJb
+            :expand:
+            :color: dark
+            :click-parent:
+
+            To the Video Series
 Indices and tables
 ==================
 

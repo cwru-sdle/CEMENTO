@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   cemento.axioms
    cemento.cli
    cemento.draw_io
    cemento.rdf
@@ -20,13 +21,13 @@ cemento.main module
 
 .. automodule:: cemento.main
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: cemento
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

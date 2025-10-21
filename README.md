@@ -21,16 +21,14 @@ Check out MDS-Onto, the modular ontology for materials data, and other FAIR-rela
 To summarize, the package offers the following features:
 
 1. Converting RDF triples into draw.io diagrams of the ontology terms and relationships and vice versa
-2. Converting RDF files files and/or draw.io diagrams of ontologies into an intermediate `networkx` graph format and vice versa (given proper formatting of course)
-3. Substituting and matching terms based on ontologies that YOU provide
+2. Substituting and matching terms based on ontologies that YOU provide
+3. Support for nested collections, axioms and restrictions for directly inputting your rulesets into the diagrams!
 4. Creating coherent tree-based layouts for terms for visualizing ontology class and instance relationships
-5. Tree-splitting diagram layouts to suppport multiple inheritance between classes (though multiple inheritance is not recommended by BFO)
+5. Tree-splitting diagram layouts to support multiple inheritance between classes (though multiple inheritance is not recommended by BFO)
 6. Support for URI prefixes (via binding) and literal annotations (language annotations like `@en` and datatype annotations like `^^xsd:string`)
-7. Domain and range collection as a union for custom object properties.
-8. Providing a log for substitutions made and suppresing substitutions by adding a key (\*).
-9. Support for Property definitions. Properties that do not have definitions will default as an Object Property type.
-10. Support for multiple pages in a draw.io file, for when you want to organize terms your way.
-11. Support for inputting containers (Container draw outputs coming out soon).
+7. Providing a log for substitutions made and suppressing substitutions by adding a key (\*).
+8. Support for Property definitions. Properties that do not have definitions will default as an Object Property type. 
+9. Support for multiple pages in a draw.io file, for when you want to organize terms your way.
 
 ## Installation
 
@@ -108,7 +106,6 @@ if __name__ == "__main__":
         file_format="turtle", # set the desired format for the rdf file output. The format is inferred if this is set to None
         check_errors=True, # set whether to check for diagram errors prior to processing
         log_substitution_path=LOG_PATH, # set where to save the substitution log for term fuzzy search
-        collect_domains_ranges=False, # set whether to collect the instances within the domain and range of a custom object property
     )
 ```
 
@@ -132,34 +129,6 @@ if __name__ == "__main__":
     )
 ```
 
-To convert to an intermediate `networkx`-based Graph instead:
-
-```{python}
-from cemento.draw_io.read_diagram import read_drawio
-from cemento.draw_io.write_diagram import draw_tree
-
-INPUT_PATH = "happy-example.drawio"
-OUTPUT_PATH = "sample.drawio"
-
-if __name__ == "__main__":
-    # reads a drawio file and converts it to a networkx graph
-    graph = read_drawio(
-        INPUT_PATH,
-        check_errors=True,
-        inverted_rank_arrow=False # set whether the rdfs:subClassOf and rdf:type were inverted
-    )
-    # reads a networkx graph and draws a draw.io diagram
-    draw_tree(
-        graph,
-        OUTPUT_PATH,
-        translate_x=0,
-        translate_y=0,
-        classes_only=False,
-        demarcate_boxes=False,
-        horizontal_tree=False,
-    )
-```
-
 ## Drawing Basics
 
 The following diagram goes through an example supplied with the repository called `happy-example.drawio` with its corresponding `.ttl` file called `happy-example.ttl`. We used [CCO terms](https://github.com/CommonCoreOntology/CommonCoreOntologies) to model the ontology.
@@ -172,9 +141,8 @@ The following diagram goes through an example supplied with the repository calle
 
 This package was designed with end-to-end conversion in mind. The package is still in active development, and future features may include, but are not limited to the following:
 
-- **Axioms and Restrictions.** Users will be able to draw out their axioms and restrictions, starting from basic domains and ranges, all the way to restrictions and onProperties.
+- **Visualizing Axioms and Restrictions.** Users will be able to visualize the axioms and restrictions already in the input RDF file.
 - **An interactive mode.** Users will be able to visualize syntax errors, improper term connections (leveraging domains and ranges), and substitutions and make edits in iterations before finalizing a draw.io or `.ttl` output.
-- **Comprehensive domain-range inference.** The package will not only be able to collect unions of terms, but infer them based on superclass term definitions.
 - **Integrated reasoner.** Packages like `owlready2` have reasoners like `HermiT` and `Pellet` that will be integrated to diagram-to-triple conversion. This is for when some implicit connections that you would want to make are a little bit tedious to draw but are equally as important.
 
 ## License

@@ -4,4 +4,4 @@ API Reference
 .. toctree::
    :maxdepth: 2
 
-   api-pages/cemento
+   api-pages/modules
