@@ -18,6 +18,32 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.13.0] - 2025-10-21
+
+### Added
+
+- support for defining axioms and restrictions via a hybrid notation of Manchester syntax
+- a light reference ontology for custom hybrid Manchester syntax terms and their counterparts
+- naming a term explicitly as a class or named individual except for property terms
+- using xsd terms to the search pool for term matching
+- choosing between term matching algorithms when using `substitute_term`
+- tests and new test cases for axiom reading
+
+### Changed
+
+- refactored the entirety of the read workflow
+- changed all read associated functions with more functional counterpart
+- interface functions to avoid intermediate graph generation scripts
+- read_drawio function signature. The function now outputs all required elements for converting to RDF formats rather than a unified graph object
+- test scripts to adapt to new read_drawio function signature
+
+### Removed
+
+- all functions for `convert_drawio_to_rdf` prior to this version
+- all functions associated with `substitute_term` and every one of its variants
+- feature for collecting domains and ranges
+- intermediate (`networkx`) graph file generation for converting between drawio to RDF
+
 ## [0.12.3] - 2025-10-01
 
 ### Hotfix
