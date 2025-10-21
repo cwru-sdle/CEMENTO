@@ -104,6 +104,15 @@ def compare_read_output(input_path):
         standard_triples = standard_output["triples"]
         assert sorted(triples) == sorted(standard_triples)
 
+def compare_graph_isomorphic(input_path):
+    params = read_drawio(input_path, check_errors=True)
+    ref_path = get_corresponding_ref_file(input_path)["ttl"]
+
+    rdf_graph = convert_graph_to_rdf_graph(*params)
+
+    ref_rdf_graph = rdflib.Graph()
+    ref_rdf_graph.parse(ref_path, format="turtle")
+    assert isomorphic(rdf_graph, ref_rdf_graph)
 
 def test_read_basic():
     compare_read_output(diagram_test_files[1])
@@ -126,11 +135,10 @@ def test_rdf_graph_generation():
 
 
 def test_container_rdf_graph_generation():
-    params = read_drawio(diagram_test_files[3], check_errors=True)
-    ref_path = get_corresponding_ref_file(diagram_test_files[3])["ttl"]
+    compare_graph_isomorphic(diagram_test_files[3])
 
-    rdf_graph = convert_graph_to_rdf_graph(*params)
-
-    ref_rdf_graph = rdflib.Graph()
-    ref_rdf_graph.parse(ref_path, format="turtle")
-    assert isomorphic(rdf_graph, ref_rdf_graph)
+# def test_axiom_read_expanded():
+#     compare_graph_isomorphic(diagram_test_files[4])
+#
+# def test_axiom_read_unexpanded():
+#     compare_graph_isomorphic(diagram_test_files[5])
