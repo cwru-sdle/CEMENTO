@@ -196,11 +196,13 @@ def extract_axiom_graph(
     # FIXME: find a way to pass multiple bnode headers and process them
     # FIXME: compressed graph edges between a node and a pivot not being added correctly
     axiom_graph = Graph()
-    facet_graph = Graph()
-    facet_graph, facet_nodes = retrieve_facet_nodes(
-        facet_graph, term_substitution, faceted_terms
-    )
-    axiom_graph += facet_graph
+    facet_graph, facet_nodes = Graph(), dict()
+
+    if faceted_terms and len(faceted_terms) > 0:
+        facet_graph, facet_nodes = retrieve_facet_nodes(
+            facet_graph, term_substitution, faceted_terms
+        )
+        axiom_graph += facet_graph
 
     parse_axiom_item = partial(
         parse_item,
