@@ -22,8 +22,7 @@ dependencies = [
   "rdflib",
   "thefuzz",
   "tldextract",
-  "more_itertools",
-  "pytest>=8.4.2",
+  "more-itertools",
 ]
 
 [project.scripts]
@@ -32,11 +31,26 @@ cemento = "cemento.main:main"
 [tool.setuptools]
 packages = [
   "cemento",
+  "cemento.axioms",
   "cemento.draw_io",
   "cemento.rdf",
   "cemento.term_matching",
   "cemento.utils",
   "cemento.cli",
+]
+
+[dependency-groups]
+dev = [
+    "build>=1.3.0",
+    "coverage>=7.11.0",
+    "myst-parser>=4.0.1",
+    "pydata-sphinx-theme>=0.16.1",
+    "pytest>=8.4.2",
+    "sphinx>=8.1.3",
+    "sphinx-design>=0.6.1",
+    "sphinx-iframes>=1.1.0",
+    "sphinxcontrib-shtest>=0.5.0",
+    "twine>=6.2.0",
 ]
 
 [project.urls]
