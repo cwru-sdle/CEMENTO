@@ -1,5 +1,17 @@
+from enum import Enum
+
 from more_itertools import flatten
 from rdflib import DCTERMS, OWL, RDF, RDFS, SKOS, Namespace, URIRef
+from thefuzz import fuzz
+
+
+class FuzzAlgorithm(Enum):
+    SimpleRatio = fuzz.ratio
+    PartialRatio = fuzz.partial_ratio
+    TokenSortRatio = fuzz.token_sort_ratio
+    TokenSetRatio = fuzz.token_set_ratio
+    PartialTokenSetRatio = fuzz.partial_token_set_ratio
+
 
 default_namespaces = [RDF, RDFS, OWL, DCTERMS, SKOS]
 default_namespace_prefixes = ["rdf", "rdfs", "owl", "dcterms", "skos"]

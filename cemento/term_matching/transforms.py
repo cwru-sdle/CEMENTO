@@ -17,6 +17,7 @@ from cemento.term_matching.constants import (
     FALLBACK_STRAT_TYPES,
     RANK_PROPS,
     get_default_namespace_prefixes,
+    FuzzAlgorithm,
 )
 from cemento.term_matching.io import (
     get_rdf_file_iter,
@@ -63,7 +64,9 @@ def get_term_matches(
 
 
 def substitute_term(
-    search_keys: list[str] | str | None, search_pool: set[tuple[Node, str]]
+    search_keys: list[str] | str | None,
+    search_pool: set[tuple[Node, str]],
+    search_algorithm: FuzzAlgorithm = FuzzAlgorithm.TokenSortRatio,
 ) -> URIRef | None:
     if search_keys is None:
         return None
@@ -74,7 +77,7 @@ def substitute_term(
             extractOne,
             choices=search_pool,
             processor=lambda item: item[1] if isinstance(item, tuple) else item,
-            scorer=fuzz.token_sort_ratio,
+            scorer=search_algorithm,
             score_cutoff=90,
         ),
         search_keys,

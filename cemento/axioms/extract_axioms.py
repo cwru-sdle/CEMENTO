@@ -15,6 +15,7 @@ from cemento.axioms.modules import MS
 from cemento.rdf.transforms import (
     get_uuid,
 )
+from cemento.term_matching.constants import FuzzAlgorithm
 from cemento.term_matching.transforms import substitute_term
 from cemento.utils.constants import invert_tuple
 from cemento.utils.utils import fst, get_subgraphs
@@ -82,7 +83,9 @@ def retrieve_facet_nodes(
         facet_graph.add((restriction_node, OWL.withRestrictions, collection_head))
         facet_collection = Collection(facet_graph, collection_head)
         for term, value in facet_pairs:
-            facet_key = substitute_term(term, facet_term_search_pool)
+            facet_key = substitute_term(
+                term, facet_term_search_pool, search_algorithm=FuzzAlgorithm.SimpleRatio
+            )
             if facet_key is None:
                 raise ValueError(
                     f"The facet key must be one of: {symbol_mapping.keys()}"
