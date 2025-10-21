@@ -29,6 +29,7 @@ from cemento.term_matching.constants import (
     get_namespace_terms,
     SUPPRESSION_KEY,
     valid_collection_types,
+    TRIPLE_SYNTAX_SUGAR,
 )
 from cemento.term_matching.preprocessing import (
     get_uriref_abbrev_term,
@@ -266,45 +267,70 @@ def convert_graph_to_rdf_graph(
 
     # add the collections to the graph
     for key, (label, children) in containers.items():
-        label = substitute_term(
-            label, set(invert_tuple(valid_collection_types.items()))
+        label = (
+            TRIPLE_SYNTAX_SUGAR
+            if not label.strip()
+            else substitute_term(
+                label, set(invert_tuple(valid_collection_types.items()))
+            )
         )
+
         if label is None:
             raise ValueError(
                 f"The chosen label is not a valid collection type. Please choose from: {valid_collection_types.keys()}"
             )
+
         children = [term_substitution[item] for item in children]
-        first_child_type = get_child_type(classes, instances, children[0])
-        if any(
-            (child_type := get_child_type(classes, instances, term)) != first_child_type
-            and child_type != OWL.Nothing
-            for term in children
-        ):
-            raise ValueError(
-                "Cannot combine terms with different types in a collection. Combinations should only be BNodes, OWL.Class or OWL.NamedIndividual..."
+
+        if label == TRIPLE_SYNTAX_SUGAR:
+            collection_triples = rdf_graph.triples(
+                (None, None, collection_headers[key])
             )
-        collection_bnode = BNode()
-        Collection(rdf_graph, collection_bnode, children)
-        if first_child_type is not None:
-            rdf_graph.add((collection_headers[key], RDF.type, first_child_type))
-        rdf_graph.add((collection_headers[key], label, collection_bnode))
+            remove_triples = []
+            for subj, pred, obj in collection_triples:
+                for child in children:
+                    rdf_graph.add((subj, pred, child))
+                remove_triples.append((subj, pred, obj))
+            for triple in remove_triples:
+                rdf_graph.remove(triple)
+            del collection_headers[key]
+        else:
+            first_child_type = get_child_type(classes, instances, children[0])
+            if any(
+                (child_type := get_child_type(classes, instances, term))
+                != first_child_type
+                and child_type != OWL.Nothing
+                for term in children
+            ):
+                child_types = {
+                    term: get_child_type(classes, instances, term) for term in children
+                }
+                raise ValueError(
+                    f"Cannot combine terms with different types in a collection. Combinations should only be BNodes, OWL.Class or OWL.NamedIndividual, but BNodes (OWL.Nothing) can be mixed with any type. The terms provided have the associated types {child_types}."
+                )
+            collection_bnode = BNode()
+            Collection(rdf_graph, collection_bnode, children)
+            if first_child_type is not None:
+                rdf_graph.add((collection_headers[key], RDF.type, first_child_type))
+            rdf_graph.add((collection_headers[key], label, collection_bnode))
 
     ## expand axiom terms
-    ### first extract faceted terms to process
-    faceted_terms = filter(
-        lambda item: re.search(r".*\[.*\]", item[1]),
-        chain(uriref_terms.items(), literal_terms.items()),
-    )
-    faceted_terms = dict(faceted_terms)
-    axiom_graph = extract_axiom_graph(
-        term_graph,
-        term_substitution,
-        restriction_nodes,
-        collection_headers,
-        intro_restriction_triples,
-        faceted_terms,
-    )
-    rdf_graph += axiom_graph
+    if len(restriction_nodes) > 0:
+        ### first extract faceted terms to process
+        faceted_terms = filter(
+            lambda item: re.search(r".*\[.*\]", item[1]),
+            chain(uriref_terms.items(), literal_terms.items()),
+        )
+        faceted_terms = dict(faceted_terms)
+        axiom_graph = extract_axiom_graph(
+            term_graph,
+            term_substitution,
+            restriction_nodes,
+            collection_headers,
+            intro_restriction_triples,
+            faceted_terms,
+        )
+        rdf_graph += axiom_graph
 
     ## retrieve all defined properties for annotation logic
     property_classes = defaults_graph.transitive_subjects(

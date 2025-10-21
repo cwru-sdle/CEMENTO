@@ -21,14 +21,15 @@ FALLBACK_STRAT_TYPES = {
 
 SUPPRESSION_KEY = "*"
 
+TRIPLE_SYNTAX_SUGAR = URIRef("https://cwrusdle.bitbucket.io/mds/tripleSyntaxSugar")
+
 valid_collection_types = {
     "owl:unionOf": OWL.unionOf,
     "owl:intersectionOf": OWL.intersectionOf,
     "owl:complementOf": OWL.complementOf,
-    "mds:tripleSyntaxSugar": URIRef(
-        "https://cwrusdle.bitbucket.io/mds/tripleSyntaxSugar"
-    ),
+    "mds:tripleSyntaxSugar": TRIPLE_SYNTAX_SUGAR,
 }
+
 
 def get_default_namespace_prefixes() -> tuple[str, URIRef | Namespace]:
     return {
