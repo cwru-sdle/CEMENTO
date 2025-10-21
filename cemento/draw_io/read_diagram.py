@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
 
@@ -17,7 +18,12 @@ from cemento.draw_io.transforms import (
 )
 
 
-def read_drawio(input_path: str | Path, check_errors: bool = False):
+def read_drawio(input_path: str | Path, check_errors: bool = False) -> tuple[
+    dict[str, dict[str, any]],
+    Iterable[str],
+    list[tuple[str, str, str]],
+    list[tuple[str, str, list[str]]],
+]:
 
     elements = parse_elements(input_path)
     containers = parse_containers(elements)
