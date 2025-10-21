@@ -84,66 +84,33 @@ def get_graph_reference(
     with open(input_path, "r") as f:
         ref_graph_data = json.load(f)
         return ref_graph_data["nodes"], ref_graph_data["edges"]
-    raise ValueError("Cannot retrieve reference file!")
 
 
-def test_graph_generation_basic():
-    graph = read_drawio(diagram_test_files[1], check_errors=True)
-    ref_path = get_corresponding_ref_file(diagram_test_files[1])["json"]
-    ref_nodes, ref_edges = get_graph_reference(ref_path)
-    graph_nodes, graph_edges = dict(graph.nodes(data=True)), list(
-        graph.edges(data=True)
+def compare_read_output(input_path):
+    elements, all_terms, triples, output_containers = read_drawio(
+        input_path, check_errors=True
     )
+    ref_path = get_corresponding_ref_file(input_path)["json"]
+    term_dict = {term_id: elements[term_id].get("value", None) for term_id in all_terms}
+    triples = [list(map(lambda term: term_dict[term], triple)) for triple in triples]
 
-    # check that the nodes and edges all have unique IDs
-    node_ids = [attr["term_id"] for attr in graph_nodes.values()]
-    assert len(node_ids) == len(set(node_ids))
+    with open(ref_path, "r") as f:
+        standard_output = json.load(f)
+        standard_term_dict = standard_output["term_dict"]
 
-    all_ids = node_ids
-    edge_ids = [attr["pred_id"] for (_, _, attr) in graph_edges]
-    assert len(edge_ids) == len(set(edge_ids))
+        assert len(standard_term_dict) == len(term_dict)
+        assert set(standard_term_dict.values()) == set(term_dict.values())
 
-    all_ids += edge_ids
-
-    assert len(all_ids) == len(set(all_ids))
-
-    # check that the parsed graph elements correspond with the reference
-    # start with nodes
-    ref_nodes = {key: remove_attr(attr, "term_id") for key, attr in ref_nodes.items()}
-    graph_nodes = {
-        key: remove_attr(value, "term_id") for key, value in graph_nodes.items()
-    }
-
-    assert graph_nodes == ref_nodes
-
-    # then compare edges
-    ref_edges = {
-        (subj, obj, frozenset(remove_attr(attr, "pred_id").items()))
-        for (subj, obj, attr) in ref_edges
-    }
-    graph_edges = {
-        (subj, obj, frozenset(remove_attr(attr, "pred_id").items()))
-        for (subj, obj, attr) in graph_edges
-    }
-    assert graph_edges == ref_edges
+        standard_triples = standard_output["triples"]
+        assert sorted(triples) == sorted(standard_triples)
 
 
-def test_graph_generation_advanced():
-    graph = read_drawio(diagram_test_files[2], check_errors=True)
-    ref_path = get_corresponding_ref_file(diagram_test_files[2])["json"]
-    print(ref_path)
-    ref_nodes, ref_edges = get_graph_reference(ref_path)
-    ref_nodes = set(ref_nodes.keys())
-    graph_nodes = set(graph.nodes)
+def test_read_basic():
+    compare_read_output(diagram_test_files[1])
 
-    assert ref_nodes == graph_nodes
-    assert len(graph_nodes) == len(ref_nodes)
 
-    graph_edges = set(graph.edges)
-    ref_edges = set((subj, obj) for subj, obj, _ in ref_edges)
-
-    assert ref_edges == graph_edges
-    assert len(ref_edges) == len(graph_edges)
+def test_read_advanced():
+    compare_read_output(diagram_test_files[2])
 
 
 def test_rdf_graph_generation():

@@ -1,939 +1,407 @@
 {
-    "nodes": {
-        "cco:Artifact": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-41",
-            "label": "cco:Artifact",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A social collective that exists as a temporally bounded organization of rational beings united by shared purpose and mutual commitment.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-70",
-            "label": "\"A social collective that exists as a temporally bounded organization of rational beings united by shared purpose and mutual commitment.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Gandalf (Gandalf)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-159",
-            "label": "lotr:Gandalf (Gandalf)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"50\"^^xsd:integer": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-121",
-            "label": "\"50\"^^xsd:integer",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"A continuant that exemplifies mortality combined with capacity for both nobility and corruption, characterized by relatively brief but potentially significant temporal existence.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-63",
-            "label": "\"A continuant that exemplifies mortality combined with capacity for both nobility and corruption, characterized by relatively brief but potentially significant temporal existence.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"3.5\"^^xsd:decimal": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-161",
-            "label": "\"3.5\"^^xsd:decimal",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Dwarf (Dwarf)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-18",
-            "label": "lotr:Dwarf (Dwarf)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"87\"^^xsd:integer": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-139",
-            "label": "\"87\"^^xsd:integer",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Wizard (Wizard)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-11",
-            "label": "lotr:Wizard (Wizard)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"Sindarin\"^^xsd:string": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-155",
-            "label": "\"Sindarin\"^^xsd:string",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "cco:Object": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-37",
-            "label": "cco:Object",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A material entity that bears supernatural qualities or powers, typically crafted through processes involving arcane knowledge or divine intervention.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-73",
-            "label": "\"A material entity that bears supernatural qualities or powers, typically crafted through processes involving arcane knowledge or divine intervention.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"A relation obtaining between a rational being and a realm over which they exercise governing authority.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-93",
-            "label": "\"A relation obtaining between a rational being and a realm over which they exercise governing authority.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:RationalBeing": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-100",
-            "label": "lotr:RationalBeing",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"Un continuador que se distingue por su robusta constitución física, afinidad por los ambientes subterráneos y competencia especializada en artesanías metalúrgicas y líticas\".@es": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-61",
-            "label": "\"Un continuador que se distingue por su robusta constitución física, afinidad por los ambientes subterráneos y competencia especializada en artesanías metalúrgicas y líticas\".@es",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"Westron\"^^xsd:string": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-162",
-            "label": "\"Westron\"^^xsd:string",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Aragorn": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-138",
-            "label": "lotr:Aragorn",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "owl:ObjectProperty": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-35",
-            "label": "owl:ObjectProperty",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:rulerOf": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-43",
-            "label": "lotr:rulerOf",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A relation between a rational being and a linguistic system they utilize for communication.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-91",
-            "label": "\"A relation between a rational being and a linguistic system they utilize for communication.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"6.0\"^^xsd:decimal": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-154",
-            "label": "\"6.0\"^^xsd:decimal",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:hasHeight": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-29",
-            "label": "lotr:hasHeight",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:MagicalArtifact (Magical Artifact)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-21",
-            "label": "lotr:MagicalArtifact (Magical Artifact)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:Fellowship": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-117",
-            "label": "lotr:Fellowship",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A relation between a rational being and a decimal measurement representing their vertical spatial extension.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-90",
-            "label": "\"A relation between a rational being and a decimal measurement representing their vertical spatial extension.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "cco:SpatialRegion": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-75",
-            "label": "cco:SpatialRegion",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "xsd:string": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-111",
-            "label": "xsd:string",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:FellowshipOfTheRing (Fellowship of the Ring)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-163",
-            "label": "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"2931\"^^xsd:integer": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-153",
-            "label": "\"2931\"^^xsd:integer",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"6.6\"^^xsd:decimal": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-140",
-            "label": "\"6.6\"^^xsd:decimal",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "\"A spatial region that constitutes a geopolitical unity characterized by defined boundaries, governance structures, and cultural identity.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-81",
-            "label": "\"A spatial region that constitutes a geopolitical unity characterized by defined boundaries, governance structures, and cultural identity.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Man (Man)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-19",
-            "label": "lotr:Man (Man)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:Frodo": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-48",
-            "label": "lotr:Frodo",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:Elf (Elf)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-13",
-            "label": "lotr:Elf (Elf)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A continuant that bears the role of wielding arcane knowledge and supernatural powers, typically manifested through staff-based focus and incantational processes.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-57",
-            "label": "\"A continuant that bears the role of wielding arcane knowledge and supernatural powers, typically manifested through staff-based focus and incantational processes.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Hobbit (Hobbit)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-45",
-            "label": "lotr:Hobbit (Hobbit)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A continuant that is characterized by the capacity for reasoning, linguistic communication, and moral agency within Middle Earth.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-56",
-            "label": "\"A continuant that is characterized by the capacity for reasoning, linguistic communication, and moral agency within Middle Earth.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:Legolas (Legolas)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-152",
-            "label": "lotr:Legolas (Legolas)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A continuant that instantiates the specific natural kind characterized by diminutive stature, distinctive pedal morphology, and disposition toward pastoral existence.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-67",
-            "label": "\"A continuant that instantiates the specific natural kind characterized by diminutive stature, distinctive pedal morphology, and disposition toward pastoral existence.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:speaks": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-31",
-            "label": "lotr:speaks",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "owl:DatatypePropertyy": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-27",
-            "label": "owl:DatatypePropertyy",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:Realm": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-76",
-            "label": "lotr:Realm",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A relation between a rational being and a numerical value representing their temporal duration of existence.\"": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-84",
-            "label": "\"A relation between a rational being and a numerical value representing their temporal duration of existence.\"",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "lotr:hasAge": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-26",
-            "label": "lotr:hasAge",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:Gondor (Gondor)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-165",
-            "label": "lotr:Gondor (Gondor)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"「延長された時間的持続、強化された感覚の鋭敏さ、そして自然のプロセスと美的美しさとの固有のつながりを特徴とする継続体。」\"@jp": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-59",
-            "label": "\"「延長された時間的持続、強化された感覚の鋭敏さ、そして自然のプロセスと美的美しさとの固有のつながりを特徴とする継続体。」\"@jp",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "cco:ObjectAggregate": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-39",
-            "label": "cco:ObjectAggregate",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:Fellowship (Fellowship)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-20",
-            "label": "lotr:Fellowship (Fellowship)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "xsd:decimal": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-103",
-            "label": "xsd:decimal",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "lotr:RationalBeing (Rational Being)": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-5",
-            "label": "lotr:RationalBeing (Rational Being)",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "xsd:integer": {
-            "term_id": "GFoEZNSDL_4xpxpBIgon-106",
-            "label": "xsd:integer",
-            "is_literal": false,
-            "parent": "1"
-        }
-    },
-    "edges": [
-        [
-            "lotr:Gandalf (Gandalf)",
-            "\"3.5\"^^xsd:decimal",
-            {
-                "label": "lotr:hasHeight",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-157",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Gandalf (Gandalf)",
-            "lotr:Wizard (Wizard)",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-170",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Gandalf (Gandalf)",
-            "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
-            {
-                "label": "obo:member part of",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-176",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Gandalf (Gandalf)",
-            "\"Westron\"^^xsd:string",
-            {
-                "label": "lotr:speaks",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-158",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Gandalf (Gandalf)",
-            "\"50\"^^xsd:integer",
-            {
-                "label": "lotr:hasAge",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-156",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Dwarf (Dwarf)",
-            "\"Un continuador que se distingue por su robusta constitución física, afinidad por los ambientes subterráneos y competencia especializada en artesanías metalúrgicas y líticas\".@es",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-62",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Dwarf (Dwarf)",
-            "lotr:RationalBeing (Rational Being)",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-24",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Wizard (Wizard)",
-            "\"A continuant that bears the role of wielding arcane knowledge and supernatural powers, typically manifested through staff-based focus and incantational processes.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-58",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Wizard (Wizard)",
-            "lotr:RationalBeing (Rational Being)",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-16",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Aragorn",
-            "lotr:Gondor (Gondor)",
-            {
-                "label": "lotr:rulerOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-175",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Aragorn",
-            "\"87\"^^xsd:integer",
-            {
-                "label": "lotr:hasAge",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-135",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Aragorn",
-            "lotr:Man (Man)",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-173",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Aragorn",
-            "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
-            {
-                "label": "obo:member part of",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-178",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Aragorn",
-            "\"Westron\"^^xsd:string",
-            {
-                "label": "lotr:speaks",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-137",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Aragorn",
-            "\"6.6\"^^xsd:decimal",
-            {
-                "label": "lotr:hasHeight",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-136",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:rulerOf",
-            "owl:ObjectProperty",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-44",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:rulerOf",
-            "lotr:Fellowship",
-            {
-                "label": "rdfs:range",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-118",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:rulerOf",
-            "\"A relation obtaining between a rational being and a realm over which they exercise governing authority.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-94",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:rulerOf",
-            "lotr:RationalBeing",
-            {
-                "label": "rdfs:domain",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-116",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasHeight",
-            "xsd:decimal",
-            {
-                "label": "rdfs:range",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-104",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasHeight",
-            "owl:DatatypePropertyy",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-30",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasHeight",
-            "lotr:RationalBeing",
-            {
-                "label": "rdfs:domain",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-102",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasHeight",
-            "\"A relation between a rational being and a decimal measurement representing their vertical spatial extension.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-95",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:MagicalArtifact (Magical Artifact)",
-            "cco:Artifact",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-42",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:MagicalArtifact (Magical Artifact)",
-            "\"A material entity that bears supernatural qualities or powers, typically crafted through processes involving arcane knowledge or divine intervention.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-74",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
-            "lotr:Fellowship (Fellowship)",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-164",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Man (Man)",
-            "\"A continuant that exemplifies mortality combined with capacity for both nobility and corruption, characterized by relatively brief but potentially significant temporal existence.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-66",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Man (Man)",
-            "lotr:RationalBeing (Rational Being)",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-25",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Frodo",
-            "\"Westron\"^^xsd:string",
-            {
-                "label": "lotr:speaks",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-127",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Frodo",
-            "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
-            {
-                "label": "obo:member part of",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-179",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Frodo",
-            "\"3.5\"^^xsd:decimal",
-            {
-                "label": "lotr:hasHeight",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-124",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Frodo",
-            "\"50\"^^xsd:integer",
-            {
-                "label": "lotr:hasAge",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-122",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Frodo",
-            "lotr:Hobbit (Hobbit)",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-50",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Elf (Elf)",
-            "\"「延長された時間的持続、強化された感覚の鋭敏さ、そして自然のプロセスと美的美しさとの固有のつながりを特徴とする継続体。」\"@jp",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-60",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Elf (Elf)",
-            "lotr:RationalBeing (Rational Being)",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-15",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Hobbit (Hobbit)",
-            "\"A continuant that instantiates the specific natural kind characterized by diminutive stature, distinctive pedal morphology, and disposition toward pastoral existence.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-68",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Hobbit (Hobbit)",
-            "lotr:RationalBeing (Rational Being)",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-47",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Legolas (Legolas)",
-            "\"Sindarin\"^^xsd:string",
-            {
-                "label": "lotr:speaks",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-151",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Legolas (Legolas)",
-            "\"6.0\"^^xsd:decimal",
-            {
-                "label": "lotr:hasHeight",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-150",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Legolas (Legolas)",
-            "lotr:Elf (Elf)",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-171",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Legolas (Legolas)",
-            "\"2931\"^^xsd:integer",
-            {
-                "label": "lotr:hasAge",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-149",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Legolas (Legolas)",
-            "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
-            {
-                "label": "obo:member part of",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-177",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:speaks",
-            "owl:DatatypePropertyy",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-32",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:speaks",
-            "lotr:RationalBeing",
-            {
-                "label": "rdfs:domain",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-114",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:speaks",
-            "\"A relation between a rational being and a linguistic system they utilize for communication.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-97",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:speaks",
-            "xsd:string",
-            {
-                "label": "rdfs:range",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-112",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Realm",
-            "\"A spatial region that constitutes a geopolitical unity characterized by defined boundaries, governance structures, and cultural identity.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-80",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Realm",
-            "cco:SpatialRegion",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-77",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasAge",
-            "lotr:RationalBeing",
-            {
-                "label": "rdfs:domain",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-108",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasAge",
-            "owl:DatatypePropertyy",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-110",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasAge",
-            "xsd:integer",
-            {
-                "label": "rdfs:range",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-107",
-                "is_strat": false,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:hasAge",
-            "\"A relation between a rational being and a numerical value representing their temporal duration of existence.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-85",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Gondor (Gondor)",
-            "lotr:Realm",
-            {
-                "label": "rdf:type",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-168",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Fellowship (Fellowship)",
-            "cco:ObjectAggregate",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-40",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:Fellowship (Fellowship)",
-            "\"A social collective that exists as a temporally bounded organization of rational beings united by shared purpose and mutual commitment.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-72",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:RationalBeing (Rational Being)",
-            "cco:Object",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-6",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "lotr:RationalBeing (Rational Being)",
-            "\"A continuant that is characterized by the capacity for reasoning, linguistic communication, and moral agency within Middle Earth.\"",
-            {
-                "label": "skos:definition",
-                "pred_id": "GFoEZNSDL_4xpxpBIgon-55",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ]
+  "term_dict": {
+    "GFoEZNSDL_4xpxpBIgon-75": "cco:SpatialRegion",
+    "GFoEZNSDL_4xpxpBIgon-152": "lotr:Legolas (Legolas)",
+    "GFoEZNSDL_4xpxpBIgon-93": "\"A relation obtaining between a rational being and a realm over which they exercise governing authority.\"",
+    "GFoEZNSDL_4xpxpBIgon-100": "lotr:RationalBeing",
+    "GFoEZNSDL_4xpxpBIgon-106": "xsd:integer",
+    "GFoEZNSDL_4xpxpBIgon-20": "lotr:Fellowship (Fellowship)",
+    "GFoEZNSDL_4xpxpBIgon-5": "lotr:RationalBeing (Rational Being)",
+    "GFoEZNSDL_4xpxpBIgon-43": "lotr:rulerOf",
+    "GFoEZNSDL_4xpxpBIgon-160": "\"50\"^^xsd:integer",
+    "GFoEZNSDL_4xpxpBIgon-165": "lotr:Gondor (Gondor)",
+    "GFoEZNSDL_4xpxpBIgon-81": "\"A spatial region that constitutes a geopolitical unity characterized by defined boundaries, governance structures, and cultural identity.\"",
+    "GFoEZNSDL_4xpxpBIgon-63": "\"A continuant that exemplifies mortality combined with capacity for both nobility and corruption, characterized by relatively brief but potentially significant temporal existence.\"",
+    "GFoEZNSDL_4xpxpBIgon-115": "lotr:RationalBeing",
+    "GFoEZNSDL_4xpxpBIgon-155": "\"Sindarin\"^^xsd:string",
+    "GFoEZNSDL_4xpxpBIgon-103": "xsd:decimal",
+    "GFoEZNSDL_4xpxpBIgon-111": "xsd:string",
+    "GFoEZNSDL_4xpxpBIgon-70": "\"A social collective that exists as a temporally bounded organization of rational beings united by shared purpose and mutual commitment.\"",
+    "GFoEZNSDL_4xpxpBIgon-141": "\"Westron\"^^xsd:string",
+    "GFoEZNSDL_4xpxpBIgon-153": "\"2931\"^^xsd:integer",
+    "GFoEZNSDL_4xpxpBIgon-56": "\"A continuant that is characterized by the capacity for reasoning, linguistic communication, and moral agency within Middle Earth.\"",
+    "GFoEZNSDL_4xpxpBIgon-59": "\"\u300c\u5ef6\u9577\u3055\u308c\u305f\u6642\u9593\u7684\u6301\u7d9a\u3001\u5f37\u5316\u3055\u308c\u305f\u611f\u899a\u306e\u92ed\u654f\u3055\u3001\u305d\u3057\u3066\u81ea\u7136\u306e\u30d7\u30ed\u30bb\u30b9\u3068\u7f8e\u7684\u7f8e\u3057\u3055\u3068\u306e\u56fa\u6709\u306e\u3064\u306a\u304c\u308a\u3092\u7279\u5fb4\u3068\u3059\u308b\u7d99\u7d9a\u4f53\u3002\u300d\"@jp",
+    "GFoEZNSDL_4xpxpBIgon-105": "lotr:RationalBeing",
+    "GFoEZNSDL_4xpxpBIgon-48": "lotr:Frodo",
+    "GFoEZNSDL_4xpxpBIgon-61": "\"Un continuador que se distingue por su robusta constituci\u00f3n f\u00edsica, afinidad por los ambientes subterr\u00e1neos y competencia especializada en artesan\u00edas metal\u00fargicas y l\u00edticas\".@es",
+    "GFoEZNSDL_4xpxpBIgon-37": "cco:Object",
+    "GFoEZNSDL_4xpxpBIgon-39": "cco:ObjectAggregate",
+    "GFoEZNSDL_4xpxpBIgon-13": "lotr:Elf (Elf)",
+    "GFoEZNSDL_4xpxpBIgon-140": "\"6.6\"^^xsd:decimal",
+    "GFoEZNSDL_4xpxpBIgon-154": "\"6.0\"^^xsd:decimal",
+    "GFoEZNSDL_4xpxpBIgon-91": "\"A relation between a rational being and a linguistic system they utilize for communication.\"",
+    "GFoEZNSDL_4xpxpBIgon-163": "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
+    "GFoEZNSDL_4xpxpBIgon-26": "lotr:hasAge",
+    "GFoEZNSDL_4xpxpBIgon-84": "\"A relation between a rational being and a numerical value representing their temporal duration of existence.\"",
+    "GFoEZNSDL_4xpxpBIgon-125": "\"3.5\"^^xsd:decimal",
+    "GFoEZNSDL_4xpxpBIgon-90": "\"A relation between a rational being and a decimal measurement representing their vertical spatial extension.\"",
+    "GFoEZNSDL_4xpxpBIgon-159": "lotr:Gandalf (Gandalf)",
+    "GFoEZNSDL_4xpxpBIgon-18": "lotr:Dwarf (Dwarf)",
+    "GFoEZNSDL_4xpxpBIgon-11": "lotr:Wizard (Wizard)",
+    "GFoEZNSDL_4xpxpBIgon-27": "owl:DatatypePropertyy",
+    "GFoEZNSDL_4xpxpBIgon-121": "\"50\"^^xsd:integer",
+    "GFoEZNSDL_4xpxpBIgon-29": "lotr:hasHeight",
+    "GFoEZNSDL_4xpxpBIgon-126": "\"Westron\"^^xsd:string",
+    "GFoEZNSDL_4xpxpBIgon-41": "cco:Artifact",
+    "GFoEZNSDL_4xpxpBIgon-35": "owl:ObjectProperty",
+    "GFoEZNSDL_4xpxpBIgon-113": "lotr:RationalBeing",
+    "GFoEZNSDL_4xpxpBIgon-161": "\"3.5\"^^xsd:decimal",
+    "GFoEZNSDL_4xpxpBIgon-19": "lotr:Man (Man)",
+    "GFoEZNSDL_4xpxpBIgon-21": "lotr:MagicalArtifact (Magical Artifact)",
+    "GFoEZNSDL_4xpxpBIgon-117": "lotr:Fellowship",
+    "GFoEZNSDL_4xpxpBIgon-67": "\"A continuant that instantiates the specific natural kind characterized by diminutive stature, distinctive pedal morphology, and disposition toward pastoral existence.\"",
+    "GFoEZNSDL_4xpxpBIgon-45": "lotr:Hobbit (Hobbit)",
+    "GFoEZNSDL_4xpxpBIgon-76": "lotr:Realm",
+    "GFoEZNSDL_4xpxpBIgon-138": "lotr:Aragorn",
+    "GFoEZNSDL_4xpxpBIgon-73": "\"A material entity that bears supernatural qualities or powers, typically crafted through processes involving arcane knowledge or divine intervention.\"",
+    "GFoEZNSDL_4xpxpBIgon-31": "lotr:speaks",
+    "GFoEZNSDL_4xpxpBIgon-162": "\"Westron\"^^xsd:string",
+    "GFoEZNSDL_4xpxpBIgon-139": "\"87\"^^xsd:integer",
+    "GFoEZNSDL_4xpxpBIgon-57": "\"A continuant that bears the role of wielding arcane knowledge and supernatural powers, typically manifested through staff-based focus and incantational processes.\"",
+    "GFoEZNSDL_4xpxpBIgon-122": "lotr:hasAge",
+    "GFoEZNSDL_4xpxpBIgon-171": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-47": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-179": "obo:member part of",
+    "GFoEZNSDL_4xpxpBIgon-149": "lotr:hasAge",
+    "GFoEZNSDL_4xpxpBIgon-118": "rdfs:range",
+    "GFoEZNSDL_4xpxpBIgon-114": "rdfs:domain",
+    "GFoEZNSDL_4xpxpBIgon-44": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-178": "obo:member part of",
+    "GFoEZNSDL_4xpxpBIgon-16": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-108": "rdfs:domain",
+    "GFoEZNSDL_4xpxpBIgon-170": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-15": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-85": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-97": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-55": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-137": "lotr:speaks",
+    "GFoEZNSDL_4xpxpBIgon-74": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-177": "obo:member part of",
+    "GFoEZNSDL_4xpxpBIgon-168": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-158": "lotr:speaks",
+    "GFoEZNSDL_4xpxpBIgon-40": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-102": "rdfs:domain",
+    "GFoEZNSDL_4xpxpBIgon-60": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-176": "obo:member part of",
+    "GFoEZNSDL_4xpxpBIgon-156": "lotr:hasAge",
+    "GFoEZNSDL_4xpxpBIgon-116": "rdfs:domain",
+    "GFoEZNSDL_4xpxpBIgon-124": "lotr:hasHeight",
+    "GFoEZNSDL_4xpxpBIgon-157": "lotr:hasHeight",
+    "GFoEZNSDL_4xpxpBIgon-80": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-173": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-58": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-175": "lotr:rulerOf",
+    "GFoEZNSDL_4xpxpBIgon-151": "lotr:speaks",
+    "GFoEZNSDL_4xpxpBIgon-164": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-72": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-24": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-62": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-110": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-95": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-104": "rdfs:range",
+    "GFoEZNSDL_4xpxpBIgon-112": "rdfs:range",
+    "GFoEZNSDL_4xpxpBIgon-94": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-77": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-135": "lotr:hasAge",
+    "GFoEZNSDL_4xpxpBIgon-150": "lotr:hasHeight",
+    "GFoEZNSDL_4xpxpBIgon-25": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-30": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-66": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-127": "lotr:speaks",
+    "GFoEZNSDL_4xpxpBIgon-107": "rdfs:range",
+    "GFoEZNSDL_4xpxpBIgon-6": "rdfs:subClassOf",
+    "GFoEZNSDL_4xpxpBIgon-136": "lotr:hasHeight",
+    "GFoEZNSDL_4xpxpBIgon-32": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-50": "rdf:type",
+    "GFoEZNSDL_4xpxpBIgon-68": "skos:definition",
+    "GFoEZNSDL_4xpxpBIgon-42": "rdfs:subClassOf"
+  },
+  "triples": [
+    [
+      "lotr:Frodo",
+      "lotr:hasAge",
+      "\"50\"^^xsd:integer"
+    ],
+    [
+      "lotr:Legolas (Legolas)",
+      "rdf:type",
+      "lotr:Elf (Elf)"
+    ],
+    [
+      "lotr:Hobbit (Hobbit)",
+      "rdfs:subClassOf",
+      "lotr:RationalBeing (Rational Being)"
+    ],
+    [
+      "lotr:Frodo",
+      "obo:member part of",
+      "lotr:FellowshipOfTheRing (Fellowship of the Ring)"
+    ],
+    [
+      "lotr:Legolas (Legolas)",
+      "lotr:hasAge",
+      "\"2931\"^^xsd:integer"
+    ],
+    [
+      "lotr:rulerOf",
+      "rdfs:range",
+      "lotr:Fellowship"
+    ],
+    [
+      "lotr:speaks",
+      "rdfs:domain",
+      "lotr:RationalBeing"
+    ],
+    [
+      "lotr:rulerOf",
+      "rdf:type",
+      "owl:ObjectProperty"
+    ],
+    [
+      "lotr:Aragorn",
+      "obo:member part of",
+      "lotr:FellowshipOfTheRing (Fellowship of the Ring)"
+    ],
+    [
+      "lotr:Wizard (Wizard)",
+      "rdfs:subClassOf",
+      "lotr:RationalBeing (Rational Being)"
+    ],
+    [
+      "lotr:hasAge",
+      "rdfs:domain",
+      "lotr:RationalBeing"
+    ],
+    [
+      "lotr:Gandalf (Gandalf)",
+      "rdf:type",
+      "lotr:Wizard (Wizard)"
+    ],
+    [
+      "lotr:Elf (Elf)",
+      "rdfs:subClassOf",
+      "lotr:RationalBeing (Rational Being)"
+    ],
+    [
+      "lotr:hasAge",
+      "skos:definition",
+      "\"A relation between a rational being and a numerical value representing their temporal duration of existence.\""
+    ],
+    [
+      "lotr:speaks",
+      "skos:definition",
+      "\"A relation between a rational being and a linguistic system they utilize for communication.\""
+    ],
+    [
+      "lotr:RationalBeing (Rational Being)",
+      "skos:definition",
+      "\"A continuant that is characterized by the capacity for reasoning, linguistic communication, and moral agency within Middle Earth.\""
+    ],
+    [
+      "lotr:Aragorn",
+      "lotr:speaks",
+      "\"Westron\"^^xsd:string"
+    ],
+    [
+      "lotr:MagicalArtifact (Magical Artifact)",
+      "skos:definition",
+      "\"A material entity that bears supernatural qualities or powers, typically crafted through processes involving arcane knowledge or divine intervention.\""
+    ],
+    [
+      "lotr:Legolas (Legolas)",
+      "obo:member part of",
+      "lotr:FellowshipOfTheRing (Fellowship of the Ring)"
+    ],
+    [
+      "lotr:Gondor (Gondor)",
+      "rdf:type",
+      "lotr:Realm"
+    ],
+    [
+      "lotr:Gandalf (Gandalf)",
+      "lotr:speaks",
+      "\"Westron\"^^xsd:string"
+    ],
+    [
+      "lotr:Fellowship (Fellowship)",
+      "rdfs:subClassOf",
+      "cco:ObjectAggregate"
+    ],
+    [
+      "lotr:hasHeight",
+      "rdfs:domain",
+      "lotr:RationalBeing"
+    ],
+    [
+      "lotr:Elf (Elf)",
+      "skos:definition",
+      "\"\u300c\u5ef6\u9577\u3055\u308c\u305f\u6642\u9593\u7684\u6301\u7d9a\u3001\u5f37\u5316\u3055\u308c\u305f\u611f\u899a\u306e\u92ed\u654f\u3055\u3001\u305d\u3057\u3066\u81ea\u7136\u306e\u30d7\u30ed\u30bb\u30b9\u3068\u7f8e\u7684\u7f8e\u3057\u3055\u3068\u306e\u56fa\u6709\u306e\u3064\u306a\u304c\u308a\u3092\u7279\u5fb4\u3068\u3059\u308b\u7d99\u7d9a\u4f53\u3002\u300d\"@jp"
+    ],
+    [
+      "lotr:Gandalf (Gandalf)",
+      "obo:member part of",
+      "lotr:FellowshipOfTheRing (Fellowship of the Ring)"
+    ],
+    [
+      "lotr:Gandalf (Gandalf)",
+      "lotr:hasAge",
+      "\"50\"^^xsd:integer"
+    ],
+    [
+      "lotr:rulerOf",
+      "rdfs:domain",
+      "lotr:RationalBeing"
+    ],
+    [
+      "lotr:Frodo",
+      "lotr:hasHeight",
+      "\"3.5\"^^xsd:decimal"
+    ],
+    [
+      "lotr:Gandalf (Gandalf)",
+      "lotr:hasHeight",
+      "\"3.5\"^^xsd:decimal"
+    ],
+    [
+      "lotr:Realm",
+      "skos:definition",
+      "\"A spatial region that constitutes a geopolitical unity characterized by defined boundaries, governance structures, and cultural identity.\""
+    ],
+    [
+      "lotr:Aragorn",
+      "rdf:type",
+      "lotr:Man (Man)"
+    ],
+    [
+      "lotr:Wizard (Wizard)",
+      "skos:definition",
+      "\"A continuant that bears the role of wielding arcane knowledge and supernatural powers, typically manifested through staff-based focus and incantational processes.\""
+    ],
+    [
+      "lotr:Aragorn",
+      "lotr:rulerOf",
+      "lotr:Gondor (Gondor)"
+    ],
+    [
+      "lotr:Legolas (Legolas)",
+      "lotr:speaks",
+      "\"Sindarin\"^^xsd:string"
+    ],
+    [
+      "lotr:FellowshipOfTheRing (Fellowship of the Ring)",
+      "rdf:type",
+      "lotr:Fellowship (Fellowship)"
+    ],
+    [
+      "lotr:Fellowship (Fellowship)",
+      "skos:definition",
+      "\"A social collective that exists as a temporally bounded organization of rational beings united by shared purpose and mutual commitment.\""
+    ],
+    [
+      "lotr:Dwarf (Dwarf)",
+      "rdfs:subClassOf",
+      "lotr:RationalBeing (Rational Being)"
+    ],
+    [
+      "lotr:Dwarf (Dwarf)",
+      "skos:definition",
+      "\"Un continuador que se distingue por su robusta constituci\u00f3n f\u00edsica, afinidad por los ambientes subterr\u00e1neos y competencia especializada en artesan\u00edas metal\u00fargicas y l\u00edticas\".@es"
+    ],
+    [
+      "lotr:hasAge",
+      "rdf:type",
+      "owl:DatatypePropertyy"
+    ],
+    [
+      "lotr:hasHeight",
+      "skos:definition",
+      "\"A relation between a rational being and a decimal measurement representing their vertical spatial extension.\""
+    ],
+    [
+      "lotr:hasHeight",
+      "rdfs:range",
+      "xsd:decimal"
+    ],
+    [
+      "lotr:speaks",
+      "rdfs:range",
+      "xsd:string"
+    ],
+    [
+      "lotr:rulerOf",
+      "skos:definition",
+      "\"A relation obtaining between a rational being and a realm over which they exercise governing authority.\""
+    ],
+    [
+      "lotr:Realm",
+      "rdfs:subClassOf",
+      "cco:SpatialRegion"
+    ],
+    [
+      "lotr:Aragorn",
+      "lotr:hasAge",
+      "\"87\"^^xsd:integer"
+    ],
+    [
+      "lotr:Legolas (Legolas)",
+      "lotr:hasHeight",
+      "\"6.0\"^^xsd:decimal"
+    ],
+    [
+      "lotr:Man (Man)",
+      "rdfs:subClassOf",
+      "lotr:RationalBeing (Rational Being)"
+    ],
+    [
+      "lotr:hasHeight",
+      "rdf:type",
+      "owl:DatatypePropertyy"
+    ],
+    [
+      "lotr:Man (Man)",
+      "skos:definition",
+      "\"A continuant that exemplifies mortality combined with capacity for both nobility and corruption, characterized by relatively brief but potentially significant temporal existence.\""
+    ],
+    [
+      "lotr:Frodo",
+      "lotr:speaks",
+      "\"Westron\"^^xsd:string"
+    ],
+    [
+      "lotr:hasAge",
+      "rdfs:range",
+      "xsd:integer"
+    ],
+    [
+      "lotr:RationalBeing (Rational Being)",
+      "rdfs:subClassOf",
+      "cco:Object"
+    ],
+    [
+      "lotr:Aragorn",
+      "lotr:hasHeight",
+      "\"6.6\"^^xsd:decimal"
+    ],
+    [
+      "lotr:speaks",
+      "rdf:type",
+      "owl:DatatypePropertyy"
+    ],
+    [
+      "lotr:Frodo",
+      "rdf:type",
+      "lotr:Hobbit (Hobbit)"
+    ],
+    [
+      "lotr:Hobbit (Hobbit)",
+      "skos:definition",
+      "\"A continuant that instantiates the specific natural kind characterized by diminutive stature, distinctive pedal morphology, and disposition toward pastoral existence.\""
+    ],
+    [
+      "lotr:MagicalArtifact (Magical Artifact)",
+      "rdfs:subClassOf",
+      "cco:Artifact"
     ]
+  ],
+  "output_containers": {}
 }

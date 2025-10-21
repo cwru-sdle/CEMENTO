@@ -1,26 +1,46 @@
-@prefix cco: <https://www.commoncoreontologies.org/> .
-@prefix mds: <https://cwrusdle.bitbucket.io/mds/> .
-@prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cco:  <https://www.commoncoreontologies.org/> .
+@prefix mds:  <https://cwrusdle.bitbucket.io/mds/> .
+@prefix obo:  <http://purl.obolibrary.org/obo/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
-mds:eats a owl:ObjectProperty ;
+mds:eats
+    a           owl:ObjectProperty ;
     rdfs:domain cco:ont00001262 ;
-    rdfs:range [ owl:unionOf ( mds:Pizza mds:Bagel [ owl:intersectionOf ( mds:Meat mds:Fish [ owl:complementOf ( mds:Vegetables ) ] ) ] ) ] .
+    rdfs:range  [ a           owl:NamedIndividual ;
+                  owl:unionOf ( mds:Pizza mds:Bagel [ a                  owl:NamedIndividual ;
+                                                      owl:intersectionOf ( mds:Meat mds:Fish [ a                owl:NamedIndividual ;
+                                                                                               owl:complementOf ( mds:Vegetables ) ] ) ] ) ] .
 
-mds:walks a owl:ObjectProperty ;
+mds:walks
+    a           owl:ObjectProperty ;
     rdfs:domain cco:ont00001262 ;
-    rdfs:range [ owl:unionOf ( mds:Dog mds:Cat ) ] .
+    rdfs:range  [ owl:unionOf ( mds:Dog mds:Cat ) ] .
 
-mds:Bagel a obo:BFO_0000030 .
+mds:Bagel
+    a obo:BFO_0000030, owl:NamedIndividual .
 
-obo:BFO_0000030 a owl:Class ;
-    rdfs:label "object"@en ;
-    skos:exactMatch obo:BFO_0000030 .
+mds:Fish
+    a obo:BFO_0000030, owl:NamedIndividual .
 
-cco:ont00001262 a owl:Class ;
-    rdfs:label "Person"@en ;
+mds:Meat
+    a obo:BFO_0000030, owl:NamedIndividual .
+
+mds:Pizza
+    a obo:BFO_0000030, owl:NamedIndividual .
+
+mds:Vegetables
+    a obo:BFO_0000030, owl:NamedIndividual .
+
+cco:ont00001262
+    a               owl:Class ;
+    rdfs:label      "Person"@en ;
     skos:exactMatch cco:ont00001262 .
+
+obo:BFO_0000030
+    a               owl:Class ;
+    rdfs:label      "object"@en ;
+    skos:exactMatch obo:BFO_0000030 .
 

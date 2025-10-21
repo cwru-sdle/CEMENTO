@@ -1,129 +1,159 @@
-@prefix cco: <https://www.commoncoreontologies.org/> .
+@prefix cco:  <https://www.commoncoreontologies.org/> .
 @prefix lotr: <http://example.com/lotr#> .
-@prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix obo:  <http://purl.obolibrary.org/obo/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
-lotr:Aragorn a lotr:Man ;
-    lotr:hasAge 87 ;
-    lotr:hasHeight 6.6 ;
-    lotr:rulerOf lotr:Gondor ;
-    lotr:speaks "Westron"^^xsd:string ;
+lotr:Aragorn
+    a               lotr:Man, owl:NamedIndividual ;
+    lotr:hasAge     87 ;
+    lotr:hasHeight  6.6 ;
+    lotr:rulerOf    lotr:Gondor ;
+    lotr:speaks     "Westron"^^xsd:string ;
     obo:BFO_0000129 lotr:FellowshipOfTheRing .
 
-lotr:Dwarf a owl:Class ;
-    rdfs:label "Dwarf" ;
+lotr:Dwarf
+    a               owl:Class ;
+    rdfs:label      "Dwarf" ;
     rdfs:subClassOf lotr:RationalBeing ;
     skos:definition "Un continuador que se distingue por su robusta constitución física, afinidad por los ambientes subterráneos y competencia especializada en artesanías metalúrgicas y líticas."@es .
 
-lotr:Frodo a lotr:Hobbit ;
-    lotr:hasAge 50 ;
-    lotr:hasHeight 3.5 ;
-    lotr:speaks "Westron"^^xsd:string ;
+lotr:Frodo
+    a               lotr:Hobbit, owl:NamedIndividual ;
+    lotr:hasAge     50 ;
+    lotr:hasHeight  3.5 ;
+    lotr:speaks     "Westron"^^xsd:string ;
     obo:BFO_0000129 lotr:FellowshipOfTheRing .
 
-lotr:Gandalf a lotr:Wizard ;
-    rdfs:label "Gandalf" ;
-    lotr:hasAge 50 ;
-    lotr:hasHeight 3.5 ;
-    lotr:speaks "Westron"^^xsd:string ;
+lotr:Gandalf
+    a               lotr:Wizard, owl:NamedIndividual ;
+    rdfs:label      "Gandalf" ;
+    lotr:hasAge     50 ;
+    lotr:hasHeight  3.5 ;
+    lotr:speaks     "Westron"^^xsd:string ;
     obo:BFO_0000129 lotr:FellowshipOfTheRing .
 
-lotr:Legolas a lotr:Elf ;
-    rdfs:label "Legolas" ;
-    lotr:hasAge 2931 ;
-    lotr:hasHeight 6.0 ;
-    lotr:speaks "Sindarin"^^xsd:string ;
+lotr:Legolas
+    a               lotr:Elf, owl:NamedIndividual ;
+    rdfs:label      "Legolas" ;
+    lotr:hasAge     2931 ;
+    lotr:hasHeight  6.0 ;
+    lotr:speaks     "Sindarin"^^xsd:string ;
     obo:BFO_0000129 lotr:FellowshipOfTheRing .
 
-lotr:MagicalArtifact a owl:Class ;
-    rdfs:label "Magical Artifact" ;
-    rdfs:subClassOf cco:ont00001045 ;
+lotr:MagicalArtifact
+    a               owl:Class ;
+    rdfs:label      "Magical Artifact" ;
+    rdfs:subClassOf cco:Artifact ;
     skos:definition "A material entity that bears supernatural qualities or powers, typically crafted through processes involving arcane knowledge or divine intervention." .
 
-lotr:hasAge a owl:DatatypeProperty ;
+lotr:hasAge
+    a           owl:DatatypeProperty ;
     rdfs:domain lotr:RationalBeing ;
-    rdfs:range xsd:integer ;
-    skos:definition "A relation between a rational being and a numerical value representing their temporal duration of existence." .
+    rdfs:range  xsd:integer ;
+    skos:definition
+                "A relation between a rational being and a numerical value representing their temporal duration of existence." .
 
-lotr:hasHeight a owl:DatatypeProperty ;
+lotr:hasHeight
+    a           owl:DatatypeProperty ;
     rdfs:domain lotr:RationalBeing ;
-    rdfs:range xsd:decimal ;
-    skos:definition "A relation between a rational being and a decimal measurement representing their vertical spatial extension." .
+    rdfs:range  xsd:decimal ;
+    skos:definition
+                "A relation between a rational being and a decimal measurement representing their vertical spatial extension." .
 
-lotr:rulerOf a owl:ObjectProperty ;
+lotr:rulerOf
+    a           owl:ObjectProperty ;
     rdfs:domain lotr:RationalBeing ;
-    rdfs:range lotr:Fellowship ;
-    skos:definition "A relation obtaining between a rational being and a realm over which they exercise governing authority." .
+    rdfs:range  lotr:Fellowship ;
+    skos:definition
+                "A relation obtaining between a rational being and a realm over which they exercise governing authority." .
 
-lotr:speaks a owl:DatatypeProperty ;
-    rdfs:domain lotr:RationalBeing ;
-    rdfs:range xsd:String ;
+lotr:speaks
+    a               owl:DatatypeProperty ;
+    rdfs:domain     lotr:RationalBeing ;
+    rdfs:range      xsd:string ;
     skos:definition "A relation between a rational being and a linguistic system they utilize for communication." .
 
-lotr:Elf a owl:Class ;
-    rdfs:label "Elf" ;
+lotr:Elf
+    a               owl:Class ;
+    rdfs:label      "Elf" ;
     rdfs:subClassOf lotr:RationalBeing ;
     skos:definition "「延長された時間的持続、強化された感覚の鋭敏さ、そして自然のプロセスと美的美しさとの固有のつながりを特徴とする継続体。」"@jp .
 
-lotr:Gondor a lotr:Realm ;
+lotr:Gondor
+    a          lotr:Realm, owl:NamedIndividual ;
     rdfs:label "Gondor" .
 
-lotr:Hobbit a owl:Class ;
-    rdfs:label "Hobbit" ;
+lotr:Hobbit
+    a               owl:Class ;
+    rdfs:label      "Hobbit" ;
     rdfs:subClassOf lotr:RationalBeing ;
     skos:definition "A continuant that instantiates the specific natural kind characterized by diminutive stature, distinctive pedal morphology, and disposition toward pastoral existence." .
 
-lotr:Man a owl:Class ;
-    rdfs:label "Man" ;
+lotr:Man
+    a               owl:Class ;
+    rdfs:label      "Man" ;
     rdfs:subClassOf lotr:RationalBeing ;
     skos:definition "A continuant that exemplifies mortality combined with capacity for both nobility and corruption, characterized by relatively brief but potentially significant temporal existence." .
 
-lotr:Realm a owl:Class ;
-    rdfs:subClassOf cco:ont00000472 ;
+lotr:Realm
+    a               owl:Class ;
+    rdfs:subClassOf cco:SpatialRegion ;
     skos:definition "A spatial region that constitutes a geopolitical unity characterized by defined boundaries, governance structures, and cultural identity." .
 
-lotr:Wizard a owl:Class ;
-    rdfs:label "Wizard" ;
+lotr:Wizard
+    a               owl:Class ;
+    rdfs:label      "Wizard" ;
     rdfs:subClassOf lotr:RationalBeing ;
     skos:definition "A continuant that bears the role of wielding arcane knowledge and supernatural powers, typically manifested through staff-based focus and incantational processes." .
 
-obo:BFO_0000129 a owl:ObjectProperty ;
-    rdfs:label "member part of"@en ;
+obo:BFO_0000129
+    a               owl:ObjectProperty ;
+    rdfs:label      "member part of"@en ;
+    rdfs:domain     obo:BFO_0000040 ;
+    rdfs:range      obo:BFO_0000040 ;
     skos:exactMatch obo:BFO_0000129 .
 
-lotr:Fellowship a owl:Class ;
-    rdfs:label "Fellowship" ;
-    rdfs:subClassOf obo:BFO_0000027 ;
+skos:definition
+    a               owl:AnnotationProperty ;
+    skos:exactMatch skos:definition .
+
+cco:Artifact
+    a owl:Class .
+
+cco:Object
+    a owl:Class .
+
+cco:ObjectAggregate
+    a owl:Class .
+
+cco:SpatialRegion
+    a owl:Class .
+
+lotr:Fellowship
+    a               owl:Class ;
+    rdfs:label      "Fellowship" ;
+    rdfs:subClassOf cco:ObjectAggregate ;
     skos:definition "A social collective that exists as a temporally bounded organization of rational beings united by shared purpose and mutual commitment." .
 
-obo:BFO_0000027 a owl:Class ;
-    rdfs:label "object aggregate"@en ;
-    skos:exactMatch obo:BFO_0000027 .
+xsd:decimal
+    skos:exactMatch xsd:decimal .
 
-xsd:decimal skos:exactMatch xsd:decimal .
+xsd:integer
+    skos:exactMatch xsd:integer .
 
-xsd:integer skos:exactMatch xsd:integer .
+xsd:string
+    skos:exactMatch xsd:string .
 
-cco:ont00000472 a owl:Class ;
-    rdfs:label "Geospatial Region"@en ;
-    skos:exactMatch cco:ont00000472 .
-
-cco:ont00000476 a owl:Class ;
-    rdfs:label "Objective"@en ;
-    skos:exactMatch cco:ont00000476 .
-
-cco:ont00001045 a owl:Class ;
-    rdfs:label "Artifact Model"@en ;
-    skos:exactMatch cco:ont00001045 .
-
-lotr:FellowshipOfTheRing a lotr:Fellowship ;
+lotr:FellowshipOfTheRing
+    a          lotr:Fellowship, owl:NamedIndividual ;
     rdfs:label "Fellowship of the Ring" .
 
-lotr:RationalBeing a owl:Class ;
-    rdfs:label "Rational Being" ;
-    rdfs:subClassOf cco:ont00000476 ;
+lotr:RationalBeing
+    a               owl:Class ;
+    rdfs:label      "Rational Being" ;
+    rdfs:subClassOf cco:Object ;
     skos:definition "A continuant that is characterized by the capacity for reasoning, linguistic communication, and moral agency within Middle Earth." .
 

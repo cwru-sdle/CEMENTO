@@ -1,142 +1,64 @@
 {
-    "nodes": {
-        "mds:Employee": {
-            "term_id": "yE1NTkxh-0s1ADCfzDLe-6",
-            "label": "mds:Employee",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "mds:Student": {
-            "term_id": "aFoWWEtB3FT1Sz6_YX94-3",
-            "label": "mds:Student",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "mds:CollegeStudent": {
-            "term_id": "yE1NTkxh-0s1ADCfzDLe-12",
-            "label": "mds:CollegeStudent",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "mds:Teenager": {
-            "term_id": "yE1NTkxh-0s1ADCfzDLe-10",
-            "label": "mds:Teenager",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "cco:Phase": {
-            "term_id": "yE1NTkxh-0s1ADCfzDLe-14",
-            "label": "cco:Phase",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "\"A person who does science\"@en": {
-            "term_id": "yE1NTkxh-0s1ADCfzDLe-3",
-            "label": "\"A person who does science\"@en",
-            "is_literal": true,
-            "parent": "1"
-        },
-        "cco:Person": {
-            "term_id": "yE1NTkxh-0s1ADCfzDLe-9",
-            "label": "cco:Person",
-            "is_literal": false,
-            "parent": "1"
-        },
-        "mds:GradStudent": {
-            "term_id": "aFoWWEtB3FT1Sz6_YX94-4",
-            "label": "mds:GradStudent",
-            "is_literal": false,
-            "parent": "1"
-        }
-    },
-    "edges": [
-        [
-            "mds:Employee",
-            "cco:Person",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-7",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:Student",
-            "\"A person who does science\"@en",
-            {
-                "label": "skos:definition",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-4",
-                "is_strat": true,
-                "is_rank": false,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:Student",
-            "cco:Person",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-2",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:CollegeStudent",
-            "mds:Teenager",
-            {
-                "label": "rdf:type",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-13",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:Teenager",
-            "cco:Person",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-11",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:Teenager",
-            "cco:Phase",
-            {
-                "label": "rdfs:subClassOf",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-15",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:GradStudent",
-            "mds:Employee",
-            {
-                "label": "rdf:type",
-                "pred_id": "yE1NTkxh-0s1ADCfzDLe-8",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ],
-        [
-            "mds:GradStudent",
-            "mds:Student",
-            {
-                "label": "rdf:type",
-                "pred_id": "aFoWWEtB3FT1Sz6_YX94-7",
-                "is_strat": true,
-                "is_rank": true,
-                "is_predicate": true
-            }
-        ]
+  "term_dict": {
+    "yE1NTkxh-0s1ADCfzDLe-6": "mds:Employee",
+    "yE1NTkxh-0s1ADCfzDLe-14": "cco:Phase",
+    "aFoWWEtB3FT1Sz6_YX94-4": "mds:GradStudent",
+    "yE1NTkxh-0s1ADCfzDLe-9": "cco:Person",
+    "yE1NTkxh-0s1ADCfzDLe-12": "mds:CollegeStudent",
+    "aFoWWEtB3FT1Sz6_YX94-3": "mds:Student",
+    "yE1NTkxh-0s1ADCfzDLe-3": "\"A person who does science\"@en",
+    "yE1NTkxh-0s1ADCfzDLe-1": "cco:Person",
+    "yE1NTkxh-0s1ADCfzDLe-10": "mds:Teenager",
+    "yE1NTkxh-0s1ADCfzDLe-11": "rdfs:subClassOf",
+    "yE1NTkxh-0s1ADCfzDLe-8": "rdf:type",
+    "yE1NTkxh-0s1ADCfzDLe-4": "skos:definition",
+    "yE1NTkxh-0s1ADCfzDLe-2": "rdfs:subClassOf",
+    "yE1NTkxh-0s1ADCfzDLe-15": "rdfs:subClassOf",
+    "yE1NTkxh-0s1ADCfzDLe-13": "rdf:type",
+    "aFoWWEtB3FT1Sz6_YX94-7": "rdf:type",
+    "yE1NTkxh-0s1ADCfzDLe-7": "rdfs:subClassOf"
+  },
+  "triples": [
+    [
+      "mds:Teenager",
+      "rdfs:subClassOf",
+      "cco:Person"
+    ],
+    [
+      "mds:GradStudent",
+      "rdf:type",
+      "mds:Employee"
+    ],
+    [
+      "mds:Student",
+      "skos:definition",
+      "\"A person who does science\"@en"
+    ],
+    [
+      "mds:Student",
+      "rdfs:subClassOf",
+      "cco:Person"
+    ],
+    [
+      "mds:Teenager",
+      "rdfs:subClassOf",
+      "cco:Phase"
+    ],
+    [
+      "mds:CollegeStudent",
+      "rdf:type",
+      "mds:Teenager"
+    ],
+    [
+      "mds:GradStudent",
+      "rdf:type",
+      "mds:Student"
+    ],
+    [
+      "mds:Employee",
+      "rdfs:subClassOf",
+      "cco:Person"
     ]
+  ],
+  "output_containers": {}
 }
