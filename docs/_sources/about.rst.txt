@@ -9,16 +9,38 @@ CEMENTO stands for the Centralized Entity Mapping & Extraction Nexus for Triples
 Package Contributors
 ====================
 
-- Gabriel Obsequio Ponon (Lead Developer)
-    - *MDS3 Center of Excellence, Case Western Reserve University; Advanced Photon Source, Argonne National Laboratory*
-- Priyan Rajamohan
-    - *MDS3 Center of Excellence, Case Western Reserve University*
-- Ethan Frakes
-    - *MDS3 Center of Excellence, Case Western Reserve University*
-- Hemant Sharma
-    - *Advanced Photon Source, Argonne National Laboratory*
-- Roger French
-    - *MDS3 Center of Excellence, Case Western Reserve University*
+.. list-table::
+   :widths: 20 20 15 45
+   :header-rows: 1
+
+   * - Name
+     - Affiliation
+     - Role
+     - Material Contribution
+   * - **Gabriel Obsequio Ponon**
+     - *MDS3 Center of Excellence, Case Western Reserve University; Advanced Photon Source, Argonne National Laboratory*
+     - **Lead Developer and Maintaner**
+     - Authored current package. Conceptualized package and current package features. Actively performs bug fixes and package optimization.
+   * - **Priyan Rajamohan**
+     - *MDS3 Center of Excellence, Case Western Reserve University*
+     - **Software and Idea Contributor**
+     - Conceptualized package and feature set to fit client needs.
+   * - **Ethan Frakes**
+     - *MDS3 Center of Excellence, Case Western Reserve University; University of Central Florida*
+     - **Software Tester and Contributor**
+     - Identifies and implements solutions for critical bugs related to function, usability and security.
+   * - **Jayvic Cristian Jimenez**
+     - *Lawrence Livermore National Laboratory*
+     - **Software Tester and Idea Contributor**
+     - Provided crucial insights for idea development and refinement of the approach. Prototypes package with real datasets.
+   * - **Hemant Sharma**
+     - *Advanced Photon Source, Argonne National Laboratory*
+     - **Research Supervisor and Idea Contributor**
+     - Oversaw and contributed to idea development, iteration, and package creation. Provided impetus for the package and drove adoption at the APS.
+   * - **Roger French**
+     - *MDS3 Center of Excellence, Case Western Reserve University*
+     - **Research Supervisor**
+     - Oversaw integration of package into existing semantic data management frameworks at CWRU-SDLE.
 
 .. _cite-work:
 
@@ -33,25 +55,25 @@ Please make sure to cite us when you use our software for your publications. We 
 
         .. parsed-literal::
 
-            G. O. Ponon, B. P. Rajamohan, E. Frakes, H. Sharma, and R. H. French, *cemento: A package to view and write ontologies directly from draw.io diagram files.* (Jul. 27, 2025). Python. Accessed: Jul. 28, 2025. [OS Independent]. Available: \https://github.com/cwru-sdle/CEMENTO
+            G. O. Ponon, B. P. Rajamohan, E. Frakes, J. Jimenez, H. Sharma, and R. H. French, *cemento: A package to view and write ontologies directly from draw.io diagram files.* (Jul. 27, 2025). Python. Accessed: Jul. 28, 2025. [OS Independent]. Available: \https://github.com/cwru-sdle/CEMENTO
 
     .. tab-item:: Nature
 
         .. parsed-literal::
 
-            \Ponon, G. O., Rajamohan, B. P., Frakes E., Sharma, H. & French, R. H. cemento: A package to view and write ontologies directly from draw.io diagram files. (2025).
+            \Ponon, G. O., Rajamohan, B. P., Frakes E., Jimenez, J., Sharma, H. & French, R. H. cemento: A package to view and write ontologies directly from draw.io diagram files. (2025).
 
     .. tab-item:: APA 7th
 
         .. parsed-literal::
 
-            Ponon, G. O., Rajamohan, B. P., Frakes E., Sharma, H., & French, R. H. (2025). *cemento: A package to view and write ontologies directly from draw.io diagram files.* (Version |release|) [Python; OS Independent]. \https://github.com/cwru-sdle/CEMENTO
+            Ponon, G. O., Rajamohan, B. P., Frakes E., Jimenez, J., Sharma, H., & French, R. H. (2025). *cemento: A package to view and write ontologies directly from draw.io diagram files.* (Version |release|) [Python; OS Independent]. \https://github.com/cwru-sdle/CEMENTO
 
     .. tab-item:: Chicago 18th
 
         .. parsed-literal::
 
-            Ponon, Gabriel O., Balashanmuga Priyan Rajamohan, Ethan Frakes, Hemant Sharma, and Roger H. French. Cemento: A Package to View and Write Ontologies Directly from Draw.Io Diagram Files. Python. Version |release|. Released July 27, 2025. OS Independent. \https://github.com/cwru-sdle/CEMENTO.
+            Ponon, Gabriel O., Balashanmuga Priyan Rajamohan, Ethan Frakes, Jayvic Cristian Jimenez, Hemant Sharma, and Roger H. French. Cemento: A Package to View and Write Ontologies Directly from Draw.Io Diagram Files. Python. Version |release|. Released July 27, 2025. OS Independent. \https://github.com/cwru-sdle/CEMENTO.
 
 Here are the files if you prefer :download:`BibTex <https://raw.githubusercontent.com/Gabbyton/CEMENTO/refs/heads/master/figures/bib-citation.bib>` or :download:`Zotero RDF <https://raw.githubusercontent.com/Gabbyton/CEMENTO/refs/heads/master/figures/zotero-rdf-citation.rdf>`.
 
