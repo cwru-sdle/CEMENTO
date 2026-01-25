@@ -343,7 +343,7 @@ def convert_graph_to_rdf_graph(
         rdf_graph.triples_choices((None, property_object_preds, None))
     )
     graph_properties = chain(
-        map(lambda item: item[0], property_triples),
+        map(lambda item: item[0] , property_triples),
         map(lambda item: item[2], property_objects),
         rdf_graph.predicates(),
     )

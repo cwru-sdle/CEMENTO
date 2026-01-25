@@ -39,6 +39,7 @@ valid_collection_types = {
     "owl:unionOf": OWL.unionOf,
     "owl:intersectionOf": OWL.intersectionOf,
     "owl:complementOf": OWL.complementOf,
+    "owl:oneOf": OWL.oneOf,
     "mds:tripleSyntaxSugar": TRIPLE_SYNTAX_SUGAR,
 }
 
