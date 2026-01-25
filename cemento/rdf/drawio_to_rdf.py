@@ -23,7 +23,7 @@ from cemento.rdf.transforms import (
     get_term_search_pool,
     replace_term_in_triples,
     get_classes_instances,
-    get_child_type,
+    get_child_type, get_datatypes,
 )
 from cemento.term_matching.constants import (
     get_namespace_terms,
@@ -264,6 +264,7 @@ def convert_graph_to_rdf_graph(
 
     ## get classes and instances to classify collection members and annotate later
     classes, instances = get_classes_instances(rdf_graph)
+    datatypes = get_datatypes(rdf_graph)
 
     # add the collections to the graph
     for key, (label, children) in containers.items():
@@ -295,9 +296,9 @@ def convert_graph_to_rdf_graph(
                 rdf_graph.remove(triple)
             del collection_headers[key]
         else:
-            first_child_type = get_child_type(classes, instances, children[0])
+            first_child_type = get_child_type(classes, instances, datatypes, children[0])
             if any(
-                (child_type := get_child_type(classes, instances, term))
+                (child_type := get_child_type(classes, instances, datatypes, term))
                 != first_child_type
                 and child_type != OWL.Nothing
                 for term in children

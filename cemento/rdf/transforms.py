@@ -4,6 +4,7 @@ from itertools import chain
 from uuid import uuid4
 
 import networkx as nx
+from more_itertools.recipes import unique_everseen
 from networkx import DiGraph
 from rdflib import Graph, Literal, Namespace, URIRef, RDFS, RDF, Node, SKOS, BNode, OWL
 from rdflib.namespace import split_uri
@@ -29,10 +30,12 @@ def get_literal_lang_annotation(literal_term: str, default=None) -> str:
 
 
 def get_child_type(
-    classes: set[URIRef], instances: set[URIRef], child: Node
+    classes: set[URIRef], instances: set[URIRef], datatypes: set[URIRef], child: Node
 ) -> URIRef | None:
     if isinstance(child, BNode):
         return OWL.Nothing
+    if isinstance(child, Literal) or child in datatypes:
+        return RDFS.Datatype
     child_type = None
     if child in classes or child in instances:
         child_type = OWL.Class if child in classes else OWL.NamedIndividual
@@ -230,6 +233,7 @@ def get_uuid():
 def get_classes_instances(rdf_graph: Graph) -> tuple[set[URIRef], set[URIRef]]:
     classes = set()
     instances = set()
+
     for subj, pred, obj in rdf_graph:
         if isinstance(subj, URIRef) and isinstance(obj, URIRef):
             if pred == RDFS.subClassOf:
@@ -239,6 +243,11 @@ def get_classes_instances(rdf_graph: Graph) -> tuple[set[URIRef], set[URIRef]]:
                 instances.add(subj)
     instances -= classes
     return classes, instances
+
+def get_datatypes(rdf_graph: Graph) -> set[URIRef]:
+    types = rdf_graph.transitive_subjects(predicate=RDF.type, object=RDFS.Datatype)
+    subclasses = rdf_graph.transitive_subjects(predicate=RDFS.subClassOf, object=RDFS.Datatype)
+    return set(unique_everseen(chain(types, subclasses)))
 
 
 def replace_term_in_triples(rdf_graph: Graph, old_term: Node, new_term: Node) -> Graph:
