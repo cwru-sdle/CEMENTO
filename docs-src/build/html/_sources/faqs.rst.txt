@@ -48,7 +48,7 @@ Usage
 
 .. dropdown:: How do I add axioms and restrictions?
 
-    CEMENTO makes use of a hybrid form of Manchester syntax to describe axioms and restrictions. This allows you to describe axiomatic concepts in a coherent and logically consistent way without sacrificing readability in the diagram. A full page dedicated to explaining axiom and restriction declaration is currently being written. The link will also be here when it gets uploaded.
+    CEMENTO makes use of a hybrid form of Manchester syntax to describe axioms and restrictions. You can consult the :doc:`Axioms and Restrictions Guide </user-guide-pages/axioms-overview>` on the subject for more information.
 
 Inaccurate outputs
 ====================

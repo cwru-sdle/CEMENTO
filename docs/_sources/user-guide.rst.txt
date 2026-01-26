@@ -13,3 +13,4 @@ Guide Sections
    user-guide-pages/cli-guide
    user-guide-pages/scripting
    user-guide-pages/drawing-basics
+   user-guide-pages/axioms-overview

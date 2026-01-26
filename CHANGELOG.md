@@ -18,6 +18,17 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.13.1] - 2025-01-26
+
+### Added
+
+- Support for `owl:oneOf` and `owl:datatypeComplementOf` for collection headers.
+- Datatype declaration and collection inference for datatypes.
+- Overview of supported constructs for defining collections, axioms and restrictions.
+- Example files for adding axioms and restrictions.
+
+### 
+
 ## [0.13.0] - 2025-10-21
 
 ### Added

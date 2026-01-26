@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; CEMENTO 0.13.1 documentation</title>
+    <title>Drawing Axioms &#8212; CEMENTO 0.13.0 documentation</title>
   
   
   
@@ -41,18 +41,16 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=b4617fb1"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/h5p-resizer.js?v=a3e8b8ed"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide-pages/installation';</script>
-    <link rel="canonical" href="https://cwru-sdle.github.io/CEMENTO/user-guide-pages/installation.html" />
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide-pages/axioms-tutorial';</script>
+    <link rel="canonical" href="https://cwru-sdle.github.io/CEMENTO/user-guide-pages/axioms-tutorial.html" />
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="CLI Guide" href="cli-guide.html" />
-    <link rel="prev" title="User Guide" href="../user-guide.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -146,7 +144,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../user-guide.html">
     User Guide
   </a>
@@ -282,8 +280,10 @@
       
       
       
+        
+      
       <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -305,7 +305,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../user-guide.html">
     User Guide
   </a>
@@ -396,22 +396,6 @@
     
   </div>
   
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli-guide.html">CLI Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scripting.html">Scripting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="drawing-basics.html">Drawing Basics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="axioms-overview.html">Axioms and Restrictions</a></li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
       <div class="sidebar-primary-item">
@@ -447,10 +431,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="../user-guide.html" class="nav-link">User Guide</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Installation</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Drawing Axioms</span></li>
   </ul>
 </nav>
 </div>
@@ -467,48 +448,82 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<p>Installing the package is as easy as using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>, However there are a few considerations that are detailed on this section. Please refer to prerequisites prior to installing the package.</p>
-<section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
-<ol class="arabic simple">
-<li><p><strong>Python Version.</strong> This package requires python installed at version <code class="docutils literal notranslate"><span class="pre">&gt;=3.10</span></code>. Lower versions will not work. If you really need to maintain a lower version, please check the versioning guide (pending), to modify the code to remove modern python features.</p></li>
-<li><p><strong>draw.io app.</strong> Though not strictly required by the package, a draw.io application, either installed on your computer or online will allow you to create and edit examples as well as make your own ontology diagrams.</p></li>
-<li><p><strong>A plain-text file editor.</strong> Same as the above, this tool can be a simple notepad or complex IDE that you can use to check <cite>.ttl</cite> files. If your computer does not recognize the format, please make sure to set it to open on your file editor of choice.</p></li>
-</ol>
-</section>
-<section id="installing-via-pypi">
-<h2>Installing via <code class="docutils literal notranslate"><span class="pre">pypi</span></code><a class="headerlink" href="#installing-via-pypi" title="Link to this heading">#</a></h2>
-<p>To install this particular package, use pip to install the latest version:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>cemento
-</pre></div>
-</div>
-<p id="use-venv">We recommend a python environment to prevent dependency conflicts:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>&lt;env-name&gt;
-</pre></div>
-</div>
-<p>You choose the environment name <code class="docutils literal notranslate"><span class="pre">&lt;env-name&gt;</span></code>. We recommend either <code class="docutils literal notranslate"><span class="pre">.venv</span></code> or <code class="docutils literal notranslate"><span class="pre">.CEMENTO</span></code>.</p>
-<p>Feel free to use non-native environment managers like <a class="reference external" href="https://anaconda.org/anaconda/conda">conda</a> and <a class="reference external" href="https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html">mamba</a>. As long as yours has access to <code class="docutils literal notranslate"><span class="pre">pypi</span></code>, you are good to go.</p>
-<p><strong>NOTE:</strong> The <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> will download the latest available version of the package. If you found our package on <code class="docutils literal notranslate"><span class="pre">pypi</span></code>, beware of major version changes. This documentation only covers versions above <code class="docutils literal notranslate"><span class="pre">v8.4</span></code>. Any versions below use an OOP-based interface which these docs don’t cover.</p>
-</section>
-<section id="installing-from-the-repository">
-<span id="install-from-repo"></span><h2>Installing from the Repository<a class="headerlink" href="#installing-from-the-repository" title="Link to this heading">#</a></h2>
-<p>If you wish to use the development version of the package, please feel free to pull the repository and install the package locally via:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>git<span class="w"> </span>pull<span class="w"> </span>https://github.com/Gabbyton/CEMENTO.git
-<span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>CEMENTO/examples
-<span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</pre></div>
-</div>
-<p>The command <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> will look for any packages in your project repo folder and install them in <em>development mode.</em> This means that any changes you make on the actual package, the <code class="docutils literal notranslate"><span class="pre">cemento</span></code> folder, will be reflected on the installed package. After doing so, you will already have access to the <code class="docutils literal notranslate"><span class="pre">cemento</span></code> keyword on your terminal.</p>
-<section id="branches">
-<h3>Branches<a class="headerlink" href="#branches" title="Link to this heading">#</a></h3>
-<p>The repository currently has two denominated branches that will be in active development:</p>
+  <section id="drawing-axioms">
+<h1>Drawing Axioms<a class="headerlink" href="#drawing-axioms" title="Link to this heading">#</a></h1>
+<p>We strongly recommend going through the <a class="reference internal" href="drawing-basics.html"><span class="doc">Drawing Basics</span></a> tutorial before reading this guide. Other things</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">main</span></code> hosts the versions that will be sourced for building the actual <code class="docutils literal notranslate"><span class="pre">CEMENTO</span></code> package. They also contain documentation since all functions are assumed to be final. We take advantage of git tags to track versions.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dev</span></code> is the most recent <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> of the repo containing the most recent changes. These do not contain documentation and are highly unstable. Please pull from this branch at your own risk.</p></li>
+<li><p>the</p></li>
+</ul>
+<section id="a-walkthrough">
+<h2>A Walkthrough<a class="headerlink" href="#a-walkthrough" title="Link to this heading">#</a></h2>
+<p>The subsequent diagram demonstrates the visual syntax CEMENTO uses for writing OWL DL axioms and restrictions.  This file is also available as an <code class="docutils literal notranslate"><span class="pre">examples</span></code> folder under the file name <code class="docutils literal notranslate"><span class="pre">happy-example-2.drawio</span></code>. Note that CEMENTO only currently supports diagram-to-RDF conversion for graphs with axioms. The example file also excludes nested collections section to avoid errors around disconnected lists.</p>
+<div class="iframe-container user " style="width: 100%;height: auto;aspect-ratio: 1.77;">
+
+            <iframe class="sphinx" None src="https://viewer.diagrams.net?#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FGabbyton%2FCEMENTO%2Frefs%2Fheads%2Fmaster%2Ffigures%2Fdo-not-input-this-happy-example-2-explainer.drawio" allow="fullscreen *;autoplay *; geolocation *; microphone *; camera *; midi *; encrypted-media *" frameborder="0"></iframe>
+        
+</div><p>Having trouble? Download the figure above as an <a class="reference download external" download="" href="https://raw.githubusercontent.com/Gabbyton/CEMENTO/refs/heads/master/figures/happy-example-2-explainer.drawio.svg"><code class="xref download docutils literal notranslate"><span class="pre">svg</span> <span class="pre">image</span></code></a> or <a class="reference download external" download="" href="https://raw.githubusercontent.com/Gabbyton/CEMENTO/refs/heads/master/figures/do-not-input-this-happy-example-2-explainer.drawio"><code class="xref download docutils literal notranslate"><span class="pre">draw.io</span> <span class="pre">diagram</span></code></a>.</p>
+</section>
+<section id="in-case-you-missed-it">
+<h2>In Case You Missed It<a class="headerlink" href="#in-case-you-missed-it" title="Link to this heading">#</a></h2>
+<p>The diagram above goes through key axioms and restriction constructs that can be defined visually in CEMENTO diagrams. In case you didn’t catch those features, the following diagrams goes through key concepts and capabilities:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Nested Collections.</strong></dt><dd><p>OWL collections for defining unions, intersections and complements are notorious for their convoluted syntax. For CEMENTO, all you need is to use the list object to create your collection. The headers can be owl:intersectionOf, owl:unionOf, owl:unionOf, owl:datatypeComplementOf, and owl:oneOf.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Domains and Ranges.</strong></dt><dd><p>You can now use nested collections for domains, ranges and other properties. CEMENTO enables users to visually describe complex classes and their combinations.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Equivalence and Disjointness.</strong></dt><dd><p>Users can declare whether two classes, instances, and properties are the incompatible or equivalent.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Datatypes and data type ranges</strong></dt><dd><p>CEMENTO extensively supports the declaration and description of custom datatypes. Datatypes can also connect to collections for more complex restrictions on types. Data type facets are also supported via the Manchester-syntax (MS) inspired bracket notation.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Property Restrictions</strong></dt><dd><p>A user now able to define property restrictions, including property chains, existential restrictions, cardinalities and the like. CEMENTO uses a hybrid turtle-Manchester syntax for full visual axiomatic descriptions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Logical recombination</strong></dt><dd><p>CEMENTO allows users to explicitly nest and define restrictions via logical branches or streams. Each branch is an anonymous restriction triple that are connected by arrows to denote facets.</p>
+</dd>
+</dl>
+</li>
 </ul>
 </section>
+<section id="non-supported-axioms-and-restrictions">
+<h2>Non-supported Axioms and Restrictions<a class="headerlink" href="#non-supported-axioms-and-restrictions" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>NOT constructs</strong></dt><dd><dl class="simple">
+<dt>Negation statements are NOT supported. Our reasons are two-fold:</dt><dd><ol class="arabic simple">
+<li><p>Negation statements are explicit and it contradicts with a declarative philosophy of ontology creation.</p></li>
+<li><p>Negation on object properties cannot be represented by arrows because draw.io does not allow arrows that connect to/from the middle of arrows.</p></li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Language range</strong></dt><dd><p>This was not supported because: Language range constructs use the MS bracket construct for datatype facets but interpret them differently, and language annotations aren’t extensively supported in CEMENTO.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Nested restrictions</strong></dt><dd><p>Users cannot simply connect one owl:Restriction to another. This is because nested restrictions are generally discouraged when a named class can simplify the logic. Nesting can also lead to self-contradictions which requires a reasoner to catch.</p>
+</dd>
+</dl>
+</li>
+</ul>
 </section>
 </section>
 
@@ -522,24 +537,6 @@
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="../user-guide.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">User Guide</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="cli-guide.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">CLI Guide</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -559,12 +556,9 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-via-pypi">Installing via <code class="docutils literal notranslate"><span class="pre">pypi</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-from-the-repository">Installing from the Repository</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#branches">Branches</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-walkthrough">A Walkthrough</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#in-case-you-missed-it">In Case You Missed It</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#non-supported-axioms-and-restrictions">Non-supported Axioms and Restrictions</a></li>
 </ul>
   </nav></div>
 
