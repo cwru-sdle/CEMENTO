@@ -93,7 +93,7 @@ CEMENTO
 
         +++
 
-        .. button-ref:: modules
+gi        .. button-ref:: modules
             :expand:
             :color: dark
             :click-parent:
