@@ -321,7 +321,10 @@ def find_container_errors_diagram_content(
     )
     for rel_id in collection_subject_rels:
         container_id = elements[rel_id]["source"]
-        errors.append((container_id, ContainerSubjectError))
+        # check if the header is empty
+        header = elements[container_id].get("value", "").strip()
+        if header != "":
+            errors.append((container_id, ContainerSubjectError))
 
     connected_containers = set()
     for rel_id in rel_ids:

@@ -358,7 +358,7 @@ class NestedSyntaxSugarError(BaseContainerError):
 class ContainerSubjectError(BaseContainerError):
     def __init__(self, container_id, container_value, member_ids, member_values):
         self.header = f"The container with id: {container_id} and content: {container_value} and members with ids: {member_ids} and corresponding values: {member_values}"
-        self.message = f"{self.header} is used as a subject! Container subjects are not supported yet."
+        self.message = f"{self.header} is used as a subject! RDF collections cannot be subjects."
         super().__init__(self.message)
 
 
