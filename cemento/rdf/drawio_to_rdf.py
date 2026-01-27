@@ -1,7 +1,8 @@
 import re
+import sys
 from collections.abc import Iterable
 from functools import reduce, partial
-from itertools import chain
+from itertools import chain, tee
 from pathlib import Path
 
 import networkx as nx
@@ -23,7 +24,8 @@ from cemento.rdf.transforms import (
     get_term_search_pool,
     replace_term_in_triples,
     get_classes_instances,
-    get_child_type, get_datatypes,
+    get_child_type,
+    get_datatypes,
 )
 from cemento.term_matching.constants import (
     get_namespace_terms,
@@ -284,19 +286,34 @@ def convert_graph_to_rdf_graph(
         children = [term_substitution[item] for item in children]
 
         if label == TRIPLE_SYNTAX_SUGAR:
-            collection_triples = rdf_graph.triples(
-                (None, None, collection_headers[key])
+            collection_subjects, subject_list = tee(
+                rdf_graph.triples((collection_headers[key], None, None))
             )
-            remove_triples = []
-            for subj, pred, obj in collection_triples:
+            collection_objects, object_list = tee(
+                rdf_graph.triples((None, None, collection_headers[key]))
+            )
+
+            # add triples for flattened list
+            for subj, pred, obj in collection_subjects:
+                for child in children:
+                    rdf_graph.add((child, pred, obj))
+
+            for subj, pred, obj in collection_objects:
                 for child in children:
                     rdf_graph.add((subj, pred, child))
+
+            # remove previous triples for flattening
+            collection_triples = chain(subject_list, object_list)
+            remove_triples = []
+            for subj, pred, obj in collection_triples:
                 remove_triples.append((subj, pred, obj))
             for triple in remove_triples:
                 rdf_graph.remove(triple)
             del collection_headers[key]
         else:
-            first_child_type = get_child_type(classes, instances, datatypes, children[0])
+            first_child_type = get_child_type(
+                classes, instances, datatypes, children[0]
+            )
             if any(
                 (child_type := get_child_type(classes, instances, datatypes, term))
                 != first_child_type
@@ -344,7 +361,7 @@ def convert_graph_to_rdf_graph(
         rdf_graph.triples_choices((None, property_object_preds, None))
     )
     graph_properties = chain(
-        map(lambda item: item[0] , property_triples),
+        map(lambda item: item[0], property_triples),
         map(lambda item: item[2], property_objects),
         rdf_graph.predicates(),
     )
