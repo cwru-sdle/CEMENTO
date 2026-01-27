@@ -18,6 +18,14 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.13.2] - 2025-01-27
+
+### Added
+- support for containers as subjects (if only for flattening lists)
+
+### Changed
+- error for containers used as subjects. It will only trigger for proper RDF/named collections.
+
 ## [0.13.1] - 2025-01-26
 
 ### Added
