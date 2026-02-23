@@ -18,6 +18,11 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.13.3] - 2025-02-23
+
+### Fixed
+- Fixed alt labels not being removed when making labels and alt-labels using parenthesis
+
 ## [0.13.2] - 2025-01-27
 
 ### Added
