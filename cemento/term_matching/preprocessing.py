@@ -17,7 +17,8 @@ def remove_suppression_key(term: str, suppression_key=SUPPRESSION_KEY) -> str:
 def remove_facet_info(term: str) -> str:
     return re.sub(r'\[.*\]',"", term).strip()
 
-
+def remove_alt_labels(term: str) -> str:
+    return re.sub(r'\(.*\)',"", term).strip()
 
 class TermCase(Enum):
     PASCAL_CASE = "pascal"

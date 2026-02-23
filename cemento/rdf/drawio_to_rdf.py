@@ -41,7 +41,7 @@ from cemento.term_matching.preprocessing import (
     TermCase,
     get_corresponding_triples,
     remove_suppression_key,
-    remove_facet_info,
+    remove_facet_info, remove_alt_labels,
 )
 from cemento.term_matching.transforms import (
     get_prefixes,
@@ -177,7 +177,7 @@ def convert_graph_to_rdf_graph(
         lambda item: item[1] is None, term_substitution.items()
     )
     not_substituted, substituted = dict(not_substituted), dict(substituted)
-    cleaning_steps = [remove_suppression_key, remove_facet_info]
+    cleaning_steps = [remove_suppression_key, remove_facet_info, remove_alt_labels]
     clean_term = partial(
         lambda item: reduce(lambda val, func: func(val), cleaning_steps, item)
     )
