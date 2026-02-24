@@ -51,7 +51,7 @@ def get_uriref_prefix(term: URIRef, inv_prefixes: dict[str, str]) -> str | None:
 
 def get_character_words(term: str):
     words = re.sub(r"[^a-zA-Z0-9]+", " ", term)
-    return words.split(" ")
+    return words.strip().split(" ")
 
 
 def convert_to_pascal_case(term: str) -> str:

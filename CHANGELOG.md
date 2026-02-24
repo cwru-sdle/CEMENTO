@@ -18,6 +18,11 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.13.4] - 2025-02-24
+
+### Fixed
+- Fixed spaces not being deleted in some terms
+
 ## [0.13.3] - 2025-02-23
 
 ### Fixed
