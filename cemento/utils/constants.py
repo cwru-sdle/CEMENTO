@@ -3,6 +3,13 @@ from enum import Enum
 
 from rdflib import URIRef, OWL
 
+APP_NAME = "cemento"
+
+DEFAULT_DOWNLOADS = {
+    # cco as the default download
+    "cco": "https://raw.githubusercontent.com/CommonCoreOntology/CommonCoreOntologies/refs/heads/develop/src/cco-merged/CommonCoreOntologiesMerged.ttl",
+    "mds_onto": "https://cwrusdle.bitbucket.io/files/MDS_Onto.ttl"
+}
 
 class RDFFormatException(BaseException):
     def __init__(self, message="Error when parsing RDF format"):

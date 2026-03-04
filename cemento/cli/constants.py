@@ -8,11 +8,6 @@ def get_version():
         return None
 
 
-DEFAULT_DOWNLOADS = {
-    # cco as the default download
-    "cco": "https://raw.githubusercontent.com/CommonCoreOntology/CommonCoreOntologies/refs/heads/develop/src/cco-merged/CommonCoreOntologiesMerged.ttl"
-}
-
 
 header = rf"""
   ____ _____ __  __ _____ _   _ _____ ___  

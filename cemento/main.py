@@ -7,11 +7,15 @@ import cemento.cli.drawio_ttl as drawio_ttl
 import cemento.cli.rdf_drawio as rdf_drawio
 import cemento.cli.ttl_drawio as ttl_drawio
 from cemento.cli.constants import header
+from cemento.utils.constants import APP_NAME
+from cemento.utils.io import update_reference_ontos
 
 
 def main():
+    update_reference_ontos()
+
     parser = argparse.ArgumentParser(
-        prog="cemento",
+        prog=APP_NAME,
         description=header,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
