@@ -1,7 +1,7 @@
 import re
 from enum import Enum
 
-from rdflib import URIRef, Graph
+from rdflib import URIRef, Graph, BNode
 from rdflib.namespace import split_uri
 
 from cemento.term_matching.constants import SUPPRESSION_KEY
@@ -14,11 +14,14 @@ def merge_dictionaries(dict_list: list[dict[any, any]]) -> dict[any, any]:
 def remove_suppression_key(term: str, suppression_key=SUPPRESSION_KEY) -> str:
     return term.replace(suppression_key, "")
 
+
 def remove_facet_info(term: str) -> str:
-    return re.sub(r'\[.*\]',"", term).strip()
+    return re.sub(r'\[.*\]', "", term).strip()
+
 
 def remove_alt_labels(term: str) -> str:
-    return re.sub(r'\(.*\)',"", term).strip()
+    return re.sub(r'\(.*\)', "", term).strip()
+
 
 class TermCase(Enum):
     PASCAL_CASE = "pascal"
@@ -76,8 +79,21 @@ def get_corresponding_triples(ref_graph: Graph, term: URIRef, *predicates: URIRe
     ]
 
 
+def copy_bnodes(triples, source_graph, target_graph):
+    for s, p, o in triples:
+        if isinstance(o, BNode):
+            copy_bnode(o, source_graph, target_graph)
+
+
+def copy_bnode(bnode, source_graph, target_graph):
+    for p, o in source_graph.predicate_objects(bnode):
+        target_graph.add((bnode, p, o))
+        if isinstance(o, BNode):
+            copy_bnode(o, source_graph, target_graph)
+
+
 def convert_str_uriref(
-    term: str, prefixes: tuple[str, str], case: TermCase = TermCase.PASCAL_CASE
+        term: str, prefixes: tuple[str, str], case: TermCase = TermCase.PASCAL_CASE
 ):
     prefix, abbrev_term = term.split(":")
     if case == TermCase.CAMEL_CASE:

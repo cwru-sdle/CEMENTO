@@ -41,7 +41,7 @@ from cemento.term_matching.preprocessing import (
     TermCase,
     get_corresponding_triples,
     remove_suppression_key,
-    remove_facet_info, remove_alt_labels,
+    remove_facet_info, remove_alt_labels, copy_bnodes,
 )
 from cemento.term_matching.transforms import (
     get_prefixes,
@@ -60,14 +60,14 @@ from cemento.utils.utils import fst, snd
 
 
 def convert_drawio_to_rdf(
-    input_path: str | Path,
-    output_path: str | Path,
-    file_format: str | RDFFormat = None,
-    onto_ref_folder: str | Path = None,
-    defaults_folder: str | Path = None,
-    prefixes_path: str | Path = None,
-    check_errors: bool = False,
-    log_substitution_path: str | Path = None,
+        input_path: str | Path,
+        output_path: str | Path,
+        file_format: str | RDFFormat = None,
+        onto_ref_folder: str | Path = None,
+        defaults_folder: str | Path = None,
+        prefixes_path: str | Path = None,
+        check_errors: bool = False,
+        log_substitution_path: str | Path = None,
 ) -> None:
     elements, all_terms, triples, containers = read_drawio(
         input_path,
@@ -88,15 +88,15 @@ def convert_drawio_to_rdf(
 
 
 def convert_graph_to_rdf_graph(
-    elements: dict[str, dict[str, any]],
-    all_terms: Iterable[str],
-    triples: list[tuple[str, str, str]],
-    containers: list[tuple[str, str, list[str]]],
-    onto_ref_folder: str | Path = None,
-    defaults_folder: str | Path = None,
-    prefixes_path: str | Path = None,
-    log_substitution_path: str | Path = None,
-    enforce_camel_case: bool = True,
+        elements: dict[str, dict[str, any]],
+        all_terms: Iterable[str],
+        triples: list[tuple[str, str, str]],
+        containers: list[tuple[str, str, list[str]]],
+        onto_ref_folder: str | Path = None,
+        defaults_folder: str | Path = None,
+        prefixes_path: str | Path = None,
+        log_substitution_path: str | Path = None,
+        enforce_camel_case: bool = True,
 ) -> Graph:
     onto_ref_folder = (
         get_default_references_folder() if not onto_ref_folder else onto_ref_folder
@@ -315,10 +315,10 @@ def convert_graph_to_rdf_graph(
                 classes, instances, datatypes, children[0]
             )
             if any(
-                (child_type := get_child_type(classes, instances, datatypes, term))
-                != first_child_type
-                and child_type != OWL.Nothing
-                for term in children
+                    (child_type := get_child_type(classes, instances, datatypes, term))
+                    != first_child_type
+                    and child_type != OWL.Nothing
+                    for term in children
             ):
                 child_types = {
                     term: get_child_type(classes, instances, term) for term in children
@@ -421,18 +421,23 @@ def convert_graph_to_rdf_graph(
         lambda item: item[1] not in reserved_graph.all_nodes(), substituted.items()
     )
     import_terms = map(snd, import_terms)
+    all_imported_triples = set()
     for term in import_terms:
         imported_triples = get_corresponding_triples(
             ref_graph, term, RDFS.label, RDF.type, RDFS.domain, RDFS.range, SKOS.definition
         )
+        all_imported_triples.update(imported_triples)
         for triple in imported_triples:
             rdf_graph.add(triple)
         rdf_graph.add((term, SKOS.exactMatch, term))
 
+    # copy imported BNode references from ref to target
+    copy_bnodes(all_imported_triples, ref_graph, rdf_graph)
+
     # remove triples that already deal with default terms
     rdf_graph -= defaults_graph
     for triple in rdf_graph.triples_choices(
-        (list(defaults_graph.subjects()), None, None)
+            (list(defaults_graph.subjects()), None, None)
     ):
         rdf_graph.remove(triple)
 
