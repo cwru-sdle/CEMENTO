@@ -423,7 +423,7 @@ def convert_graph_to_rdf_graph(
     import_terms = map(snd, import_terms)
     for term in import_terms:
         imported_triples = get_corresponding_triples(
-            ref_graph, term, RDFS.label, RDF.type, RDFS.domain, RDFS.range
+            ref_graph, term, RDFS.label, RDF.type, RDFS.domain, RDFS.range, SKOS.definition
         )
         for triple in imported_triples:
             rdf_graph.add(triple)
