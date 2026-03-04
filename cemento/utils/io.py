@@ -32,6 +32,7 @@ def download_default_reference_ontos(data_path: Path) -> list[str]:
                 download_files.append(str(default_file))
     return download_files
 
+
 def download_onto(download_url: str, output_path: Path) -> Path | None:
     try:
         print(f"attempting to download {output_path.name} from {download_url}...")
@@ -42,6 +43,7 @@ def download_onto(download_url: str, output_path: Path) -> Path | None:
         print(f"Download failed for {output_path.name}....")
         return None
     return output_path
+
 
 def update_reference_ontos():
     user_path = Path(user_data_dir(APP_NAME))
@@ -58,6 +60,7 @@ def update_reference_ontos():
                 print("File could not be downloaded! Will copy from packaged resources.")
                 copy_path = pkg_default_refs_folder / default_ref_file_path.name
                 default_ref_file_path.write_bytes(copy_path.read_bytes())
+
 
 def get_default_path(rel_path: str | Path) -> Path:
     try:
@@ -76,6 +79,14 @@ def get_default_references_folder() -> Path:
 
 def get_default_reserved_folder() -> Path:
     return get_default_path("reserved")
+
+
+def get_data_folders() -> list[Path]:
+    return [
+        get_default_defaults_folder(),
+        get_default_references_folder(),
+        get_default_reserved_folder()
+    ]
 
 
 def get_default_prefixes_file() -> Path:

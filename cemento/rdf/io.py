@@ -1,14 +1,19 @@
 from collections.abc import Iterable
 from functools import reduce
+from itertools import chain
 from pathlib import Path
 from typing import Container
 
 import pandas as pd
+from more_itertools import flatten
 from rdflib import URIRef, Graph
 
 
-def aggregate_graphs(folder_path: str | Path):
-    files = Path(folder_path).rglob("*.ttl")
+def aggregate_graphs(folder_path: str | Path | list[str | Path]):
+    if isinstance(folder_path, list):
+        files = flatten(f.rglob("*.ttl") for f in folder_path)
+    else:
+        files = Path(folder_path).rglob("*.ttl")
     graph = Graph()
     return reduce(lambda acc, item: acc.parse(item), files, graph)
 
