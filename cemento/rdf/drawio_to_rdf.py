@@ -1,5 +1,4 @@
 import re
-import sys
 from collections.abc import Iterable
 from functools import reduce, partial
 from itertools import chain, tee
@@ -16,6 +15,7 @@ from rdflib.collection import Collection
 from cemento.axioms.extract_axioms import extract_axiom_graph
 from cemento.axioms.modules import MS
 from cemento.draw_io.read_diagram import read_drawio
+from cemento.pun.resolve_puns import expand_punned_triples
 from cemento.rdf.io import aggregate_graphs, save_substitution_log
 from cemento.rdf.preprocessing import extract_aliases
 from cemento.rdf.transforms import (
@@ -68,6 +68,7 @@ def convert_drawio_to_rdf(
         prefixes_path: str | Path = None,
         check_errors: bool = False,
         log_substitution_path: str | Path = None,
+        expand_puns: bool = False,
 ) -> None:
     elements, all_terms, triples, containers = read_drawio(
         input_path,
@@ -83,6 +84,7 @@ def convert_drawio_to_rdf(
         defaults_folder=defaults_folder,
         prefixes_path=prefixes_path,
         log_substitution_path=log_substitution_path,
+        expand_puns=expand_puns,
     )
     rdf_graph.serialize(destination=output_path, format=rdf_format)
 
@@ -96,6 +98,7 @@ def convert_graph_to_rdf_graph(
         defaults_folder: str | Path = None,
         prefixes_path: str | Path = None,
         log_substitution_path: str | Path = None,
+        expand_puns: bool = False,
         enforce_camel_case: bool = True,
 ) -> Graph:
     onto_ref_folder = (
@@ -444,5 +447,9 @@ def convert_graph_to_rdf_graph(
     ## bind prefixes
     for prefix, namespace in prefixes.items():
         rdf_graph.bind(prefix, namespace)
+
+    # expand punned triples on pun mode
+    if expand_puns:
+        rdf_graph = expand_punned_triples(rdf_graph)
 
     return rdf_graph

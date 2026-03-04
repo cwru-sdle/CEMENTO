@@ -57,9 +57,9 @@ def register(subparsers):
         action="store_false",
     )
     parser.add_argument(
-        "-cdr",
-        "--collect-domains-ranges",
-        help="Set whether to aggregate instances that are in the domain and range of a custom object property (Class inference coming soon).",
+        "-pun",
+        "--expand-puns",
+        help="Set whether to un-pun or expand punned triples.",
         action="store_true",
     )
     parser.set_defaults(_handler=run)
@@ -75,5 +75,6 @@ def run(args):
         defaults_folder=args.defaults_folder_path,
         prefixes_path=args.prefix_file_path,
         check_errors=args.dont_check_errors,
+        expand_puns=args.expand_puns,
         log_substitution_path=args.log_substitution_path,
     )
