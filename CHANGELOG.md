@@ -18,6 +18,25 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
+## [0.14.0] - 2025-03-04
+
+### Added
+- downloading individual ontology files for reference
+- automatically downloading reference ontologies on start-up 
+- MDS-Onto as a reference ontology
+- a pun module for expanding punned triples for expressive RDF output
+- domain and range capture via closed-world inference on single drawing
+- definitions into imported statements from reference
+
+### Changed
+- reference ontologies now download into a user folder, defaulting to packaged reference if the files are not downloadable
+
+### Fixed
+- BNodes on domains and ranges not displaying for imported triples
+
+### Removed
+- domain and range collection toggle via interface
+
 ## [0.13.4] - 2025-02-24
 
 ### Fixed

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>cemento.utils package &#8212; CEMENTO 0.13.4 documentation</title>
+    <title>cemento.utils package &#8212; CEMENTO 0.14.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=ec68e10f"></script>
+    <script src="../_static/documentation_options.js?v=9e420a66"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -561,6 +561,21 @@
 <section id="module-cemento.utils.io">
 <span id="cemento-utils-io-module"></span><h2>cemento.utils.io module<a class="headerlink" href="#module-cemento.utils.io" title="Link to this heading">#</a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="cemento.utils.io.download_default_reference_ontos">
+<span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">download_default_reference_ontos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cemento.utils.io.download_default_reference_ontos" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cemento.utils.io.download_onto">
+<span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">download_onto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">download_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#cemento.utils.io.download_onto" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cemento.utils.io.get_data_folders">
+<span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">get_data_folders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cemento.utils.io.get_data_folders" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cemento.utils.io.get_default_defaults_folder">
 <span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">get_default_defaults_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#cemento.utils.io.get_default_defaults_folder" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -588,6 +603,16 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="cemento.utils.io.get_rdf_format">
 <span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">get_rdf_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cemento.utils.constants.RDFFormat" title="cemento.utils.constants.RDFFormat"><span class="pre">RDFFormat</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cemento.utils.io.get_rdf_format" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cemento.utils.io.make_data_dirs">
+<span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">make_data_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">download_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#cemento.utils.io.make_data_dirs" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cemento.utils.io.update_reference_ontos">
+<span class="sig-prename descclassname"><span class="pre">cemento.utils.io.</span></span><span class="sig-name descname"><span class="pre">update_reference_ontos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cemento.utils.io.update_reference_ontos" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -716,12 +741,17 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-cemento.utils.io">cemento.utils.io module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.download_default_reference_ontos"><code class="docutils literal notranslate"><span class="pre">download_default_reference_ontos()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.download_onto"><code class="docutils literal notranslate"><span class="pre">download_onto()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_data_folders"><code class="docutils literal notranslate"><span class="pre">get_data_folders()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_default_defaults_folder"><code class="docutils literal notranslate"><span class="pre">get_default_defaults_folder()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_default_path"><code class="docutils literal notranslate"><span class="pre">get_default_path()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_default_prefixes_file"><code class="docutils literal notranslate"><span class="pre">get_default_prefixes_file()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_default_references_folder"><code class="docutils literal notranslate"><span class="pre">get_default_references_folder()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_default_reserved_folder"><code class="docutils literal notranslate"><span class="pre">get_default_reserved_folder()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.get_rdf_format"><code class="docutils literal notranslate"><span class="pre">get_rdf_format()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.make_data_dirs"><code class="docutils literal notranslate"><span class="pre">make_data_dirs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cemento.utils.io.update_reference_ontos"><code class="docutils literal notranslate"><span class="pre">update_reference_ontos()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-cemento.utils.utils">cemento.utils.utils module</a><ul class="nav section-nav flex-column">
