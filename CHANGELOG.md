@@ -18,7 +18,13 @@ _[Unreleased]_ section for tracking changes prior to binning to versions.
 
 _[X.X.X] - YYYY-MM-YY_ for version-date header
 
-## [0.14.0] - 2025-03-04
+## [0.14.1] - 2026-03-16
+
+### Fixed
+- `get_child_type` missing the datatype argument when checking for errors
+- Dates on Changelog mistakenly reporting changes from 2026 as from 2025
+
+## [0.14.0] - 2026-03-04
 
 ### Added
 - downloading individual ontology files for reference
@@ -37,17 +43,17 @@ _[X.X.X] - YYYY-MM-YY_ for version-date header
 ### Removed
 - domain and range collection toggle via interface
 
-## [0.13.4] - 2025-02-24
+## [0.13.4] - 2026-02-24
 
 ### Fixed
 - Fixed spaces not being deleted in some terms
 
-## [0.13.3] - 2025-02-23
+## [0.13.3] - 2026-02-23
 
 ### Fixed
 - Fixed alt labels not being removed when making labels and alt-labels using parenthesis
 
-## [0.13.2] - 2025-01-27
+## [0.13.2] - 2026-01-27
 
 ### Added
 - support for containers as subjects (if only for flattening lists)
@@ -55,7 +61,7 @@ _[X.X.X] - YYYY-MM-YY_ for version-date header
 ### Changed
 - error for containers used as subjects. It will only trigger for proper RDF/named collections.
 
-## [0.13.1] - 2025-01-26
+## [0.13.1] - 2026-01-26
 
 ### Added
 
