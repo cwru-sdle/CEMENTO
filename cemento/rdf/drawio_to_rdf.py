@@ -324,7 +324,7 @@ def convert_graph_to_rdf_graph(
                     for term in children
             ):
                 child_types = {
-                    term: get_child_type(classes, instances, term) for term in children
+                    term: get_child_type(classes, instances, datatypes, term) for term in children
                 }
                 raise ValueError(
                     f"Cannot combine terms with different types in a collection. Combinations should only be BNodes, OWL.Class or OWL.NamedIndividual, but BNodes (OWL.Nothing) can be mixed with any type. The terms provided have the associated types {child_types}."
